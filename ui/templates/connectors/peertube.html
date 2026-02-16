@@ -6,11 +6,12 @@
   <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-orange-600/10 blur-[120px] rounded-full"></div>
   <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-slate-400/5 blur-[120px] rounded-full"></div>
 
-  <div class="max-w-7xl mx-auto relative z-10">
+  <div class="max-w-7xl mx-auto relative z-10 space-y-24">
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
+    <!-- Hero -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
       <div data-aos="fade-right">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/30 bg-orange-500/5 text-orange-500 text-[10px] font-mono mb-8 tracking-widest uppercase">
+        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/30 bg-orange-500/5 text-orange-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
@@ -21,60 +22,167 @@
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
             PeerTube <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-white">Connector</span>
         </h1>
-        <p class="text-slate-300 text-xl mb-10 leading-relaxed font-medium">
+        <p class="text-slate-300 text-xl mb-10 leading-relaxed font-medium max-w-xl">
           The Segmento PeerTube Connector aggregates public videos, decentralized channels, and instance-specific metadata from across the ActivityPub federation.
         </p>
 
         <div class="flex flex-wrap gap-4 items-center" id="connectSection">
-          <button onclick="syncNow()" id="syncBtn"
-             class="px-10 py-4 bg-orange-600 text-white rounded-2xl font-black hover:bg-white hover:text-orange-600 transition-all shadow-xl shadow-orange-600/20">
-            Establish Link
-          </button>
-          <a href="/dashboard/peertube"
-             class="px-10 py-4 border border-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">
-            Dashboard
-          </a>
+            <button onclick="connectPeerTube()" id="connectBtn" 
+                    class="px-10 py-4 bg-orange-600 text-white rounded-2xl font-black hover:bg-white hover:text-orange-600 transition-all shadow-xl shadow-orange-600/20">
+              Establish Link
+            </button>
+            <button onclick="disconnectPeerTube()" id="disconnectBtn" class="hidden px-10 py-4 bg-slate-700 text-white rounded-2xl font-black hover:bg-slate-600 transition-all">
+              Disconnect
+            </button>
+            <a href="/dashboard/peertube" class="px-10 py-4 border border-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">
+              Dashboard
+            </a>
         </div>
       </div>
 
       <div class="flex justify-center items-center" data-aos="zoom-in">
         <div class="relative w-full max-w-[500px] h-[350px] bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#F1682D 1px, transparent 1px); background-size: 30px 30px;"></div>
-            
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#F1682D 1px, transparent 1px); background-size: 30px 30px;"></div>
             <div class="flex items-center justify-between w-full px-12 relative z-10">
-                <div class="relative group">
-                    <div class="absolute inset-0 bg-orange-500 blur-2xl opacity-40 animate-pulse"></div>
-                    <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center relative shadow-2xl transform group-hover:rotate-6 transition-transform">
-                        <img src="/static/images/logos/peertube.png" class="w-12 h-12">
-                    </div>
+                <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
+                    <img src="/static/images/logos/peertube.png" class="w-12 h-12 object-contain">
                 </div>
-
                 <div class="flex-1 h-[2px] mx-4 relative bg-slate-700">
                     <div class="absolute inset-0 bg-gradient-to-r from-orange-500 to-white animate-[flow_2s_infinite_linear]"></div>
                 </div>
-
-                <div class="relative group">
-                    <div class="absolute inset-0 bg-cyan-500 blur-2xl opacity-40 animate-pulse"></div>
-                    <div class="w-20 h-20 bg-slate-800 border-2 border-cyan-400 rounded-full flex items-center justify-center relative shadow-2xl">
-                        <svg class="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
-                        </svg>
-                    </div>
+                <div class="w-20 h-20 bg-slate-800 border-2 border-orange-500 rounded-full flex items-center justify-center shadow-2xl">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
                 </div>
             </div>
-            
             <div class="absolute bottom-4 left-4 right-4 bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/5 font-mono text-[10px] text-orange-400 flex justify-between">
                 <span id="protocolStatus" class="animate-pulse">● PEERTUBE_REST_LISTENER</span>
-                <span class="text-slate-400 tracking-tighter">STORAGE_SQLITE_VERIFIED</span>
+                <span id="dbStatus" class="text-slate-400 tracking-tighter">STORAGE_SQLITE_VERIFIED</span>
             </div>
         </div>
       </div>
     </div>
 
-    <div class="mb-32">
-      <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">
-        Federated <span class="text-orange-500">Video Ingest</span>
-      </h2>
+    <!-- Controls: Sync Engine + Destination -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        <!-- Sync Engine -->
+        <div class="lg:col-span-1">
+            <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center border border-orange-500/20">
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-white font-black text-xl">Sync Engine</h3>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh Strategy</label>
+                        <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-orange-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
+                            <option value="incremental">Incremental</option>
+                            <option value="historical">Historical (Full)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Daily Schedule</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="relative">
+                                <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-orange-500 outline-none">
+                                    {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}" class="bg-slate-800">{{ '%02d' % h }}</option>{% endfor %}
+                                </select>
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 pointer-events-none">H</span>
+                            </div>
+                            <div class="relative">
+                                <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-orange-500 outline-none">
+                                    {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}" class="bg-slate-800">{{ '%02d' % m }}</option>{% endfor %}
+                                </select>
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 pointer-events-none">M</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 space-y-3">
+                        <button onclick="saveJob()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update Schedule</button>
+                        <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-orange-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Destination Setup – ORANGE THEME -->
+        <div class="lg:col-span-2">
+            <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center border border-orange-500/20">
+                            <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
+                    </div>
+                    <div id="destStatus" class="text-[10px] font-mono text-orange-400 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20 uppercase font-bold tracking-tighter">System Ready</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block">Target Platform</label>
+                        <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-orange-500 transition-all outline-none">
+                            <option value="">Select Connector...</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="postgres">PostgreSQL</option>
+                            <option value="bigquery">BigQuery</option>
+                            <option value="snowflake">SnowFlake</option>
+                        </select>
+                    </div>
+
+                    <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
+                        <div id="sqlFields" class="contents">
+                            <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
+                            <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
+                            <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
+                            <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
+                            <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
+                        </div>
+
+                        <div id="bigqueryFields" class="hidden contents">
+                            <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
+                            <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
+                            <div class="md:col-span-2">
+                                <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all resize-y"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2 pt-2">
+                            <button onclick="saveDestination()" id="saveDestBtn" 
+                                    class="w-full py-5 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-orange-600/30 text-xs uppercase tracking-widest">
+                              Authenticate & Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-8 border-t border-white/5">
+                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection Switcher</label>
+                    <div class="relative">
+                        <select id="destDropdown" onchange="activateDest(this.value)" 
+                                class="w-full p-4 rounded-xl bg-black/40 text-orange-300 border border-orange-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
+                            <option value="">Loading connections...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline Steps -->
+    <div>
+      <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">Federated <span class="text-orange-500">Video Ingest</span></h2>
       <div class="grid md:grid-cols-3 gap-8">
         {% for step, title, desc in [
           ('01', 'Instance Resolution', 'Targeting specific PeerTube nodes and resolving API endpoints for video discovery.'),
@@ -84,70 +192,58 @@
         <div class="group p-10 bg-slate-800/40 border border-white/5 rounded-[2.5rem] hover:bg-slate-800/80 transition-all hover:-translate-y-2">
           <div class="text-5xl font-black text-slate-700/30 mb-6 group-hover:text-orange-500 transition-colors">{{step}}</div>
           <h3 class="text-2xl font-bold text-white mb-3">{{title}}</h3>
-          <p class="text-slate-400 leading-relaxed">{{desc}}</p>
+          <p class="text-slate-400 leading-relaxed text-sm">{{desc}}</p>
         </div>
         {% endfor %}
       </div>
     </div>
 
-    <div class="mb-32">
-      <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">
-        Storage <span class="text-orange-500">Architecture</span>
-      </h2>
+    <!-- Schema -->
+    <div class="pt-12">
+      <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">Storage <span class="text-orange-500">Architecture</span></h2>
+      
       <div class="grid lg:grid-cols-2 gap-12 items-start">
-        <div class="grid grid-cols-1 gap-4" data-aos="fade-right">
+        <div class="grid grid-cols-1 gap-4">
           {% for table, columns in [
             ('peertube_videos', ['id', 'uuid', 'name', 'description', 'views', 'duration', 'published_at']),
             ('peertube_channels', ['id', 'name', 'display_name', 'description', 'actor_id', 'followers_count']),
             ('peertube_instances', ['host', 'name', 'short_description', 'version', 'total_users'])
           ] %}
-          <div class="p-5 bg-slate-800/60 border border-white/5 rounded-2xl shadow-xl hover:border-orange-500/30 transition-colors">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-2 h-2 rounded-full bg-orange-500"></div>
-                <h4 class="text-white font-mono font-bold text-sm">{{table}}</h4>
+          <div class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-orange-500/30 transition-all group">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-3 h-3 rounded-full bg-orange-600 group-hover:animate-pulse"></div>
+                <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">{{table}}</h4>
             </div>
             <div class="flex flex-wrap gap-2">
                 {% for col in columns %}
-                <span class="px-2 py-1 bg-slate-900/80 border border-white/10 rounded text-[10px] font-mono text-slate-400">{{col}}</span>
+                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400">{{col}}</span>
                 {% endfor %}
             </div>
           </div>
           {% endfor %}
         </div>
-        <div class="relative bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-2xl sticky top-10" data-aos="fade-left">
-          <img src="/static/images/erd/peertube_erd.png" class="mx-auto max-w-full rounded-xl opacity-90"/>
+        
+        <div class="relative bg-slate-800 border border-white/10 rounded-[3rem] p-10 shadow-3xl sticky top-10">
+          <div class="absolute inset-0 bg-orange-600/5 rounded-[3rem] blur-xl"></div>
+          <img src="/static/images/erd/peertube_erd.png" class="relative z-10 mx-auto max-w-full rounded-2xl opacity-90 grayscale hover:grayscale-0 transition-all duration-700"/>
         </div>
       </div>
     </div>
 
+    <!-- Extraction Entities -->
     <div class="mb-32">
       <h2 class="text-4xl font-black mb-12 text-center text-white">Extraction Points</h2>
       <div class="grid md:grid-cols-3 gap-6">
         {% for table in ['peertube_videos', 'peertube_channels', 'peertube_instances'] %}
-        <div class="p-8 bg-slate-800/40 border border-white/5 rounded-3xl hover:bg-orange-600/10 transition-all flex items-center justify-between group">
-          <span class="font-mono text-slate-300 font-bold text-lg">{{table}}</span>
-          <div class="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center group-hover:bg-orange-600 transition-colors">
-            <svg class="w-5 h-5 text-slate-500 group-hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        <div class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-orange-600/5 hover:border-orange-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
+          <div class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-orange-600 transition-all duration-500 shadow-xl">
+            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
           </div>
+          <span class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">{{table}}</span>
         </div>
         {% endfor %}
-      </div>
-    </div>
-
-    <div class="bg-gradient-to-r from-slate-800 to-slate-900 border border-white/10 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden text-center md:text-left">
-      <div class="absolute inset-0 bg-orange-600 opacity-[0.02] animate-pulse"></div>
-      <div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-        <div>
-            <h2 class="text-3xl font-black text-white mb-2">Sync Federated Video</h2>
-            <p class="text-slate-400 font-medium">Capture latest video uploads and channel updates from your linked instances.</p>
-        </div>
-        <div class="flex gap-4">
-            <button onclick="syncNow()" id="syncBtn2"
-                    class="px-8 py-4 bg-orange-600 text-white rounded-xl font-black hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-orange-600/20">
-              <svg id="syncIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              Run Sync
-            </button>
-        </div>
       </div>
     </div>
 
@@ -156,60 +252,232 @@
 
 <style>
   @keyframes flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
-  .animate-spin-slow { animation: spin 2s linear infinite; }
-  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  .bg-slate-900 {
-    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.035) 1px, transparent 0);
-    background-size: 50px 50px;
-  }
+  .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", function(){
-  fetch("/api/status/peertube")
-  .then(r => r.json())
-  .then(d => {
-    if(d.connected){
-      document.getElementById("connectSection").innerHTML = `
-        <div class="px-8 py-4 bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 rounded-2xl font-black flex items-center gap-3">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          NODE_CONNECTED
-        </div>
-        <a href="/dashboard/peertube" class="px-8 py-4 bg-slate-800 text-white border border-slate-700 rounded-2xl font-bold hover:bg-slate-700 transition-all">
-          View Dashboard
-        </a>
-      `;
-      const statusLabel = document.getElementById("protocolStatus");
-      if(statusLabel) {
-          statusLabel.innerText = "● FEDERATION_SYNC_ACTIVE";
-          statusLabel.classList.replace("text-orange-400", "text-emerald-400");
-      }
-    }
-  });
+document.addEventListener("DOMContentLoaded", () => {
+    checkPeerTubeStatus();
+    loadDestinations();
+    loadJob();
 });
 
-function syncNow(){
-  const btn = document.getElementById("syncBtn");
-  const btn2 = document.getElementById("syncBtn2");
-  const icon = document.getElementById("syncIcon");
+async function checkPeerTubeStatus(){
+    try {
+        const res = await fetch("http://localhost:4000/api/status/peertube").then(r => r.json());
+        const connectBtn = document.getElementById("connectBtn");
+        const disconnectBtn = document.getElementById("disconnectBtn");
+        const badge = document.getElementById("statusBadge");
 
-  const toggle = (state) => {
-    if(btn) btn.innerText = state ? "Syncing..." : "Sync";
-    if(btn2) btn2.innerText = state ? "Syncing..." : "Run Sync";
-    if(icon) icon.classList.toggle("animate-spin-slow", state);
-  }
+        if(res.connected){
+            connectBtn.classList.add("hidden");
+            disconnectBtn.classList.remove("hidden");
+            badge.innerHTML = `<span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+              </span> CONNECTED`;
+            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/30 bg-orange-500/5 text-orange-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        }
+    } catch(e) { console.error(e); }
+}
 
-  toggle(true);
+async function connectPeerTube(){
+    const instance = prompt("Enter PeerTube Instance URL (default: https://peertube.tv)", "https://peertube.tv");
+    if (!instance) return;
 
-  fetch("/connectors/peertube/sync")
-    .then(r => r.json())
-    .then(() => {
-      location.reload();
-    })
-    .catch(() => {
-      alert("Sync failed");
-      toggle(false);
+    const btn = document.getElementById("connectBtn");
+    btn.disabled = true;
+    btn.innerText = "Connecting...";
+
+    try {
+        const res = await fetch("/connectors/peertube/connect", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ instance: instance.trim() })
+        });
+
+        const data = await res.json();
+
+        if(data.status === "connected"){
+            alert("PeerTube Connected");
+            location.reload();  // Auto-reload to show Disconnect button
+        } else {
+            alert("Connection Failed: " + (data.message || "Unknown error"));
+        }
+    } catch(e) {
+        alert("Connection Failed");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Establish Link";
+    }
+}
+
+async function disconnectPeerTube(){
+    if(!confirm("Disconnect PeerTube?")) return;
+    await fetch("/connectors/peertube/disconnect");
+    location.reload();  // Auto-reload after disconnect
+}
+
+async function loadDestinations(){
+    try {
+        const res = await fetch(`http://localhost:4000/destination/list/peertube`);
+        const data = await res.json();
+        const dropdown = document.getElementById("destDropdown");
+        const statusEl = document.getElementById("destStatus");
+        
+        dropdown.innerHTML = '<option value="">Loading connections...</option>';
+        
+        if(data.destinations?.length){
+            data.destinations.forEach(d => {
+                const opt = document.createElement("option");
+                opt.value = d.id;
+                opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database} (@${d.host || '—'})`;
+                if(d.active) {
+                    opt.selected = true;
+                    statusEl.innerText = "Connection Active";
+                    statusEl.classList.replace("text-orange-400", "text-emerald-400");
+                }
+                dropdown.appendChild(opt);
+            });
+        } else {
+            statusEl.innerText = "No destination configured";
+        }
+    } catch(e) { console.error(e); }
+}
+
+async function activateDest(id){
+    if(!id) return;
+    await fetch("http://localhost:4000/destination/activate", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ source: "peertube", dest_id: id })
     });
+    loadDestinations();
+}
+
+function toggleDest() {
+    const type = document.getElementById("destType").value;
+    const wrapper = document.getElementById("dbFields");
+    const sql = document.getElementById("sqlFields");
+    const bq = document.getElementById("bigqueryFields");
+
+    if(!type){
+        wrapper.classList.add("hidden");
+        return;
+    }
+
+    wrapper.classList.remove("hidden");
+
+    if(type === "bigquery"){
+        sql.classList.add("hidden");
+        bq.classList.remove("hidden");
+    } else {
+        sql.classList.remove("hidden");
+        bq.classList.add("hidden");
+    }
+}
+
+async function saveDestination(){
+    const btn = document.getElementById("saveDestBtn");
+    btn.innerText = "AUTHENTICATING..."; btn.disabled = true;
+
+    const type = document.getElementById("destType").value;
+    let payload = { source: "peertube", type };
+
+    if(type === "bigquery"){
+        payload.host = document.getElementById("bqProject")?.value || "";
+        payload.database = document.getElementById("bqDataset")?.value || "";
+        payload.password = document.getElementById("bqKey")?.value || "";
+        payload.port = "";
+        payload.username = "";
+    } else if(type) {
+        payload.host = document.getElementById("dbHost").value;
+        payload.port = document.getElementById("dbPort").value;
+        payload.username = document.getElementById("dbUser").value;
+        payload.password = document.getElementById("dbPass").value;
+        payload.database = document.getElementById("dbName").value;
+    }
+
+    try {
+        const res = await fetch("http://localhost:4000/destination/save", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        if(res.ok) {
+            btn.innerText = "SAVED ✓";
+            btn.classList.replace("bg-orange-600", "bg-emerald-600");
+            loadDestinations();
+            setTimeout(() => {
+                btn.innerText = "Authenticate & Save";
+                btn.classList.replace("bg-emerald-600", "bg-orange-600");
+                btn.disabled = false;
+            }, 2000);
+        }
+    } catch(e) {
+        alert("Connection failed");
+        btn.disabled = false;
+    }
+}
+
+async function loadJob(){
+    try {
+        const data = await fetch("/connectors/peertube/job/get").then(r => r.json());
+        if(data.schedule_time){
+            const [h, m] = data.schedule_time.split(':');
+            document.getElementById("hourSelect").value = h;
+            document.getElementById("minSelect").value = m;
+            document.getElementById("syncType").value = data.sync_type || "incremental";
+        }
+    } catch(e) {}
+}
+
+async function saveJob(){
+    const time = `${document.getElementById("hourSelect").value}:${document.getElementById("minSelect").value}`;
+    const res = await fetch("/connectors/peertube/job/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+            sync_type: document.getElementById("syncType").value, 
+            schedule_time: time 
+        })
+    });
+    if(res.ok) alert("Job Schedule Updated");
+}
+
+async function runSync(){
+    const btn = document.getElementById("syncBtn");
+    btn.innerText = "SYNCING...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch("/connectors/peertube/sync");
+        const d = await res.json();
+
+        if(d.status === "stored_locally"){
+            btn.innerText = `SYNCED (${d.rows || 0} ROWS)`;
+        }
+        else if(d.status === "pushed_to_destination"){
+            btn.innerText = `PUSHED (${d.rows || 0} ROWS)`;
+        }
+        else if(d.error){
+            btn.innerText = "FAILED";
+            console.error("Sync error:", d.error);
+        }
+        else{
+            btn.innerText = "FAILED";
+        }
+
+    } catch(e) {
+        console.error("Sync exception:", e);
+        btn.innerText = "FAILED";
+    } finally {
+        setTimeout(() => {
+            btn.innerText = "Run Manual Sync";
+            btn.disabled = false;
+        }, 3000);
+    }
 }
 </script>
 

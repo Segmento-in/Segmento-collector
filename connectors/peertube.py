@@ -216,82 +216,135 @@ def fetch_search(term,limit):
 
 # ---------------- Main Sync ----------------
 
-def sync_peertube(uid,limit=50):
+def sync_peertube(uid, sync_type="historical", limit=50):
 
-    last_ts=get_last_time(uid)
+    instance = INSTANCE
+    last_ts = "1970-01-01T00:00:00Z"
 
-    total_new=0
+    con = db()
+    cur = con.cursor()
 
+    cur.execute("""
+        SELECT state_json
+        FROM connector_state
+        WHERE uid=? AND source='peertube'
+    """, (uid,))
 
-    # -------- Latest (Paginated) --------
+    row = cur.fetchone()
 
-    page=0
-    new_latest=[]
+    if row:
+        state = json.loads(row[0])
+        instance = state.get("instance", INSTANCE)
+        last_ts = state.get("last_published_at", last_ts)
 
-    while page<3:
+    con.close()
 
-        latest=fetch_videos({
-            "count":limit,
-            "sort":"-publishedAt",
-            "start":page*limit
-        })
+    api_base = instance.rstrip("/") + "/api/v1"
 
-        if not latest:
-            break
+    def fetch(path, params=None):
+        try:
+            r = requests.get(
+                api_base + path,
+                headers=HEADERS,
+                params=params,
+                timeout=25
+            )
 
+            if r.status_code == 200:
+                data = r.json()
+                return data.get("data", []) if isinstance(data, dict) else []
 
-        for v in latest:
+        except Exception as e:
+            print("PEERTUBE ERROR:", e)
 
-            ts=v.get("publishedAt")
+        return []
 
-            if ts and ts>last_ts:
-                new_latest.append(v)
+    latest = fetch("/videos", {
+        "count": limit,
+        "sort": "-publishedAt"
+    })
 
+    rows = []
+    newest_ts = last_ts
 
-        page+=1
+    for v in latest:
 
-        time.sleep(2)
+        ts = v.get("publishedAt")
 
+        if sync_type == "incremental" and ts and ts <= last_ts:
+            continue
 
-    if new_latest:
+        row_dict = {
+            "uid": uid,
+            "instance": instance,
+            "video_id": v.get("uuid"),
+            "name": v.get("name"),
+            "description": v.get("description"),
+            "duration": v.get("duration"),
+            "views": v.get("views"),
+            "likes": v.get("likes"),
+            "dislikes": v.get("dislikes"),
+            "published_at": ts,
+            "channel_name": (v.get("channel") or {}).get("name"),
+            "url": v.get("url")
+        }
 
-        insert_videos(uid,new_latest)
+        rows.append(row_dict)
 
-        newest=max(v["publishedAt"] for v in new_latest)
+        if ts and ts > newest_ts:
+            newest_ts = ts
 
-        save_last_time(uid,newest)
+    if rows:
 
-        total_new=len(new_latest)
+        con = db()
+        cur = con.cursor()
 
+        now = datetime.utcnow().isoformat()
 
-    # -------- Trending --------
+        for r in rows:
+            cur.execute("""
+                INSERT OR IGNORE INTO peertube_videos
+                (uid, instance, video_id, name, description,
+                 duration, views, likes, dislikes,
+                 published_at, channel_name, url,
+                 raw_json, fetched_at)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            """, (
+                r["uid"],
+                r["instance"],
+                r["video_id"],
+                r["name"],
+                r["description"],
+                r["duration"],
+                r["views"],
+                r["likes"],
+                r["dislikes"],
+                r["published_at"],
+                r["channel_name"],
+                r["url"],
+                json.dumps(r),
+                now
+            ))
 
-    trending=fetch_videos({
-        "count":limit,
-        "sort":"-trending"
-    }) or []
+        new_state = {
+            "instance": instance,
+            "last_published_at": newest_ts
+        }
 
-    insert_videos(uid,trending)
+        cur.execute("""
+            INSERT OR REPLACE INTO connector_state
+            (uid, source, state_json, updated_at)
+            VALUES (?, 'peertube', ?, ?)
+        """, (
+            uid,
+            json.dumps(new_state),
+            now
+        ))
 
-
-    # -------- Search --------
-
-    search_items=fetch_search("ai",limit) or []
-
-    insert_videos(uid,search_items)
-
-
-    # -------- Channels --------
-
-    channels=fetch_channels() or []
-
-    insert_channels(uid,channels)
-
+        con.commit()
+        con.close()
 
     return {
-        "status":"ok",
-        "latest_new":total_new,
-        "trending":len(trending),
-        "search":len(search_items),
-        "channels":len(channels)
+        "rows": rows,
+        "count": len(rows)
     }

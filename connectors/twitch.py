@@ -170,54 +170,107 @@ def sync_stream(uid, username):
     return {"stream": "live"}
 
 
-# ---------------- SYNC VIDEOS ----------------
+def sync_videos(uid, username, limit=20, sync_type="historical"):
 
-def sync_videos(uid, username, limit=10):
-
-    users = twitch_get("users", {
-        "login": username
-    })
+    # ---------------- GET USER ----------------
+    users = twitch_get("users", {"login": username})
 
     if not users:
         raise Exception("User not found")
 
     user_id = users[0]["id"]
 
+    # ---------------- GET LAST STATE ----------------
+    last_video_date = None
+
+    con = db()
+    cur = con.cursor()
+
+    if sync_type == "incremental":
+        cur.execute("""
+            SELECT state_json
+            FROM connector_state
+            WHERE uid=? AND source='twitch'
+        """, (uid,))
+        row = cur.fetchone()
+
+        if row:
+            state = json.loads(row[0])
+            last_video_date = state.get("last_video_date")
+
+    # ---------------- FETCH VIDEOS ----------------
     videos = twitch_get("videos", {
         "user_id": user_id,
         "first": limit
     })
 
-    con = db()
-    cur = con.cursor()
+    now = datetime.datetime.utcnow().isoformat()
 
-    now = datetime.datetime.now().isoformat()
-
-    count = 0
+    rows = []
+    newest_created_at = last_video_date
 
     for v in videos:
 
+        created_at = v.get("created_at")
+
+        # Incremental filter
+        if sync_type == "incremental" and last_video_date:
+            if created_at <= last_video_date:
+                continue
+
+        row_dict = {
+            "uid": uid,
+            "twitch_id": user_id,
+            "video_id": v.get("id"),
+            "title": v.get("title"),
+            "views": v.get("view_count"),
+            "duration": v.get("duration"),
+            "created_at": created_at
+        }
+
         cur.execute("""
-        INSERT OR REPLACE INTO twitch_videos
-        (uid, twitch_id, video_id,
-         title, views, duration,
-         created_at, raw_json, fetched_at)
-        VALUES (?,?,?,?,?,?,?,?,?)
+            INSERT OR IGNORE INTO twitch_videos
+            (uid, twitch_id, video_id,
+             title, views, duration,
+             created_at, raw_json, fetched_at)
+            VALUES (?,?,?,?,?,?,?,?,?)
         """, (
             uid,
             user_id,
-            v["id"],
-            v["title"],
-            v["view_count"],
-            v["duration"],
-            v["created_at"],
+            v.get("id"),
+            v.get("title"),
+            v.get("view_count"),
+            v.get("duration"),
+            created_at,
             json.dumps(v),
             now
         ))
 
-        count += 1
+        if cur.rowcount > 0:
+            rows.append(row_dict)
+
+            if not newest_created_at or created_at > newest_created_at:
+                newest_created_at = created_at
+
+    # ---------------- SAVE STATE ----------------
+    if newest_created_at:
+        cur.execute("""
+            INSERT OR REPLACE INTO connector_state
+            (uid, source, state_json, updated_at)
+            VALUES (?, 'twitch', ?, ?)
+        """, (
+            uid,
+            json.dumps({
+                "username": username,
+                "last_video_date": newest_created_at
+            }),
+            now
+        ))
 
     con.commit()
     con.close()
 
-    return {"videos": count}
+    return {
+        "videos": len(rows),
+        "rows": rows
+    }

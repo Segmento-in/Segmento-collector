@@ -14,7 +14,7 @@ import requests
 import datetime
 import sqlite3
 
-
+from destinations.destination_router import push_to_destination
 # Google OAuth
 from dotenv import load_dotenv
 from google_auth_oauthlib.flow import Flow
@@ -3353,39 +3353,168 @@ def tumblr_sync_posts():
     return jsonify(sync_posts(uid, blog))
 
 # ---------------- TWITCH ----------------
+# ---------------- TWITCH ----------------
 
-@app.route("/twitch/sync/user")
-def twitch_sync_user():
+@app.route("/connectors/twitch/connect", methods=["POST"])
+def twitch_connect():
 
-    uid = request.cookies.get("uid")
-    username = request.args.get("username")
+    uid = get_uid()
+    data = request.get_json()
 
-    from connectors.twitch import sync_user
+    if not data:
+        return jsonify({"status": "error", "message": "No data provided"}), 400
 
-    return jsonify(sync_user(uid, username))
+    username = data.get("username")
 
+    if not username:
+        return jsonify({"status": "error", "message": "Username required"}), 400
 
-@app.route("/twitch/sync/stream")
-def twitch_sync_stream():
+    con = get_db()
+    cur = con.cursor()
 
-    uid = request.cookies.get("uid")
-    username = request.args.get("username")
+    now = datetime.datetime.utcnow().isoformat()
 
-    from connectors.twitch import sync_stream
+    # Save username inside connector_state
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_state
+        (uid, source, state_json, updated_at)
+        VALUES (?, 'twitch', ?, ?)
+    """, (
+        uid,
+        json.dumps({"username": username}),
+        now
+    ))
 
-    return jsonify(sync_stream(uid, username))
+    # Enable connector
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'twitch', 1)
+    """, (uid,))
 
+    con.commit()
+    con.close()
 
-@app.route("/twitch/sync/videos")
-def twitch_sync_videos():
+    return jsonify({"status": "connected"})
 
-    uid = request.cookies.get("uid")
-    username = request.args.get("username")
+@app.route("/connectors/twitch/disconnect")
+def twitch_disconnect():
 
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Only disable connector
+    cur.execute("""
+        UPDATE google_connections
+        SET enabled = 0
+        WHERE uid=? AND source='twitch'
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "disconnected"})
+
+@app.route("/connectors/twitch/sync")
+def twitch_sync():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Check if enabled
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='twitch'
+    """, (uid,))
+    row = cur.fetchone()
+
+    if not row or row[0] != 1:
+        con.close()
+        return jsonify({"error": "Twitch not connected"}), 400
+
+    # Get username from connector_state
+    cur.execute("""
+        SELECT state_json
+        FROM connector_state
+        WHERE uid=? AND source='twitch'
+    """, (uid,))
+    row = cur.fetchone()
+
+    if not row:
+        con.close()
+        return jsonify({"error": "Username missing"}), 400
+
+    state = json.loads(row[0])
+    username = state.get("username")
+
+    if not username:
+        con.close()
+        return jsonify({"error": "Username missing"}), 400
+
+    # Get sync type from job
+    sync_type = get_connector_sync_type(uid, "twitch")
+
+    con.close()
+
+    # Run connector
     from connectors.twitch import sync_videos
 
-    return jsonify(sync_videos(uid, username))
+    result = sync_videos(
+        uid=uid,
+        username=username,
+        sync_type=sync_type
+    )
 
+    rows = result.get("rows", [])
+
+    # Check destination
+    con = get_db()
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM destination_configs
+        WHERE uid=? AND source='twitch'
+        ORDER BY id DESC
+        LIMIT 1
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    dest = None
+
+    if row:
+        dest = dict(row)
+
+        # Normalize key name for router
+        if "dest_type" in dest:
+            dest["type"] = dest["dest_type"]
+
+    if dest and rows:
+        inserted = push_to_destination(
+            dest,
+            "twitch_videos",
+            rows
+        )
+
+        return jsonify({
+            "status": "pushed_to_destination",
+            "rows": inserted
+        })
+
+    return jsonify({
+        "status": "stored_locally",
+        "videos": result.get("videos", 0)
+    })
+
+#------------------- Tumblr --------------------------
 @app.route("/connectors/tumblr/connect", methods=["POST"])
 def tumblr_connect():
 
@@ -4821,11 +4950,131 @@ def wikipedia_sync():
 
 # ---------------- PEERTUBE ----------------
 
-@app.route("/peertube/sync")
+@app.route("/connectors/peertube/sync")
 def peertube_sync():
+
     uid = get_uid()
-    result = sync_peertube(uid)
-    return jsonify(result)
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='peertube'
+    """, (uid,))
+    row = cur.fetchone()
+
+    if not row or row[0] != 1:
+        con.close()
+        return jsonify({"error": "PeerTube not connected"}), 400
+
+    sync_type = get_connector_sync_type(uid, "peertube")
+
+    con.close()
+
+    result = sync_peertube(uid, sync_type=sync_type)
+
+    rows = result.get("rows", [])
+
+    # ---- Destination ----
+    con = get_db()
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM destination_configs
+        WHERE uid=? AND source='peertube'
+        ORDER BY id DESC
+        LIMIT 1
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    dest = None
+
+    if row:
+        dest = dict(row)
+        if "dest_type" in dest:
+            dest["type"] = dest["dest_type"]
+
+    if dest and rows:
+        inserted = push_to_destination(dest, "peertube_videos", rows)
+
+        return jsonify({
+            "status": "pushed_to_destination",
+            "rows": inserted
+        })
+
+    return jsonify({
+        "status": "stored_locally",
+        "rows": len(rows)
+    })
+
+@app.route("/connectors/peertube/connect", methods=["POST"])
+def peertube_connect():
+
+    uid = get_uid()
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"status": "error", "message": "No data provided"}), 400
+
+    instance = data.get("instance")
+
+    if not instance:
+        return jsonify({"status": "error", "message": "Instance required"}), 400
+
+    instance = instance.strip().rstrip("/")
+
+    con = get_db()
+    cur = con.cursor()
+
+    now = datetime.datetime.utcnow().isoformat()
+
+    # Save instance inside connector_state
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_state
+        (uid, source, state_json, updated_at)
+        VALUES (?, 'peertube', ?, ?)
+    """, (
+        uid,
+        json.dumps({"instance": instance}),
+        now
+    ))
+
+    # Enable connector
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'peertube', 1)
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "connected"})
+
+@app.route("/connectors/peertube/disconnect")
+def peertube_disconnect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        UPDATE google_connections
+        SET enabled=0
+        WHERE uid=? AND source='peertube'
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "disconnected"})
 
 # ---------------- MASTODON ----------------
 
@@ -5448,7 +5697,7 @@ def pinterest_sync_universal():
     con = get_db()
     cur = con.cursor()
 
-    # 1️⃣ Check enabled
+    # Check enabled
     cur.execute("""
         SELECT enabled
         FROM google_connections
@@ -5460,10 +5709,10 @@ def pinterest_sync_universal():
         con.close()
         return jsonify({"error": "not connected"}), 400
 
-    # 2️⃣ Run sync
+    # Run sync
     result = sync_pinterest(uid)
 
-    # 3️⃣ Fetch newly inserted pins
+    # Fetch newly inserted pins
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -5484,7 +5733,7 @@ def pinterest_sync_universal():
         d.pop("fetched_at", None)
         rows.append(d)
 
-    # 4️⃣ Destination lookup
+    # Destination lookup
     cur.execute("""
         SELECT dest_type, host, port, username, password, database_name
         FROM destination_configs
@@ -5779,6 +6028,26 @@ def get_connector_job(source):
         "schedule_time": row[1],
         "enabled": row[2]
     })
+
+def get_connector_sync_type(uid, source):
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source=? AND enabled=1
+        LIMIT 1
+    """, (uid, source))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row:
+        return "historical"
+
+    return row[0]
 
 @app.route("/destination/save", methods=["POST"])
 def save_destination():

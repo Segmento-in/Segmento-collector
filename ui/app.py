@@ -1,5 +1,6 @@
 import sys
 import os
+import datetime
 
 # Add project root to PYTHONPATH
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1342,123 +1343,49 @@ def twitch_page():
 @app.route("/connectors/twitch/connect", methods=["POST"])
 def twitch_connect():
 
-    username = request.form.get("username")
-
-    if not username:
-        return "Missing username", 400
-
-    r = requests.get(
-        f"http://localhost:4000/twitch/sync/user?username={username}"
+    r = requests.post(
+        "http://localhost:4000/connectors/twitch/connect",
+        json=request.json,
+        cookies=request.cookies
     )
 
-    return redirect("/connectors/twitch")
+    return jsonify(r.json()), r.status_code
 
+@app.route("/connectors/twitch/disconnect")
+def twitch_disconnect():
+    requests.get("http://localhost:4000/connectors/twitch/disconnect")
+    return redirect("/connectors/twitch")
 
 @app.route("/connectors/twitch/sync")
 def twitch_sync():
 
-    username = request.args.get("username")
-
-    if not username:
-        return jsonify({"error": "username required"})
-
-    res1 = requests.get(
-        f"http://localhost:4000/twitch/sync/user?username={username}"
+    r = requests.get(
+        "http://localhost:4000/connectors/twitch/sync"
     )
 
-    res2 = requests.get(
-        f"http://localhost:4000/twitch/sync/stream?username={username}"
-    )
-
-    res3 = requests.get(
-        f"http://localhost:4000/twitch/sync/videos?username={username}"
-    )
-
-    return jsonify({
-        "user": res1.json(),
-        "stream": res2.json(),
-        "videos": res3.json()
-    })
-
-
-@app.route("/dashboard/twitch")
-def twitch_dashboard():
-    return render_template("dashboards/twitch.html")
-
-
-# -------- STATUS --------
+    return jsonify(r.json())
 
 @app.route("/api/status/twitch")
 def twitch_status():
 
+    uid = request.cookies.get("uid") or "demo_user"
+
     con = sqlite3.connect("../identity.db")
     cur = con.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM twitch_users")
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='twitch'
+        LIMIT 1
+    """, (uid,))
 
-    c = cur.fetchone()[0]
-
+    row = cur.fetchone()
     con.close()
 
     return jsonify({
-        "connected": c > 0
+        "connected": bool(row and row[0] == 1)
     })
-
-
-# -------- DATA --------
-
-@app.route("/api/twitch/users")
-def twitch_users():
-
-    con = sqlite3.connect("../identity.db")
-    con.row_factory = sqlite3.Row
-    cur = con.cursor()
-
-    cur.execute("SELECT * FROM twitch_users")
-
-    rows = [dict(r) for r in cur.fetchall()]
-
-    con.close()
-
-    return jsonify(rows)
-
-
-@app.route("/api/twitch/streams")
-def twitch_streams():
-
-    con = sqlite3.connect("../identity.db")
-    con.row_factory = sqlite3.Row
-    cur = con.cursor()
-
-    cur.execute("""
-    SELECT * FROM twitch_streams
-    ORDER BY fetched_at DESC
-    """)
-
-    rows = [dict(r) for r in cur.fetchall()]
-
-    con.close()
-
-    return jsonify(rows)
-
-
-@app.route("/api/twitch/videos")
-def twitch_videos():
-
-    con = sqlite3.connect("../identity.db")
-    con.row_factory = sqlite3.Row
-    cur = con.cursor()
-
-    cur.execute("""
-    SELECT * FROM twitch_videos
-    ORDER BY fetched_at DESC
-    """)
-
-    rows = [dict(r) for r in cur.fetchall()]
-
-    con.close()
-
-    return jsonify(rows)
 
 # ================= PEERTUBE =================
 
@@ -1466,16 +1393,37 @@ def twitch_videos():
 def peertube_page():
     return render_template("connectors/peertube.html")
 
+@app.route("/connectors/peertube/connect", methods=["POST"])
+def peertube_connect_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/peertube/connect",
+        json=request.json,
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/peertube/disconnect")
+def peertube_disconnect_proxy():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/peertube/disconnect",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/peertube/sync")
-def peertube_sync():
+def peertube_sync_proxy():
 
-    r = requests.get("http://localhost:4000/peertube/sync")
+    r = requests.get(
+        "http://localhost:4000/connectors/peertube/sync",
+        cookies=request.cookies
+    )
 
-    try:
-        return jsonify(r.json())
-    except:
-        return jsonify([])
+    return jsonify(r.json()), r.status_code
+
 
 @app.route("/dashboard/peertube")
 def peertube_dashboard():
