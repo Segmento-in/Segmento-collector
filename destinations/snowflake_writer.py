@@ -1,47 +1,57 @@
 import snowflake.connector
 import json
-
+from datetime import datetime
 
 def push_snowflake(dest, source, rows):
 
-    conn = snowflake.connector.connect(
-        user=dest["username"],
-        password=dest["password"],
-        account=dest["host"],
-        warehouse="COMPUTE_WH",
-        database=dest["database_name"],
-        schema="PUBLIC"
-    )
+    if not rows:
+        return 0
 
-    cur = conn.cursor()
-
-    table = f"{source}_data"
-
-
-    cur.execute(f"""
-        CREATE TABLE IF NOT EXISTS {table} (
-            id INTEGER AUTOINCREMENT,
-            payload VARIANT
-        )
-    """)
-
-
-    count = 0
-
-    for r in rows:
-
-        cur.execute(
-            f"INSERT INTO {table} (payload) SELECT PARSE_JSON(%s)",
-            (json.dumps(r),)
+    try:
+        conn = snowflake.connector.connect(
+            user=dest["username"],
+            password=dest["password"],
+            account=dest["host"],
+            warehouse=dest.get("port") or "COMPUTE_WH",
+            database=dest["database_name"],
+            schema="PUBLIC"
         )
 
-        count += 1
+        cur = conn.cursor()
 
+        table = f"{source}_data"
 
-    conn.commit()
-    cur.close()
-    conn.close()
+        # Create table if not exists
+        cur.execute(f"""
+            CREATE TABLE IF NOT EXISTS {table} (
+                id INTEGER AUTOINCREMENT,
+                payload VARIANT,
+                fetched_at TIMESTAMP_NTZ
+            )
+        """)
 
-    print(f"[DEST] Pushed {count} rows to Snowflake")
+        insert_sql = f"""
+            INSERT INTO {table}(payload, fetched_at)
+            SELECT PARSE_JSON(%s), %s
+        """
 
-    return count
+        now = datetime.utcnow()
+
+        values = [
+            (json.dumps(r), now)
+            for r in rows
+        ]
+
+        cur.executemany(insert_sql, values)
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        print(f"[DEST] Batch pushed {len(rows)} rows to Snowflake")
+
+        return len(rows)
+
+    except Exception as e:
+        print("[SNOWFLAKE ERROR]", e)
+        raise e
