@@ -4881,14 +4881,122 @@ def hackernews_job_save():
 
 # ---------------- PRODUCTHUNT ----------------
 
-@app.route("/producthunt/sync")
+@app.route("/connectors/producthunt/connect", methods=["POST"])
+def producthunt_connect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'producthunt', 1)
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "connected"})
+
+@app.route("/connectors/producthunt/disconnect")
+def producthunt_disconnect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        UPDATE google_connections
+        SET enabled=0
+        WHERE uid=? AND source='producthunt'
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "disconnected"})
+
+@app.route("/connectors/producthunt/sync")
 def producthunt_sync():
 
     uid = get_uid()
 
-    result = sync_producthunt(uid)
+    con = get_db()
+    cur = con.cursor()
 
-    return jsonify(result)
+    # Check enabled
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='producthunt'
+    """, (uid,))
+
+    row = cur.fetchone()
+
+    if not row or row[0] != 1:
+        con.close()
+        return jsonify({"error": "Product Hunt not connected"}), 400
+
+    # Get job config
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='producthunt'
+    """, (uid,))
+
+    job = cur.fetchone()
+    sync_type = job[0] if job else "incremental"
+
+    con.close()
+
+    # Run connector
+    result = sync_producthunt(
+        uid=uid,
+        sync_type=sync_type
+    )
+
+    rows = result.get("rows", [])
+
+    # Destination
+    con = get_db()
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM destination_configs
+        WHERE uid=? AND source='producthunt'
+        ORDER BY id DESC
+        LIMIT 1
+    """, (uid,))
+
+    dest = cur.fetchone()
+    con.close()
+
+    if dest and rows:
+
+        dest_cfg = dict(dest)
+        dest_cfg["type"] = dest_cfg["dest_type"]
+
+        inserted = push_to_destination(
+            dest_cfg,
+            "producthunt_data",
+            rows
+        )
+
+        return jsonify({
+            "status": "pushed_to_destination",
+            "rows": inserted
+        })
+
+    return jsonify({
+        "status": "stored_locally",
+        "posts": result.get("posts", 0),
+        "topics": result.get("topics", 0)
+    })
 
 # ---------------- PRODUCTHUNT DATA ----------------
 
@@ -4939,14 +5047,123 @@ def producthunt_data_topics():
 
 # ---------------- WIKIPEDIA ----------------
 
-@app.route("/wikipedia/sync")
+@app.route("/connectors/wikipedia/connect", methods=["POST"])
+def wikipedia_connect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'wikipedia', 1)
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "connected"})
+
+@app.route("/connectors/wikipedia/disconnect")
+def wikipedia_disconnect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        UPDATE google_connections
+        SET enabled=0
+        WHERE uid=? AND source='wikipedia'
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "disconnected"})
+
+@app.route("/connectors/wikipedia/sync")
 def wikipedia_sync():
 
     uid = get_uid()
 
-    result = sync_wikipedia(uid)
+    con = get_db()
+    cur = con.cursor()
 
-    return jsonify(result)
+    # Check enabled
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='wikipedia'
+    """, (uid,))
+
+    row = cur.fetchone()
+
+    if not row or row[0] != 1:
+        con.close()
+        return jsonify({"error": "Wikipedia not connected"}), 400
+
+    # Get job config
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='wikipedia'
+    """, (uid,))
+
+    job = cur.fetchone()
+    sync_type = job[0] if job else "incremental"
+
+    con.close()
+
+    # Run connector
+    result = sync_wikipedia(
+        uid=uid,
+        sync_type=sync_type
+    )
+
+    rows = result.get("rows", [])
+
+    # Destination
+    con = get_db()
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM destination_configs
+        WHERE uid=? AND source='wikipedia'
+        ORDER BY id DESC
+        LIMIT 1
+    """, (uid,))
+
+    dest = cur.fetchone()
+    con.close()
+
+    if dest and rows:
+
+        dest_cfg = dict(dest)
+        dest_cfg["type"] = dest_cfg["dest_type"]
+
+        inserted = push_to_destination(
+            dest_cfg,
+            "wikipedia_data",
+            rows
+        )
+
+        return jsonify({
+            "status": "pushed_to_destination",
+            "rows": inserted
+        })
+
+    return jsonify({
+        "status": "stored_locally",
+        "recent_changes": result.get("recent_changes"),
+        "new_pages": result.get("new_pages"),
+        "most_viewed": result.get("most_viewed")
+    })
 
 # ---------------- PEERTUBE ----------------
 
@@ -5220,10 +5437,123 @@ def mastodon_disconnect():
 
 # ---------------- DISCOURSE ----------------
 
-@app.route("/discourse/sync")
+@app.route("/connectors/discourse/connect", methods=["POST"])
+def discourse_connect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'discourse', 1)
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "connected"})
+
+@app.route("/connectors/discourse/disconnect")
+def discourse_disconnect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        UPDATE google_connections
+        SET enabled=0
+        WHERE uid=? AND source='discourse'
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "disconnected"})
+
+@app.route("/connectors/discourse/sync")
 def discourse_sync():
-    uid=request.cookies.get("uid") or "demo_user"
-    return jsonify(sync_discourse(uid))
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Check enabled
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='discourse'
+    """, (uid,))
+
+    row = cur.fetchone()
+
+    if not row or row[0] != 1:
+        con.close()
+        return jsonify({"error": "Discourse not connected"}), 400
+
+    # Get job config
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='discourse'
+    """, (uid,))
+
+    job = cur.fetchone()
+    sync_type = job[0] if job else "incremental"
+
+    con.close()
+
+    # Run connector
+    result = sync_discourse(
+        uid=uid,
+        sync_type=sync_type
+    )
+
+    rows = result.get("rows", [])
+
+    # Destination
+    con = get_db()
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM destination_configs
+        WHERE uid=? AND source='discourse'
+        ORDER BY id DESC
+        LIMIT 1
+    """, (uid,))
+
+    dest = cur.fetchone()
+    con.close()
+
+    if dest and rows:
+
+        dest_cfg = dict(dest)
+        dest_cfg["type"] = dest_cfg["dest_type"]
+
+        inserted = push_to_destination(
+            dest_cfg,
+            "discourse_topics_data",
+            rows
+        )
+
+        return jsonify({
+            "status": "pushed_to_destination",
+            "rows": inserted
+        })
+
+    return jsonify({
+        "status": "stored_locally",
+        "new_topics": result.get("new_topics", 0),
+        "categories": result.get("categories", 0),
+        "users": result.get("users", 0)
+    })
 
 # ---------------- DISCOURSE DATA ----------------
 

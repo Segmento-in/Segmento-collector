@@ -1597,39 +1597,74 @@ def wikipedia_page():
     return render_template("connectors/wikipedia.html")
 
 
+# -------- CONNECT --------
+
+@app.route("/connectors/wikipedia/connect", methods=["POST"])
+def ui_wikipedia_connect():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/wikipedia/connect",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
+
+
+# -------- DISCONNECT --------
+
+@app.route("/connectors/wikipedia/disconnect")
+def ui_wikipedia_disconnect():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/wikipedia/disconnect",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
+
+
+# -------- SYNC --------
+
 @app.route("/connectors/wikipedia/sync")
-def wikipedia_sync():
+def ui_wikipedia_sync():
 
-    r = requests.get("http://localhost:4000/wikipedia/sync")
+    r = requests.get(
+        "http://localhost:4000/connectors/wikipedia/sync",
+        cookies=request.cookies
+    )
 
-    try:
-        return jsonify(r.json())
-    except:
-        return jsonify([])
-
-
-@app.route("/dashboard/wikipedia")
-def wikipedia_dashboard():
-    return render_template("dashboards/wikipedia.html")
+    return jsonify(r.json()), r.status_code
 
 
-# -------- STATUS --------
+# -------- STATUS (Unified Pattern) --------
 
 @app.route("/api/status/wikipedia")
 def wikipedia_status():
 
+    uid = request.cookies.get("uid") or "demo_user"
+
     con = sqlite3.connect("../identity.db")
     cur = con.cursor()
 
-    cur.execute("SELECT COUNT(*) FROM wikipedia_recent_changes")
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='wikipedia'
+    """, (uid,))
 
-    c = cur.fetchone()[0]
-
+    row = cur.fetchone()
     con.close()
 
     return jsonify({
-        "connected": c > 0
+        "connected": bool(row and row[0] == 1)
     })
+
+
+# -------- DASHBOARD --------
+
+@app.route("/dashboard/wikipedia")
+def wikipedia_dashboard():
+    return render_template("dashboards/wikipedia.html")
 
 
 # -------- DATA --------
@@ -1642,12 +1677,12 @@ def wiki_recent():
     cur = con.cursor()
 
     cur.execute("""
-    SELECT * FROM wikipedia_recent_changes
-    ORDER BY fetched_at DESC
+        SELECT *
+        FROM wikipedia_recent_changes
+        ORDER BY fetched_at DESC
     """)
 
     rows = [dict(r) for r in cur.fetchall()]
-
     con.close()
 
     return jsonify(rows)
@@ -1661,12 +1696,12 @@ def wiki_new():
     cur = con.cursor()
 
     cur.execute("""
-    SELECT * FROM wikipedia_new_pages
-    ORDER BY fetched_at DESC
+        SELECT *
+        FROM wikipedia_new_pages
+        ORDER BY fetched_at DESC
     """)
 
     rows = [dict(r) for r in cur.fetchall()]
-
     con.close()
 
     return jsonify(rows)
@@ -1680,12 +1715,12 @@ def wiki_viewed():
     cur = con.cursor()
 
     cur.execute("""
-    SELECT * FROM wikipedia_most_viewed
-    ORDER BY fetched_at DESC
+        SELECT *
+        FROM wikipedia_most_viewed
+        ORDER BY fetched_at DESC
     """)
 
     rows = [dict(r) for r in cur.fetchall()]
-
     con.close()
 
     return jsonify(rows)
@@ -1697,88 +1732,139 @@ def producthunt_page():
     return render_template("connectors/producthunt.html")
 
 
+# -------- CONNECT --------
+
+@app.route("/connectors/producthunt/connect", methods=["POST"])
+def ui_producthunt_connect():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/producthunt/connect",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
+
+
+# -------- DISCONNECT --------
+
+@app.route("/connectors/producthunt/disconnect")
+def ui_producthunt_disconnect():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/producthunt/disconnect",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
+
+
+# -------- SYNC --------
+
 @app.route("/connectors/producthunt/sync")
-def producthunt_sync():
+def ui_producthunt_sync():
 
-    r = requests.get("http://localhost:4000/producthunt/sync")
+    r = requests.get(
+        "http://localhost:4000/connectors/producthunt/sync",
+        cookies=request.cookies
+    )
 
-    try:
-        return jsonify(r.json())
-    except:
-        return jsonify([])
+    return jsonify(r.json()), r.status_code
+
+
+# -------- STATUS (STANDARDIZED) --------
+
+@app.route("/api/status/producthunt")
+def ui_producthunt_status():
+
+    uid = request.cookies.get("uid") or "demo_user"
+
+    con = sqlite3.connect("../identity.db")
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='producthunt'
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    return jsonify({
+        "connected": bool(row and row[0] == 1)
+    })
+
+
+# -------- DASHBOARD --------
 
 @app.route("/dashboard/producthunt")
 def producthunt_dashboard():
     return render_template("dashboards/producthunt.html")
 
-# ============ PRODUCTHUNT API ============
+
+# -------- DATA APIs --------
 
 @app.route("/api/producthunt/posts")
 def ui_producthunt_posts():
 
     r = requests.get(
-        "http://127.0.0.1:4000/producthunt/data/posts",
-        headers={
-            "Cookie": request.headers.get("Cookie", "")
-        }
+        "http://localhost:4000/producthunt/data/posts",
+        cookies=request.cookies
     )
 
-    try:
-        return jsonify(r.json())
-    except:
-        return jsonify([])
+    return jsonify(r.json())
+
 
 @app.route("/api/producthunt/topics")
 def ui_producthunt_topics():
 
     r = requests.get(
-        "http://127.0.0.1:4000/producthunt/data/topics",
-        headers={
-            "Cookie": request.headers.get("Cookie", "")
-        }
+        "http://localhost:4000/producthunt/data/topics",
+        cookies=request.cookies
     )
 
-    try:
-        return jsonify(r.json())
-    except:
-        return jsonify([])
-
-@app.route("/api/status/producthunt")
-def ui_producthunt_status():
-
-    r = requests.get(
-        "http://127.0.0.1:4000/producthunt/data/posts",
-        headers={
-            "Cookie": request.headers.get("Cookie", "")
-        }
-    )
-
-    data = r.json()
-
-    return jsonify({
-        "connected": len(data) > 0
-    })
+    return jsonify(r.json())
 
 # ============ DISCOURSE ============
+
+# ================= DISCOURSE =================
 
 @app.route("/connectors/discourse")
 def discourse_page():
     return render_template("connectors/discourse.html")
 
-@app.route("/connectors/discourse/sync")
-def discourse_sync():
 
-    r = requests.get(
-        "http://127.0.0.1:4000/discourse/sync",
-        headers={
-            "Cookie": request.headers.get("Cookie", "")
-        }
+@app.route("/connectors/discourse/connect", methods=["POST"])
+def ui_discourse_connect():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/discourse/connect",
+        cookies=request.cookies
     )
 
-    try:
-        return jsonify(r.json())
-    except:
-        return jsonify([])
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/discourse/disconnect")
+def ui_discourse_disconnect():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/discourse/disconnect",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/discourse/sync")
+def ui_discourse_sync():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/discourse/sync",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
 
 @app.route("/dashboard/discourse")
 def discourse_dashboard():

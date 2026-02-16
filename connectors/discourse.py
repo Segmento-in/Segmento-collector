@@ -168,59 +168,68 @@ def fetch_users():
 
 # ---------------- Main Sync ----------------
 
-def sync_discourse(uid):
+def sync_discourse(uid, sync_type="incremental"):
 
-    last_id=get_last_topic(uid)
+    last_id = 0
 
+    if sync_type == "incremental":
+        last_id = get_last_topic(uid)
 
-    # Latest Topics
-    latest=fetch_latest()
-    new_topics=[]
+    rows = []
+
+    # -------- Latest Topics --------
+    latest = fetch_latest()
+    new_topics = []
 
     if latest:
-        topics=latest.get("topic_list",{}).get("topics",[])
+        topics = latest.get("topic_list", {}).get("topics", [])
+
         for t in topics:
-            tid=t.get("id",0)
-            if tid>last_id:
-                new_topics.append(t)
+            tid = t.get("id", 0)
+
+            if sync_type == "incremental":
+                if tid <= last_id:
+                    continue
+
+            new_topics.append(t)
+
+            rows.append({
+                "uid": uid,
+                "forum": FORUM,
+                "topic_id": tid,
+                "title": t.get("title"),
+                "posts_count": t.get("posts_count"),
+                "views": t.get("views"),
+                "created_at": t.get("created_at"),
+                "last_posted_at": t.get("last_posted_at"),
+                "slug": t.get("slug")
+            })
 
     if new_topics:
-        insert_topics(uid,new_topics)
-        save_last_topic(uid,max(t["id"] for t in new_topics))
+        insert_topics(uid, new_topics)
+        save_last_topic(uid, max(t["id"] for t in new_topics))
 
-
-    # Top Topics
-    top=fetch_top()
-    if top:
-        topics=top.get("topic_list",{}).get("topics",[])
-        if topics:
-            insert_topics(uid,topics)
-
-
-    # Categories
-    cats=fetch_categories()
-    categories=[]
+    # -------- Categories --------
+    cats = fetch_categories()
+    categories = []
 
     if cats:
-        categories=cats.get("category_list",{}).get("categories",[])
+        categories = cats.get("category_list", {}).get("categories", [])
         if categories:
-            insert_categories(uid,categories)
+            insert_categories(uid, categories)
 
-
-    # Users (requires auth)
-    users=fetch_users()
-    user_rows=[]
+    # -------- Users --------
+    users = fetch_users()
+    user_rows = []
 
     if users:
-        user_rows=users.get("directory_items",[])
+        user_rows = users.get("directory_items", [])
         if user_rows:
-            insert_users(uid,user_rows)
-
+            insert_users(uid, user_rows)
 
     return {
-        "status":"ok",
-        "new_topics":len(new_topics),
-        "categories":len(categories),
-        "users":len(user_rows),
-        "auth_enabled":bool(API_KEY and API_USER)
+        "rows": rows,
+        "new_topics": len(new_topics),
+        "categories": len(categories),
+        "users": len(user_rows)
     }
