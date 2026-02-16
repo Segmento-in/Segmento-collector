@@ -28,3 +28,4 @@ mysql-connector-python
 psycopg2-binary
 snowflake-connector-python
 google-cloud-bigquery
+clickhouse-connect

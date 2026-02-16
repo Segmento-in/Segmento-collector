@@ -2,6 +2,7 @@ from destinations.mysql_writer import push_to_mysql
 from destinations.postgres_writer import push_postgres
 from destinations.bigquery_writer import push_bigquery
 from destinations.snowflake_writer import push_snowflake
+from destinations.clickhouse_writer import push_clickhouse
 
 import sqlite3
 
@@ -35,6 +36,8 @@ def push_to_destination(dest_cfg, source, rows):
 
         return push_snowflake(dest_cfg, source, rows)
 
+    elif dest_type == "clickhouse":
+        return push_clickhouse(dest_cfg, source, rows)
 
     else:
 
