@@ -750,6 +750,51 @@ and validate public statements.
   ]
 },
 
+/* ================= META ================= */
+{
+  id:"facebook",
+  name:"Facebook Pages",
+  category:"social",
+  logo:"/static/images/logos/facebook.png",
+
+  auth_type:"oauth",
+
+  connect_url:"http://localhost:4000/connectors/facebook/connect",
+  sync_url:"http://localhost:4000/connectors/facebook/sync",
+  dashboard:"/dashboard/facebook",
+
+  long_description:`
+Connect and analyze your Facebook Page to understand audience engagement,
+content performance, reactions, comments, and daily insights.
+All page data is securely synchronized using OAuth authorization.
+  `,
+
+  steps:[
+    {title:"Provide App Credentials",desc:"Enter Facebook App ID and App Secret."},
+    {title:"Authorize Access",desc:"Grant pages permissions via OAuth."},
+    {title:"Initial Sync",desc:"Page posts, comments, reactions and insights are fetched."}
+  ],
+
+  tables:[
+    "facebook_pages_metadata",
+    "facebook_page_posts",
+    "facebook_post_comments",
+    "facebook_reactions",
+    "facebook_page_insights"
+  ],
+
+  erd:"/static/images/erd/facebook_pages_erd.png",
+
+  description:"Collects page metadata, posts, comments, reactions and insights.",
+
+  data:[
+    "Page information",
+    "Posts & stories",
+    "Comments",
+    "Reactions summary",
+    "Daily insights metrics"
+  ]
+},
 
 /* ================= DEV ================= */
 

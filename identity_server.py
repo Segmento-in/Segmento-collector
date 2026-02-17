@@ -13,7 +13,7 @@ import xmltodict
 import requests
 import datetime
 import sqlite3
-
+from urllib.parse import urlencode
 from destinations.destination_router import push_to_destination
 # Google OAuth
 from dotenv import load_dotenv
@@ -49,6 +49,7 @@ from connectors.google_drive import sync_drive_files
 from connectors.google_forms import sync_forms
 from connectors.google_sheets import sync_sheets_files
 from connectors.google_ga4 import sync_ga4
+from connectors.facebook_pages import sync_facebook_pages
 
 # ---------------- CONFIG ----------------
 load_dotenv()
@@ -1981,6 +1982,106 @@ def init_db():
     )
     """)
 
+    # ---------------- FACEBOOK PAGES ----------------
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        page_id TEXT,
+        page_name TEXT,
+        page_access_token TEXT,
+        connected_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_pages_metadata (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        page_id TEXT,
+        name TEXT,
+        category TEXT,
+        link TEXT,
+        tasks TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_page_posts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        post_id TEXT UNIQUE,
+        page_id TEXT,
+        message TEXT,
+        story TEXT,
+        created_time TEXT,
+        privacy TEXT,
+        attachments TEXT,
+        message_tags TEXT,
+        reactions_count INTEGER,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_post_comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        comment_id TEXT UNIQUE,
+        post_id TEXT,
+        from_id TEXT,
+        from_name TEXT,
+        message TEXT,
+        created_time TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_page_insights (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        page_id TEXT,
+        metric_name TEXT,
+        period TEXT,
+        value TEXT,
+        end_time TEXT,
+        title TEXT,
+        description TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_reactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        reaction_id TEXT UNIQUE,
+        post_id TEXT,
+        comment_id TEXT,
+        type TEXT,
+        user_psid TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_app_credentials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    uid TEXT,
+    app_id TEXT,
+    app_secret TEXT,
+    redirect_uri TEXT,
+    created_at TEXT
+    )
+    """)
 
     con.commit()
     con.close()
@@ -5665,7 +5766,7 @@ def lemmy_sync_universal():
     con = get_db()
     cur = con.cursor()
 
-    # 1️⃣ Check enabled
+    # Check enabled
     cur.execute("""
         SELECT enabled
         FROM google_connections
@@ -5677,7 +5778,7 @@ def lemmy_sync_universal():
         con.close()
         return jsonify({"error": "not connected"}), 400
 
-    # 2️⃣ Get sync type
+    # Get sync type
     cur.execute("""
         SELECT sync_type
         FROM connector_jobs
@@ -5691,7 +5792,7 @@ def lemmy_sync_universal():
 
     result = sync_lemmy(uid)
 
-    # 3️⃣ Fetch newly inserted posts
+    # Fetch newly inserted posts
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -5712,7 +5813,7 @@ def lemmy_sync_universal():
         d.pop("fetched_at", None)
         rows.append(d)
 
-    # 4️⃣ Destination lookup
+    # Destination lookup
     cur.execute("""
         SELECT dest_type, host, port, username, password, database_name
         FROM destination_configs
@@ -6213,6 +6314,284 @@ def pinterest_sync_universal():
     return jsonify({
         "pins": result.get("pins", 0),
         "rows_pushed": pushed
+    })
+
+# ---------------- FACEBOOK SAVE APP CREDENTIALS ----------------
+
+@app.route("/connectors/facebook/save_app", methods=["POST"])
+def facebook_save_app():
+
+    uid = get_uid()
+    data = request.get_json()
+
+    app_id = data.get("app_id")
+    app_secret = data.get("app_secret")
+
+    if not app_id or not app_secret:
+        return jsonify({"error": "App ID and App Secret required"}), 400
+
+    redirect_uri = request.host_url.rstrip("/") + "/connectors/facebook/callback"
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO facebook_app_credentials
+        (uid, app_id, app_secret, redirect_uri, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        uid,
+        app_id,
+        app_secret,
+        redirect_uri,
+        datetime.datetime.utcnow().isoformat()
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "saved"})
+
+#-------------- Temporary route to test saving Facebook credentials without going through the UI --------------
+@app.route("/connectors/facebook/test_save", methods=["GET"])
+def facebook_test_save():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO facebook_app_credentials
+        (uid, app_id, app_secret, redirect_uri, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        uid,
+        "TEST_APP_ID",
+        "TEST_SECRET",
+        request.host_url.rstrip("/") + "/connectors/facebook/callback",
+        datetime.datetime.utcnow().isoformat()
+    ))
+
+    con.commit()
+    con.close()
+
+    return "Test credentials saved"
+
+# ---------------- FACEBOOK CONNECT ----------------
+
+@app.route("/connectors/facebook/connect", methods=["GET"])
+def facebook_connect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT app_id, redirect_uri
+        FROM facebook_app_credentials
+        WHERE uid=?
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row:
+        return "App credentials not saved", 400
+
+    app_id, redirect_uri = row
+
+    params = {
+        "client_id": app_id,
+        "redirect_uri": redirect_uri,
+        "scope": "pages_show_list,pages_read_engagement,pages_read_user_content,read_insights",
+        "response_type": "code"
+    }
+
+    auth_url = "https://www.facebook.com/v19.0/dialog/oauth?" + urlencode(params)
+
+    return redirect(auth_url)
+
+# ---------------- FACEBOOK CALLBACK ----------------
+
+@app.route("/connectors/facebook/callback", methods=["GET"])
+def facebook_callback():
+
+    uid = get_uid()
+    code = request.args.get("code")
+
+    if not code:
+        return "Authorization failed: No code received", 400
+
+    # Get user app credentials
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT app_id, app_secret, redirect_uri
+        FROM facebook_app_credentials
+        WHERE uid=?
+    """, (uid,))
+
+    row = cur.fetchone()
+
+    if not row:
+        con.close()
+        return "App credentials not found", 400
+
+    app_id, app_secret, redirect_uri = row
+    con.close()
+
+    # Exchange code for user access token
+    token_res = requests.get(
+        "https://graph.facebook.com/v19.0/oauth/access_token",
+        params={
+            "client_id": app_id,
+            "redirect_uri": redirect_uri,
+            "client_secret": app_secret,
+            "code": code
+        },
+        timeout=30
+    )
+
+    token_data = token_res.json()
+
+    user_token = token_data.get("access_token")
+
+    if not user_token:
+        return jsonify({"error": "Token exchange failed", "details": token_data}), 400
+
+    # Get managed pages
+    pages_res = requests.get(
+        "https://graph.facebook.com/v19.0/me/accounts",
+        params={"access_token": user_token},
+        timeout=30
+    )
+
+    pages_data = pages_res.json()
+    pages = pages_data.get("data", [])
+
+    if not pages:
+        return jsonify({"error": "No pages found"}), 400
+
+    # For now select first page (we can improve later)
+    page = pages[0]
+
+    # Store page connection
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO facebook_connections
+        (uid, page_id, page_name, page_access_token, connected_at)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        uid,
+        page.get("id"),
+        page.get("name"),
+        page.get("access_token"),
+        datetime.datetime.utcnow().isoformat()
+    ))
+
+    # Enable connector
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'facebook', 1)
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return "Facebook Page Connected Successfully"
+
+# ---------------- FACEBOOK DISCONNECT ----------------
+
+@app.route("/connectors/facebook/disconnect", methods=["GET"])
+def facebook_disconnect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Remove stored page token
+    cur.execute("DELETE FROM facebook_connections WHERE uid=?", (uid,))
+
+    # Disable connector
+    cur.execute("""
+        UPDATE google_connections
+        SET enabled = 0
+        WHERE uid=? AND source='facebook'
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "facebook disconnected"})
+
+# ---------------- FACEBOOK SYNC ----------------
+
+@app.route("/connectors/facebook/sync")
+def facebook_sync():
+
+    uid = get_uid()
+
+    # Check enabled
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='facebook'
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row or row[0] != 1:
+        return jsonify({"error": "Facebook not connected"}), 400
+
+    sync_type = "historical"
+
+    job_res = get_connector_job("facebook")
+    try:
+        job_data = job_res.get_json()
+        if job_data.get("exists"):
+            sync_type = job_data.get("sync_type", "historical")
+    except:
+        pass
+
+    result = sync_facebook_pages(uid, sync_type)
+
+    # Destination push
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM destination_configs
+        WHERE uid=? AND source='facebook'
+        ORDER BY id DESC
+        LIMIT 1
+    """, (uid,))
+
+    dest = cur.fetchone()
+    con.close()
+
+    if dest and result.get("rows"):
+        inserted = push_to_destination(dest, "facebook_data", result["rows"])
+        return jsonify({
+            "status": "pushed_to_destination",
+            "rows": inserted
+        })
+
+    return jsonify({
+        "status": "stored_locally",
+        "posts": result.get("posts", 0),
+        "insights": result.get("insights", 0)
     })
 
 @app.route("/connectors/<source>/disconnect")

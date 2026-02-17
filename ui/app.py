@@ -3467,6 +3467,44 @@ def factcheck_claims():
 
     return jsonify([dict(r) for r in rows])
 
+# ================= FACEBOOK =================
+
+@app.route("/connectors/facebook")
+def facebook_page():
+    return render_template("connectors/facebookpages.html")
+
+
+@app.route("/connectors/facebook/connect")
+def facebook_connect():
+    return redirect("http://localhost:4000/connectors/facebook/connect")
+
+
+@app.route("/connectors/facebook/disconnect")
+def facebook_disconnect():
+    requests.get(
+        "http://localhost:4000/connectors/facebook/disconnect",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return redirect("/connectors/facebook")
+
+
+@app.route("/connectors/facebook/sync")
+def facebook_sync():
+    r = requests.get(
+        "http://localhost:4000/connectors/facebook/sync",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return jsonify(r.json())
+
+
+@app.route("/api/status/facebook")
+def facebook_status():
+    r = requests.get(
+        "http://localhost:4000/api/status/facebook",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return jsonify(r.json())
+
 # ================= MAIN ==========================
 
 if __name__ == "__main__":
