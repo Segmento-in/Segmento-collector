@@ -796,6 +796,53 @@ All page data is securely synchronized using OAuth authorization.
   ]
 },
 
+/* ================= META ADS ================= */
+{
+  id:"facebook_ads",
+  name:"Facebook Ads",
+  category:"social",
+  logo:"/static/images/logos/facebook.png",
+
+  auth_type:"oauth",
+
+  connect_url:"http://localhost:4000/connectors/facebook_ads/connect",
+  sync_url:"http://localhost:4000/connectors/facebook_ads/sync",
+  dashboard:"/dashboard/facebook_ads",
+
+  long_description:`
+Connect and analyze your Facebook Ad Account to monitor campaign
+performance, ad sets, creatives, and advertising insights.
+All advertising data is securely synchronized using OAuth authorization.
+  `,
+
+  steps:[
+    {title:"Provide App Credentials",desc:"Enter Facebook App ID and App Secret."},
+    {title:"Authorize Access",desc:"Grant ads_read and ads_management permissions via OAuth."},
+    {title:"Initial Sync",desc:"Ad Accounts, Campaigns, Ads, Creatives and Insights are fetched."}
+  ],
+
+  tables:[
+    "facebook_ad_accounts",
+    "facebook_ad_campaigns",
+    "facebook_ad_sets",
+    "facebook_ads",
+    "facebook_ad_creatives",
+    "facebook_ads_insights"
+  ],
+
+  erd:"/static/images/erd/facebook_ads_erd.png",
+
+  description:"Collects ad accounts, campaigns, ad sets, ads, creatives and performance insights.",
+
+  data:[
+    "Ad account metadata",
+    "Campaign structure",
+    "Ad sets configuration",
+    "Ad creatives",
+    "Performance insights (spend, impressions, clicks, CTR, CPC, CPM, reach)"
+  ]
+},
+
 /* ================= DEV ================= */
 
 {

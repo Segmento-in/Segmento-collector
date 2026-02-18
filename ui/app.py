@@ -3467,7 +3467,7 @@ def factcheck_claims():
 
     return jsonify([dict(r) for r in rows])
 
-# ================= FACEBOOK =================
+# ================= FACEBOOK PAGES=================
 
 @app.route("/connectors/facebook")
 def facebook_page():
@@ -3496,14 +3496,115 @@ def facebook_sync():
     )
     return jsonify(r.json())
 
-
 @app.route("/api/status/facebook")
 def facebook_status():
     r = requests.get(
         "http://localhost:4000/api/status/facebook",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/facebook/save_app", methods=["POST"])
+def facebook_save_app_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/facebook/save_app",
+        json=request.get_json(),
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/facebook/job/get")
+def facebook_job_get_proxy():
+    r = requests.get(
+        "http://localhost:4000/connectors/facebook/job/get",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+
+    try:
+        return jsonify(r.json()), r.status_code
+    except:
+        return jsonify({
+            "exists": False,
+            "sync_type": "incremental",
+            "schedule_time": None
+        }), 200
+
+@app.route("/connectors/facebook/job/save", methods=["POST"])
+def facebook_job_save_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/facebook/job/save",
+        json=request.get_json(),
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return jsonify(r.json()), r.status_code
+
+# ================= FACEBOOK ADS =================
+
+@app.route("/connectors/facebook_ads")
+def facebook_ads_page():
+    return render_template("connectors/facebook_ads.html")
+
+@app.route("/connectors/facebook_ads/connect")
+def facebook_ads_connect():
+    return redirect("http://localhost:4000/connectors/facebook_ads/connect")
+
+@app.route("/connectors/facebook_ads/disconnect")
+def facebook_ads_disconnect():
+    requests.get(
+        "http://localhost:4000/connectors/facebook_ads/disconnect",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return redirect("/connectors/facebook_ads")
+
+@app.route("/connectors/facebook_ads/sync")
+def facebook_ads_sync():
+    r = requests.get(
+        "http://localhost:4000/connectors/facebook_ads/sync",
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
+
+@app.route("/api/status/facebook_ads")
+def facebook_ads_status():
+    r = requests.get(
+        "http://localhost:4000/api/status/facebook_ads",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/facebook_ads/job/get")
+def facebook_ads_job_get_proxy():
+    r = requests.get(
+        "http://localhost:4000/connectors/facebook_ads/job/get",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+
+    try:
+        return jsonify(r.json()), r.status_code
+    except:
+        return jsonify({
+            "exists": False,
+            "sync_type": "incremental",
+            "schedule_time": None
+        }), 200
+
+@app.route("/connectors/facebook_ads/job/save", methods=["POST"])
+def facebook_ads_job_save_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/facebook_ads/job/save",
+        json=request.get_json(),
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/facebook_ads/save_app", methods=["POST"])
+def facebook_ads_save_app_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/facebook_ads/save_app",
+        json=request.get_json(),
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return jsonify(r.json()), r.status_code
 
 # ================= MAIN ==========================
 

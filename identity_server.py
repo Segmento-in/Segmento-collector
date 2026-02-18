@@ -2083,6 +2083,116 @@ def init_db():
     )
     """)
 
+    # ---------------- FACEBOOK ADS ----------------
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_ads_connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        ad_account_id TEXT,
+        ad_account_name TEXT,
+        access_token TEXT,
+        connected_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_ad_accounts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        account_id TEXT UNIQUE,
+        name TEXT,
+        account_status TEXT,
+        currency TEXT,
+        timezone_name TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_ad_campaigns (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        campaign_id TEXT UNIQUE,
+        account_id TEXT,
+        name TEXT,
+        status TEXT,
+        objective TEXT,
+        daily_budget TEXT,
+        start_time TEXT,
+        stop_time TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_ad_sets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        adset_id TEXT UNIQUE,
+        campaign_id TEXT,
+        name TEXT,
+        status TEXT,
+        daily_budget TEXT,
+        optimization_goal TEXT,
+        start_time TEXT,
+        end_time TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_ads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        ad_id TEXT UNIQUE,
+        adset_id TEXT,
+        name TEXT,
+        status TEXT,
+        creative_id TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_ad_creatives (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        creative_id TEXT UNIQUE,
+        name TEXT,
+        object_story_id TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS facebook_ads_insights (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        account_id TEXT,
+        campaign_id TEXT,
+        adset_id TEXT,
+        ad_id TEXT,
+        date_start TEXT,
+        date_stop TEXT,
+        impressions TEXT,
+        clicks TEXT,
+        spend TEXT,
+        ctr TEXT,
+        cpc TEXT,
+        cpm TEXT,
+        reach TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+
     con.commit()
     con.close()
 
@@ -6316,12 +6426,13 @@ def pinterest_sync_universal():
         "rows_pushed": pushed
     })
 
-# ---------------- FACEBOOK SAVE APP CREDENTIALS ----------------
+# ---------------- FACEBOOK PAGES SAVE APP CREDENTIALS ----------------
 
 @app.route("/connectors/facebook/save_app", methods=["POST"])
 def facebook_save_app():
 
     uid = get_uid()
+    print("SAVE UID:", uid)
     data = request.get_json()
 
     app_id = data.get("app_id")
@@ -6378,11 +6489,11 @@ def facebook_test_save():
 
     return "Test credentials saved"
 
-# ---------------- FACEBOOK CONNECT ----------------
+# ---------------- FACEBOOK PAGES CONNECT ----------------
 
 @app.route("/connectors/facebook/connect", methods=["GET"])
 def facebook_connect():
-
+    print("CONNECT UID:", uid)
     uid = get_uid()
 
     con = get_db()
@@ -6413,7 +6524,7 @@ def facebook_connect():
 
     return redirect(auth_url)
 
-# ---------------- FACEBOOK CALLBACK ----------------
+# ---------------- FACEBOOK PAGES CALLBACK ----------------
 
 @app.route("/connectors/facebook/callback", methods=["GET"])
 def facebook_callback():
@@ -6506,7 +6617,7 @@ def facebook_callback():
 
     return "Facebook Page Connected Successfully"
 
-# ---------------- FACEBOOK DISCONNECT ----------------
+# ---------------- FACEBOOK PAGES DISCONNECT ----------------
 
 @app.route("/connectors/facebook/disconnect", methods=["GET"])
 def facebook_disconnect():
@@ -6531,7 +6642,7 @@ def facebook_disconnect():
 
     return jsonify({"status": "facebook disconnected"})
 
-# ---------------- FACEBOOK SYNC ----------------
+# ---------------- FACEBOOK PAGES SYNC ----------------
 
 @app.route("/connectors/facebook/sync")
 def facebook_sync():
@@ -6594,6 +6705,65 @@ def facebook_sync():
         "insights": result.get("insights", 0)
     })
 
+@app.route("/connectors/facebook/job/get")
+def facebook_job_get():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT sync_type, schedule_time
+        FROM connector_jobs
+        WHERE uid=? AND source='facebook'
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row[0],
+        "schedule_time": row[1]
+    })
+
+# ---------------- FACEBOOK PAGES STATUS ----------------
+
+@app.route("/api/status/facebook")
+def facebook_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Check saved app credentials
+    cur.execute("""
+        SELECT 1 FROM facebook_app_credentials
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    creds = cur.fetchone()
+
+    # Check page connection
+    cur.execute("""
+        SELECT 1 FROM facebook_connections
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    conn = cur.fetchone()
+
+    con.close()
+
+    return jsonify({
+        "connected": bool(conn),
+        "has_credentials": bool(creds)
+    })
+
 @app.route("/connectors/<source>/disconnect")
 def connector_disconnect(source):
 
@@ -6612,6 +6782,351 @@ def connector_disconnect(source):
     con.close()
 
     return jsonify({"status": "disconnected"})
+
+# ---------------- FACEBOOK ADS CONNECT ----------------
+
+@app.route("/connectors/facebook_ads/connect", methods=["GET"])
+def facebook_ads_connect():
+
+    uid = get_uid()
+    print("ADS CONNECT UID:", uid)
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT app_id, redirect_uri
+        FROM facebook_app_credentials
+        WHERE uid=?
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row:
+        return "App credentials not saved", 400
+
+    app_id, redirect_uri = row
+
+    # IMPORTANT: different scope for Ads
+    params = {
+        "client_id": app_id,
+        "redirect_uri": redirect_uri,
+        "scope": "ads_read,ads_management",
+        "response_type": "code"
+    }
+
+    auth_url = "https://www.facebook.com/v19.0/dialog/oauth?" + urlencode(params)
+
+    return redirect(auth_url)
+
+# ---------------- FACEBOOK ADS CALLBACK ----------------
+
+@app.route("/connectors/facebook_ads/callback", methods=["GET"])
+def facebook_ads_callback():
+
+    uid = get_uid()
+    code = request.args.get("code")
+
+    if not code:
+        return "Authorization failed: No code received", 400
+
+    # Get app credentials
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT app_id, app_secret, redirect_uri
+        FROM facebook_app_credentials
+        WHERE uid=?
+    """, (uid,))
+
+    row = cur.fetchone()
+
+    if not row:
+        con.close()
+        return "App credentials not found", 400
+
+    app_id, app_secret, redirect_uri = row
+    con.close()
+
+    # Exchange code for token
+    token_res = requests.get(
+        "https://graph.facebook.com/v19.0/oauth/access_token",
+        params={
+            "client_id": app_id,
+            "redirect_uri": redirect_uri,
+            "client_secret": app_secret,
+            "code": code
+        },
+        timeout=30
+    )
+
+    token_data = token_res.json()
+    user_token = token_data.get("access_token")
+
+    if not user_token:
+        return jsonify({"error": "Token exchange failed", "details": token_data}), 400
+
+    # Fetch Ad Accounts
+    accounts_res = requests.get(
+        "https://graph.facebook.com/v19.0/me/adaccounts",
+        params={
+            "access_token": user_token,
+            "fields": "id,name,account_status,currency,timezone_name"
+        },
+        timeout=30
+    )
+
+    accounts_data = accounts_res.json()
+    accounts = accounts_data.get("data", [])
+
+    if not accounts:
+        return jsonify({"error": "No Ad Accounts found"}), 400
+
+    # Select first ad account for now
+    account = accounts[0]
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO facebook_ads_connections
+        (uid, ad_account_id, ad_account_name, access_token, connected_at)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        uid,
+        account.get("id"),
+        account.get("name"),
+        user_token,
+        datetime.datetime.utcnow().isoformat()
+    ))
+
+    # Enable connector
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'facebook_ads', 1)
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return "Facebook Ads Connected Successfully"
+
+# ---------------- FACEBOOK ADS STATUS ----------------
+
+@app.route("/api/status/facebook_ads")
+def facebook_ads_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Check saved app credentials
+    cur.execute("""
+        SELECT 1 FROM facebook_app_credentials
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    creds = cur.fetchone()
+
+    # Check ads connection
+    cur.execute("""
+        SELECT 1 FROM facebook_ads_connections
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    conn = cur.fetchone()
+
+    con.close()
+
+    return jsonify({
+        "connected": bool(conn),
+        "has_credentials": bool(creds)
+    })
+
+# ---------------- FACEBOOK ADS DISCONNECT ----------------
+
+@app.route("/connectors/facebook_ads/disconnect", methods=["GET"])
+def facebook_ads_disconnect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Remove stored ad account connection
+    cur.execute("DELETE FROM facebook_ads_connections WHERE uid=?", (uid,))
+
+    # Disable connector
+    cur.execute("""
+        UPDATE google_connections
+        SET enabled = 0
+        WHERE uid=? AND source='facebook_ads'
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "facebook_ads disconnected"})
+
+# ---------------- FACEBOOK ADS JOB GET ----------------
+
+@app.route("/connectors/facebook_ads/job/get")
+def facebook_ads_job_get():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT sync_type, schedule_time
+        FROM connector_jobs
+        WHERE uid=? AND source='facebook_ads'
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row[0],
+        "schedule_time": row[1]
+    })
+
+# ---------------- FACEBOOK ADS JOB SAVE ----------------
+
+@app.route("/connectors/facebook_ads/job/save", methods=["POST"])
+def facebook_ads_job_save():
+
+    uid = get_uid()
+    data = request.get_json()
+
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'facebook_ads', ?, ?)
+    """, (uid, sync_type, schedule_time))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
+# ---------------- FACEBOOK ADS SYNC ----------------
+
+from connectors.facebook_ads import sync_facebook_ads
+
+@app.route("/connectors/facebook_ads/sync")
+def facebook_ads_sync():
+
+    uid = get_uid()
+
+    # Check enabled
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='facebook_ads'
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row or row[0] != 1:
+        return jsonify({"error": "Facebook Ads not connected"}), 400
+
+    sync_type = "historical"
+
+    job_res = facebook_ads_job_get()
+    try:
+        job_data = job_res.get_json()
+        if job_data.get("exists"):
+            sync_type = job_data.get("sync_type", "historical")
+    except:
+        pass
+
+    result = sync_facebook_ads(uid, sync_type)
+
+    # Destination push
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT *
+        FROM destination_configs
+        WHERE uid=? AND source='facebook_ads'
+        ORDER BY id DESC
+        LIMIT 1
+    """, (uid,))
+
+    dest = cur.fetchone()
+    con.close()
+
+    if dest and result.get("rows"):
+        inserted = push_to_destination(dest, "facebook_ads_data", result["rows"])
+        return jsonify({
+            "status": "pushed_to_destination",
+            "rows": inserted
+        })
+
+    return jsonify({
+        "status": "stored_locally",
+        "campaigns": result.get("campaigns", 0),
+        "adsets": result.get("adsets", 0),
+        "ads": result.get("ads", 0),
+        "insights": result.get("insights", 0)
+    })
+
+# ---------------- FACEBOOK ADS SAVE APP CREDENTIALS ----------------
+
+@app.route("/connectors/facebook_ads/save_app", methods=["POST"])
+def facebook_ads_save_app():
+
+    uid = get_uid()
+    data = request.get_json()
+
+    app_id = data.get("app_id")
+    app_secret = data.get("app_secret")
+
+    if not app_id or not app_secret:
+        return jsonify({"error": "App ID and App Secret required"}), 400
+
+    redirect_uri = request.host_url.rstrip("/") + "/connectors/facebook_ads/callback"
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO facebook_app_credentials
+        (uid, app_id, app_secret, redirect_uri, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    """, (
+        uid,
+        app_id,
+        app_secret,
+        redirect_uri,
+        datetime.datetime.utcnow().isoformat()
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "saved"})
 
 @app.route("/connectors/<source>/connect")
 def connector_connect(source):
