@@ -8,50 +8,93 @@
 
   <div class="max-w-7xl mx-auto relative z-10 space-y-24">
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-      <div data-aos="fade-right">
-        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/30 bg-red-500/5 text-red-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-          </span>
-          YOUTUBE_DATA_V3_READY
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div data-aos="fade-right" class="pt-8">
+        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
+          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+          NOT CONNECTED
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
-            You<span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-400">Tube</span>
+          YouTube <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-500">Connector</span>
         </h1>
-        <p class="text-slate-300 text-xl mb-10 leading-relaxed font-medium max-w-xl">
-          Sync channel performance, video-level engagement metrics, and audience retention data for deep-dive content auditing.
+        
+        <p class="text-slate-300 text-lg mb-6 leading-relaxed font-medium max-w-xl">
+          Deep-sync your channel performance. Track views, watch time, and subscriber growth across your entire video catalog directly in your data warehouse.
         </p>
 
-        <div class="flex flex-wrap gap-4 items-center" id="connectSection">
-            <button onclick="connectGoogle()" id="connectBtn" class="px-10 py-4 bg-red-600 text-white rounded-2xl font-black hover:bg-white hover:text-red-600 transition-all shadow-xl shadow-red-600/20">Connect Channel</button>
-            <button onclick="disconnectYT()" id="disconnectBtn" class="hidden px-10 py-4 bg-slate-700 text-white rounded-2xl font-black hover:bg-slate-600 transition-all">Disconnect</button>
-            <a href="/dashboard/youtube" id="dashboardBtn" class="px-10 py-4 border border-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">Dashboard</a>
+        <div class="space-y-4 text-slate-400 text-sm max-w-lg mb-10">
+          <div class="flex gap-3">
+            <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            <span>Credentials are encrypted using AES-256 before being stored in your secure vault.</span>
+          </div>
+          <div class="flex gap-3">
+            <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+            <span>OAuth 2.0 protocol ensures restricted read-only access to your YouTube data.</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 items-center">
+          <a href="/dashboard/youtube" id="dashboardBtn" class="px-10 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white hover:text-red-900 transition-all shadow-xl">
+            Dashboard
+          </a>
+          <button onclick="disconnectYouTube()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
+            Disconnect
+          </button>
         </div>
       </div>
 
-      <div class="flex justify-center items-center" data-aos="zoom-in">
-        <div class="relative w-full max-w-[500px] h-[350px] bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ef4444 1px, transparent 1px); background-size: 30px 30px;"></div>
-            <div class="flex items-center justify-between w-full px-12 relative z-10">
-                <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl transform hover:scale-110 transition-transform">
-                    <img src="/static/images/logos/youtube.png" class="w-10 h-10">
-                </div>
-                <div class="flex-1 h-[2px] mx-4 relative bg-slate-700">
-                    <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-rose-500 animate-[flow_2s_infinite_linear]"></div>
-                </div>
-                <div class="w-20 h-20 bg-slate-800 border-2 border-red-500 rounded-full flex items-center justify-center shadow-2xl">
-                    <svg class="w-10 h-10 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                    </svg>
-                </div>
+      <div class="relative" data-aos="zoom-in">
+        <div id="connectSection" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl">
+          <div class="flex justify-between mb-10 px-2">
+            <div class="flex flex-col items-center gap-2">
+              <div id="step1-circle" class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold">1</div>
+              <span class="text-[9px] font-mono text-red-400 uppercase tracking-tighter">Credentials</span>
             </div>
-            <div class="absolute bottom-4 left-4 right-4 bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/5 font-mono text-[10px] text-red-400 flex justify-between">
-                <span id="protocolStatus" class="animate-pulse">● YT_REPORTING_V3_STREAM</span>
-                <span id="dbStatus" class="text-slate-400 tracking-tighter">OAUTH2_ACTIVE</span>
+            <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold">2</div>
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Authorize</span>
             </div>
+            <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step3-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold">3</div>
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Connected</span>
+            </div>
+          </div>
+
+          <div id="credentialsForm" class="space-y-4">
+            <div>
+              <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Google Client ID</label>
+              <input id="clientId" placeholder="Enter Client ID" class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-red-400 transition-all shadow-inner">
+            </div>
+            <div>
+              <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Google Client Secret</label>
+              <input id="clientSecret" type="password" placeholder="Enter Client Secret" class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-red-400 transition-all shadow-inner">
+            </div>
+            
+            <button id="saveCredsBtn" onclick="saveCredentials()" class="w-full py-5 bg-red-600 text-white rounded-2xl font-black hover:bg-white hover:text-red-600 transition-all shadow-lg shadow-red-600/20 text-xs uppercase tracking-widest mt-2">
+              Save Credentials & Continue
+            </button>
+
+            <div class="mt-8 pt-8 border-t border-white/5">
+              <h4 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">Setup Instructions</h4>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
+                  <span>Enable <b>YouTube Data API v3</b> in Google Cloud Console.</span>
+                </li>
+                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
+                  <span>Create OAuth 2.0 Web App credentials.</span>
+                </li>
+                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
+                  <span>Add redirect URI: <code class="bg-slate-900 px-1 rounded text-red-300">http://localhost:4000/oauth2callback</code></span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -61,17 +104,19 @@
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
                 <div class="flex items-center gap-3 mb-8">
                     <div class="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center border border-red-500/20">
-                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
                     </div>
                     <h3 class="text-white font-black text-xl">Sync Engine</h3>
                 </div>
                 
                 <div class="space-y-6">
                     <div>
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh Strategy</label>
-                        <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-red-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all font-bold">
-                            <option value="full" class="bg-slate-800">Full Refresh (Historical)</option>
-                            <option value="incremental" class="bg-slate-800">Incremental (Daily)</option>
+                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Data Resolution</label>
+                        <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-red-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
+                            <option value="incremental">Incremental</option>
+                            <option value="full">Historical (All Time)</option>
                         </select>
                     </div>
 
@@ -93,7 +138,7 @@
 
                     <div class="pt-6 space-y-3">
                         <button onclick="saveJob()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update Schedule</button>
-                        <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-red-600/30 text-xs uppercase tracking-widest">Start Manual Sync</button>
+                        <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-red-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
                     </div>
                 </div>
             </div>
@@ -103,115 +148,112 @@
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
                 <div class="flex items-center justify-between mb-8">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center border border-rose-500/20">
-                            <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        <div class="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center border border-red-500/20">
+                            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
                         </div>
-                        <h3 class="text-white font-black text-xl tracking-tight">Destination Setup</h3>
+                        <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
                     </div>
-                    <div id="destStatus" class="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-4 py-1.5 rounded-full border border-rose-500/20 uppercase font-bold tracking-tighter">System Ready</div>
+                    <div id="destStatus" class="text-[10px] font-mono text-red-400 bg-red-500/10 px-4 py-1.5 rounded-full border border-red-500/20 uppercase font-bold tracking-tighter">System Ready</div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="md:col-span-2">
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block">Target Warehouse</label>
-                        <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-rose-500 transition-all outline-none font-bold">
-                            <option value="" class="bg-slate-800">Select Connector...</option>
-                            <option value="mysql" class="bg-slate-800">MySQL</option>
-                            <option value="postgres" class="bg-slate-800">PostgreSQL</option>
-                            <option value="bigquery" class="bg-slate-800">BigQuery</option>
-                            <option value="snowflake" class="bg-slate-800">SnowFlake</option>
+                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block">Target Platform</label>
+                        <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-red-500 transition-all outline-none">
+                            <option value="">Select Connector...</option>
+                            <option value="mysql">MySQL</option>
+                            <option value="postgres">PostgreSQL</option>
+                            <option value="bigquery">BigQuery</option>
+                            <option value="snowflake">SnowFlake</option>
+                            <option value="clickhouse">ClickHouse</option>
                         </select>
                     </div>
 
-                    <div id="dbFields" class="hidden md:contents animate-in fade-in slide-in-from-top-2 duration-500">
-                        
+                    <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                         <div id="sqlFields" class="contents">
-                            <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-rose-500 outline-none text-sm transition-all">
-                            <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-rose-500 outline-none text-sm transition-all">
-                            <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-rose-500 outline-none text-sm transition-all">
-                            <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-rose-500 outline-none text-sm transition-all">
-                            <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-rose-500 outline-none text-sm transition-all">
+                            <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-red-500 outline-none text-sm transition-all">
+                            <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-red-500 outline-none text-sm transition-all">
+                            <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-red-500 outline-none text-sm transition-all">
+                            <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-red-500 outline-none text-sm transition-all">
+                            <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-red-500 outline-none text-sm transition-all">
                         </div>
-
                         <div id="bigqueryFields" class="hidden contents">
-                            <input id="bqProject" placeholder="BigQuery Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-rose-500 outline-none text-sm transition-all">
-                            <input id="bqDataset" placeholder="Dataset Name" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-rose-500 outline-none text-sm transition-all">
-                            <textarea id="bqKey" placeholder="Paste Service Account JSON Key Content" rows="5" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-rose-500 outline-none font-mono text-xs"></textarea>
+                            <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-red-500 outline-none text-sm transition-all">
+                            <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-red-500 outline-none text-sm transition-all">
+                            <div class="md:col-span-2">
+                                <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-red-500 outline-none text-sm transition-all resize-y font-mono"></textarea>
+                            </div>
                         </div>
-                        
                         <div class="md:col-span-2 pt-2">
-                            <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-rose-600/30 text-xs uppercase tracking-widest">Authenticate & Save</button>
+                            <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-red-600/30 text-xs uppercase tracking-widest">Authenticate & Save</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-8 pt-8 border-t border-white/5">
-                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection</label>
-                    <select id="destDropdown" onchange="activateDest(this.value)" class="w-full p-4 rounded-xl bg-black/40 text-rose-300 border border-rose-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
-                        <option value="" class="bg-slate-900 text-white">Loading connections...</option>
+                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection Switcher</label>
+                    <select id="destDropdown" onchange="activateDest(this.value)" class="w-full p-4 rounded-xl bg-black/40 text-red-300 border border-red-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
+                        <option value="">Loading connections...</option>
                     </select>
                 </div>
             </div>
         </div>
     </div>
 
-    <div>
-      <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">Content <span class="text-red-500">Ingest Pipeline</span></h2>
-      <div class="grid md:grid-cols-3 gap-8">
-        {% for step, title, desc in [
-          ('01', 'Channel Inventory', 'Indexing all accessible channels and playlists under the authenticated Google Account.'),
-          ('02', 'Video Metadata', 'Extracting snippets, tags, categories, and duration for every uploaded asset.'),
-          ('03', 'Analytics Sync', 'Pulling time-series data for views, estimated minutes watched, and subscriber delta.')
-        ] %}
-        <div class="group p-10 bg-slate-800/40 border border-white/5 rounded-[2.5rem] hover:bg-slate-800/80 transition-all hover:-translate-y-2">
-          <div class="text-5xl font-black text-slate-700/30 mb-6 group-hover:text-red-500 transition-colors">{{step}}</div>
-          <h3 class="text-2xl font-bold text-white mb-3">{{title}}</h3>
-          <p class="text-slate-400 leading-relaxed text-sm">{{desc}}</p>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <div>
-      <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">YouTube <span class="text-red-500">Relational Schema</span></h2>
+    <div class="pt-12">
+      <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">YouTube <span class="text-red-500">Schema</span></h2>
       <div class="grid lg:grid-cols-2 gap-12 items-start">
         <div class="grid grid-cols-1 gap-4">
           {% for table, columns in [
-            ('yt_channels', ['id', 'yt_channel_id', 'title', 'subscriber_count', 'view_count']),
-            ('yt_videos', ['id', 'channel_id', 'yt_video_id', 'title', 'published_at', 'duration']),
-            ('yt_video_stats', ['id', 'video_id', 'date', 'views', 'likes', 'comments', 'watch_time'])
+            ('yt_video_stats', ['video_id', 'title', 'published_at', 'views', 'likes', 'comments', 'duration']),
+            ('yt_channel_stats', ['date', 'subscribers', 'total_views', 'total_videos']),
+            ('yt_traffic_sources', ['video_id', 'source_type', 'views', 'watch_time_minutes']),
+            ('yt_demographics', ['video_id', 'age_group', 'gender', 'viewer_percentage'])
           ] %}
           <div class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-red-500/30 transition-all group">
             <div class="flex items-center gap-3 mb-4">
-                <div class="w-3 h-3 rounded-full bg-red-600 group-hover:animate-pulse"></div>
+                <div class="w-3 h-3 rounded-full bg-red-600 group-hover:animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div>
                 <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">{{table}}</h4>
             </div>
             <div class="flex flex-wrap gap-2">
                 {% for col in columns %}
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400">{{col}}</span>
+                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-red-300 transition-colors">{{col}}</span>
                 {% endfor %}
             </div>
           </div>
           {% endfor %}
         </div>
-        <div class="relative bg-slate-800 border border-white/10 rounded-[3rem] p-10 shadow-3xl sticky top-10">
-          <div class="absolute inset-0 bg-red-600/5 rounded-[3rem] blur-xl"></div>
-          <img src="/static/images/erd/youtube_erd.png" class="relative z-10 mx-auto max-w-full rounded-2xl opacity-90 grayscale hover:grayscale-0 transition-all duration-700"/>
+        
+        <div class="sticky top-10 group">
+            <div class="absolute -inset-4 bg-red-500/10 rounded-[4rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div class="relative bg-slate-800/80 border border-white/10 rounded-[3.5rem] p-4 shadow-3xl overflow-hidden backdrop-blur-md">
+                <div class="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/5 to-transparent flex items-center px-8 justify-between">
+                    <div class="flex gap-2">
+                        <div class="w-2 h-2 rounded-full bg-red-500/40"></div>
+                        <div class="w-2 h-2 rounded-full bg-yellow-500/40"></div>
+                        <div class="w-2 h-2 rounded-full bg-green-500/40"></div>
+                    </div>
+                    <span class="text-[9px] font-mono text-slate-500 tracking-widest uppercase">YouTube_Data_v3.vuerd</span>
+                </div>
+                <div class="mt-12 p-6 rounded-[2.5rem] bg-slate-900/50 border border-white/5">
+                    <img src="/static/images/erd/youtube_erd.png" class="mx-auto max-w-full rounded-2xl opacity-80 group-hover:opacity-100 transition-all duration-700 transform group-hover:scale-[1.02]"/>
+                </div>
+            </div>
         </div>
       </div>
     </div>
 
     <div class="mb-32">
-      <h2 class="text-4xl font-black mb-12 text-center text-white">Extraction Entities</h2>
+      <h2 class="text-4xl font-black mb-12 text-center text-white">Data <span class="text-red-500">Extracted</span></h2>
       <div class="grid md:grid-cols-4 gap-6">
-        {% for table in ['yt_channels', 'yt_videos', 'yt_video_stats', 'yt_comments'] %}
+        {% for table in ['Channel Metrics', 'Video Stats', 'Traffic Sources', 'Viewer Demo'] %}
         <div class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-red-600/5 hover:border-red-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
           <div class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-red-600 transition-all duration-500 shadow-xl">
-            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
+            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
           </div>
-          <span class="font-mono text-slate-400 font-bold text-xs tracking-widest group-hover:text-white transition-colors">{{table}}</span>
+          <span class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors uppercase">{{table}}</span>
         </div>
         {% endfor %}
       </div>
@@ -221,100 +263,131 @@
 </section>
 
 <style>
-  @keyframes flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
   .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
   select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
-  .animate-spin-slow { animation: spin 2s linear infinite; }
-  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    checkStatus();
-    loadJob();
+    checkYouTubeStatus();
     loadDestinations();
+    loadJob();
 });
 
-// FIXED TOGGLE LOGIC
-function toggleDest() {
-    const type = document.getElementById("destType").value;
-    const wrapper = document.getElementById("dbFields");
-    const sqlGroup = document.getElementById("sqlFields");
-    const bqGroup = document.getElementById("bigqueryFields");
-
-    if(!type) {
-        wrapper.classList.add("hidden");
-        return;
-    }
-
-    wrapper.classList.remove("hidden");
-
-    if(type === "bigquery") {
-        sqlGroup.classList.add("hidden");
-        bqGroup.classList.remove("hidden");
-    } else {
-        sqlGroup.classList.remove("hidden");
-        bqGroup.classList.add("hidden");
-    }
-}
-
-async function checkStatus(){
+async function checkYouTubeStatus(){
     try {
-        const res = await fetch("/api/status/youtube").then(r => r.json());
-        const connectBtn = document.getElementById("connectBtn");
-        const disconnectBtn = document.getElementById("disconnectBtn");
+        const res = await fetch("/api/status/youtube");
+        const data = await res.json();
         const badge = document.getElementById("statusBadge");
+        const disconnectBtn = document.getElementById("disconnectBtn");
 
-        if(res.connected){
-            connectBtn.classList.add("hidden");
+        if(data.connected){
+            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
+            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
             disconnectBtn.classList.remove("hidden");
-            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> CONNECTED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/30 bg-red-500/5 text-red-400 text-[10px] font-mono mb-8 uppercase";
+            updateFlowUI(3);
         }
-    } catch(e) {}
+        else if(data.has_credentials){
+            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
+            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+            disconnectBtn.classList.add("hidden");
+            updateFlowUI(1);
+        }
+        else{
+            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-red-600"></span> NOT CONNECTED`;
+            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/30 bg-red-500/5 text-red-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+            disconnectBtn.classList.add("hidden");
+        }
+    } catch(e){ console.error(e); }
 }
 
-function connectGoogle(){
-    window.location.href = "http://localhost:4000/google/connect?source=youtube";
+function updateFlowUI(step) {
+    const s1 = document.getElementById("step1-circle");
+    const s2 = document.getElementById("step2-circle");
+    const s3 = document.getElementById("step3-circle");
+    const btn = document.getElementById("saveCredsBtn");
+
+    if (step >= 1) {
+        s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s1.innerHTML = "✓";
+        s2.className = "w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold";
+        
+        btn.innerText = "Authorize with Google";
+        btn.className = "w-full py-5 bg-white text-red-600 rounded-2xl font-black hover:bg-red-600 hover:text-white transition-all shadow-lg text-xs uppercase tracking-widest mt-2";
+        btn.onclick = () => window.location.href = "/connectors/youtube/connect";
+    }
+
+    if (step >= 3) {
+        s2.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s2.innerHTML = "✓";
+        s3.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s3.innerHTML = "✓";
+
+        btn.innerText = "Connection Established";
+        btn.className = "w-full py-5 bg-emerald-600 text-white rounded-2xl font-black transition-all text-xs uppercase tracking-widest mt-2 cursor-default";
+        btn.onclick = null;
+    }
 }
 
-async function disconnectYT(){
-    if(!confirm("Disconnect YouTube?")) return;
-    await fetch("/connectors/youtube/disconnect");
-    window.location.reload();
+async function saveCredentials(){
+    const clientId = document.getElementById("clientId").value.trim();
+    const clientSecret = document.getElementById("clientSecret").value.trim();
+    if(!clientId || !clientSecret) { alert("Client ID and Secret are required."); return; }
+    try {
+        const res = await fetch("/connectors/youtube/save_app", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
+        });
+        if(res.ok) { checkYouTubeStatus(); }
+        else { alert("Failed to save credentials"); }
+    } catch(e) { alert("Save failed"); }
+}
+
+async function disconnectYouTube(){
+    if(!confirm("Are you sure you want to disconnect YouTube?")) return;
+    try {
+        const res = await fetch("/connectors/youtube/disconnect");
+        if(res.ok) { location.reload(); }
+    } catch(e) { alert("Disconnect failed"); }
 }
 
 async function loadDestinations(){
     try {
-        const res = await fetch(`http://localhost:4000/destination/list/youtube`);
+        const res = await fetch(`/destination/list/youtube`);
         const data = await res.json();
         const dropdown = document.getElementById("destDropdown");
-        dropdown.innerHTML = '<option value="">Select Existing Destination...</option>';
-        data.destinations?.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d.id;
-            opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database}`;
-            if(d.active) opt.selected = true;
-            dropdown.appendChild(opt);
-        });
+        const statusEl = document.getElementById("destStatus");
+        dropdown.innerHTML = '<option value="">Select Connection...</option>';
+        if(data.destinations?.length) {
+            data.destinations.forEach(d => {
+                const opt = document.createElement("option");
+                opt.value = d.id;
+                opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database}`;
+                if(d.active) {
+                    opt.selected = true;
+                    statusEl.innerText = "Connection Active";
+                    statusEl.classList.replace("text-red-400", "text-emerald-400");
+                }
+                dropdown.appendChild(opt);
+            });
+        }
     } catch(e) {}
 }
 
-async function activateDest(id){
-    if(!id) return;
-    await fetch("http://localhost:4000/destination/activate", {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ source: "youtube", dest_id: id })
-    });
-    loadDestinations();
+function toggleDest(){
+    const type = document.getElementById("destType").value;
+    const fields = document.getElementById("dbFields");
+    if(type){ fields.classList.remove("hidden"); } else { fields.classList.add("hidden"); return; }
+    document.getElementById("sqlFields").classList.toggle("hidden", type === "bigquery");
+    document.getElementById("bigqueryFields").classList.toggle("hidden", type !== "bigquery");
 }
 
 async function saveDestination(){
     const btn = document.getElementById("saveDestBtn");
-    btn.innerText = "AUTHENTICATING..."; btn.disabled = true;
+    btn.innerText = "CONNECTING...";
     const type = document.getElementById("destType").value;
-    
-    let payload = { source: "youtube", type: type };
+    let payload = { source: "youtube", type };
     if(type === "bigquery"){
         payload.host = document.getElementById("bqProject").value;
         payload.database = document.getElementById("bqDataset").value;
@@ -326,22 +399,12 @@ async function saveDestination(){
         payload.password = document.getElementById("dbPass").value;
         payload.database = document.getElementById("dbName").value;
     }
-
-    try {
-        const res = await fetch("http://localhost:4000/destination/save", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-        if(res.ok) {
-            btn.innerText = "SAVED ✓";
-            loadDestinations();
-            setTimeout(() => { btn.innerText = "AUTHENTICATE & SAVE"; btn.disabled = false; }, 2000);
-        }
-    } catch(e) { 
-        alert("Connection failed"); 
-        btn.innerText = "RETRY";
-        btn.disabled = false; 
-    }
+    const res = await fetch("/destination/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+    if(res.ok) { btn.innerText = "SUCCESS ✓"; loadDestinations(); setTimeout(() => btn.innerText = "Authenticate & Save", 2000); }
 }
 
 async function loadJob(){
@@ -358,11 +421,11 @@ async function loadJob(){
 
 async function saveJob(){
     const time = `${document.getElementById("hourSelect").value}:${document.getElementById("minSelect").value}`;
-    await fetch("/connectors/youtube/job/save", {
+    const res = await fetch("/connectors/youtube/job/save", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sync_type: document.getElementById("syncType").value, schedule_time: time })
     });
-    alert("Sync Job Updated");
+    if(res.ok) alert("Job Schedule Updated");
 }
 
 function runSync(){
@@ -370,14 +433,27 @@ function runSync(){
     btn.innerText = "SYNCING...";
     btn.disabled = true;
 
-    fetch("/connectors/youtube/sync?sync_type=" 
-      + document.getElementById("syncType").value)
+    fetch("/connectors/youtube/sync?sync_type=" + document.getElementById("syncType").value)
     .then(r => r.json())
     .then(d => {
-        btn.innerText = `INDEXED (${d.videos || 0} VIDEOS)`;
-        setTimeout(() => { btn.innerText = "START MANUAL SYNC"; btn.disabled = false; }, 3000);
+        btn.innerText = `INDEXED (${d.videos || 0})`;
+        btn.disabled = false;
+        setTimeout(() => btn.innerText = "RUN MANUAL SYNC", 3000);
     })
-    .catch(() => { btn.innerText = "FAILED"; btn.disabled = false; });
+    .catch(e => {
+        btn.innerText = "FAILED";
+        btn.disabled = false;
+    });
+}
+
+async function activateDest(id){
+    if(!id) return;
+    await fetch("/destination/activate", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ source: "youtube", dest_id: id })
+    });
+    loadDestinations();
 }
 </script>
 
