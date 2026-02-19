@@ -672,8 +672,8 @@ and object-level information.
 
   auth_type:"oauth",
 
-  connect_url:"http://localhost:4000/google/connect",
-  sync_url:"http://localhost:4000/google/sync/classroom",
+  connect_url:"/connectors/classroom/connect",   
+  sync_url:"/connectors/classroom/sync",
   dashboard:"/dashboard/classroom",
 
   long_description:`

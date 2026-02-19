@@ -8,15 +8,14 @@
 
   <div class="max-w-7xl mx-auto relative z-10 space-y-24">
 
-    <!-- Hero -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
       <div data-aos="fade-right">
         <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/5 text-indigo-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
-          <span class="relative flex h-2 w-2">
+          <span id="statusDot" class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
           </span>
-          FACTCHECK_API_V1_READY
+          <span id="statusText">NOT CONNECTED</span>
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
@@ -26,10 +25,13 @@
           Leverage the Google Fact Check Tools API to ingest verified claims, claimant details, and truth ratings into your local warehouse for disinformation analysis.
         </p>
 
-        <div class="flex flex-wrap gap-4 items-center" id="connectSection">
-            <button onclick="connectFactCheck()" id="connectBtn" class="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-white hover:text-indigo-600 transition-all shadow-xl shadow-indigo-600/20">Connect Fact Check</button>
-            <button onclick="disconnectFactCheck()" id="disconnectBtn" class="hidden px-10 py-4 bg-slate-700 text-white rounded-2xl font-black hover:bg-slate-600 transition-all">Disconnect</button>
-            <a href="/dashboard/factcheck" id="dashboardBtn" class="px-10 py-4 border border-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">Dashboard</a>
+        <div class="flex flex-wrap gap-4 items-center">
+            <a href="/dashboard/factcheck" id="dashboardBtn" class="px-10 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white hover:text-indigo-900 transition-all shadow-xl">
+                Dashboard
+            </a>
+            <button onclick="disconnectFactCheck()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
+                Disconnect
+            </button>
         </div>
 
         <div class="flex flex-wrap gap-4 items-center mt-6">
@@ -39,36 +41,52 @@
         </div>
       </div>
 
-      <div class="flex justify-center items-center" data-aos="zoom-in">
-        <div class="relative w-full max-w-[500px] h-[350px] bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 30px 30px;"></div>
-            <div class="flex items-center justify-between w-full px-12 relative z-10">
-                <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
-                    <svg class="w-12 h-12 text-indigo-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                    </svg>
-                </div>
-                <div class="flex-1 h-[2px] mx-4 relative bg-slate-700">
-                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-blue-500 animate-[flow_2s_infinite_linear]"></div>
-                </div>
-                <div class="w-20 h-20 bg-slate-800 border-2 border-blue-500 rounded-full flex items-center justify-center shadow-2xl">
-                    <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
+      <div class="relative" data-aos="zoom-in">
+        <div id="connectCard" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl">
+          
+          <div class="flex justify-between mb-10 px-2">
+            <div class="flex flex-col items-center gap-2">
+              <div id="step1-circle" class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold transition-colors">1</div>
+              <span id="step1-label" class="text-[9px] font-mono text-indigo-400 uppercase tracking-tighter">Credentials</span>
             </div>
-            <div class="absolute bottom-4 left-4 right-4 bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/5 font-mono text-[10px] text-indigo-400 flex justify-between">
-                <span id="protocolStatus" class="animate-pulse">● LISTENING_FOR_QUERIES</span>
-                <span id="dbStatus" class="text-slate-400 tracking-tighter">DATASET: VERIFIED_CLAIMS</span>
+            <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-colors">2</div>
+              <span id="step2-label" class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Activate</span>
             </div>
+            <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step3-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-colors">3</div>
+              <span id="step3-label" class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Connected</span>
+            </div>
+          </div>
+
+          <div id="credentialsForm" class="space-y-4">
+            <div id="apiKeyInputWrapper">
+              <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Google FactCheck API Key</label>
+              <input id="apiKey" type="password" placeholder="Paste your API Key here" class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-400 transition-all shadow-inner">
+            </div>
+            
+            <button id="mainActionBtn" onclick="handleMainAction()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-white hover:text-indigo-600 transition-all shadow-lg shadow-indigo-600/20 text-xs uppercase tracking-widest mt-2">
+              Save API Key
+            </button>
+
+            <div class="mt-8 pt-8 border-t border-white/5">
+              <h4 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">Setup Instructions</h4>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
+                  <span>Enable <b>Fact Check Tools API</b> in Google Cloud Console.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Controls: Sync Engine + Destination -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
-        <!-- Sync Engine -->
         <div class="lg:col-span-1">
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
                 <div class="flex items-center gap-3 mb-8">
@@ -120,7 +138,6 @@
             </div>
         </div>
 
-        <!-- Destination Setup -->
         <div class="lg:col-span-2">
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
                 <div class="flex items-center justify-between mb-8">
@@ -184,7 +201,6 @@
         </div>
     </div>
 
-    <!-- Pipeline Steps -->
     <div>
       <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">Claim <span class="text-indigo-400">Ingestion Logic</span></h2>
       <div class="grid md:grid-cols-3 gap-8">
@@ -202,10 +218,8 @@
       </div>
     </div>
 
-    <!-- Schema -->
     <div class="pt-12">
       <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">Warehouse <span class="text-indigo-400">Schema</span></h2>
-      
       <div class="grid lg:grid-cols-2 gap-12 items-start">
         <div class="grid grid-cols-1 gap-4">
           {% for table, columns in [
@@ -226,7 +240,6 @@
           </div>
           {% endfor %}
         </div>
-        
         <div class="relative bg-slate-800 border border-white/10 rounded-[3rem] p-10 shadow-3xl sticky top-10">
           <div class="absolute inset-0 bg-indigo-600/5 rounded-[3rem] blur-xl"></div>
           <img src="/static/images/erd/factcheck_erd.png" class="relative z-10 mx-auto max-w-full rounded-2xl opacity-90 grayscale hover:grayscale-0 transition-all duration-700"/>
@@ -234,7 +247,6 @@
       </div>
     </div>
 
-    <!-- Extraction Entities -->
     <div class="mb-32">
       <h2 class="text-4xl font-black mb-12 text-center text-white">Extraction Entities</h2>
       <div class="grid md:grid-cols-3 gap-6">
@@ -262,30 +274,84 @@
 </style>
 
 <script>
+let isApiKeySaved = false;
+let isConnected = false;
+
 document.addEventListener("DOMContentLoaded", () => {
     checkFactCheckStatus();
     loadDestinations();
     loadJob();
 });
 
+// MULTI-STEP AUTH LOGIC
 async function checkFactCheckStatus(){
     try {
         const res = await fetch("http://localhost:4000/api/status/factcheck").then(r => r.json());
-        const connectBtn = document.getElementById("connectBtn");
-        const disconnectBtn = document.getElementById("disconnectBtn");
-        const badge = document.getElementById("statusBadge");
-
-        if(res.connected){
-            connectBtn.classList.add("hidden");
-            disconnectBtn.classList.remove("hidden");
-            badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span> CONNECTED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/5 text-indigo-400 text-[10px] font-mono mb-8 uppercase";
-        }
+        isConnected = res.connected;
+        isApiKeySaved = res.api_key_saved;
+        updateAuthUI();
     } catch(e) { console.error(e); }
 }
 
-function connectFactCheck(){
-    window.location.href = "http://localhost:4000/google/connect?source=factcheck";
+function updateAuthUI(){
+    const s1c = document.getElementById("step1-circle");
+    const s1l = document.getElementById("step1-label");
+    const s2c = document.getElementById("step2-circle");
+    const s2l = document.getElementById("step2-label");
+    const s3c = document.getElementById("step3-circle");
+    const s3l = document.getElementById("step3-label");
+    const btn = document.getElementById("mainActionBtn");
+    const badgeText = document.getElementById("statusText");
+    const badgeDot = document.getElementById("statusDot");
+    const disconnectBtn = document.getElementById("disconnectBtn");
+    const inputWrapper = document.getElementById("apiKeyInputWrapper");
+
+    // Reset styles
+    [s1c, s2c, s3c].forEach(c => c.className = "w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-colors");
+    [s1l, s2l, s3l].forEach(l => l.className = "text-[9px] font-mono text-slate-500 uppercase tracking-tighter");
+
+    if (isConnected) {
+        s1c.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s2c.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s3c.className = "w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold";
+        s3l.className = "text-[9px] font-mono text-indigo-400 uppercase tracking-tighter";
+        
+        btn.classList.add("hidden");
+        disconnectBtn.classList.remove("hidden");
+        inputWrapper.classList.add("hidden");
+        badgeText.innerText = "CONNECTED";
+        badgeDot.innerHTML = '<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>';
+    } else if (isApiKeySaved) {
+        s1c.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s2c.className = "w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold";
+        s2l.className = "text-[9px] font-mono text-indigo-400 uppercase tracking-tighter";
+        
+        btn.innerText = "ACTIVATE FACTCHECK";
+        btn.className = "w-full py-5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-emerald-500 transition-all text-xs uppercase tracking-widest mt-2";
+        inputWrapper.classList.add("hidden");
+        badgeText.innerText = "CREDENTIALS SAVED";
+    } else {
+        s1c.className = "w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold";
+        s1l.className = "text-[9px] font-mono text-indigo-400 uppercase tracking-tighter";
+        btn.innerText = "SAVE API KEY";
+        inputWrapper.classList.remove("hidden");
+        badgeText.innerText = "NOT CONNECTED";
+    }
+}
+
+async function handleMainAction(){
+    if(!isApiKeySaved){
+        const api_key = document.getElementById("apiKey").value.trim();
+        if(!api_key) return alert("Please enter an API key");
+        const res = await fetch("/connectors/factcheck/save_config", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ api_key })
+        });
+        if(res.ok){ isApiKeySaved = true; updateAuthUI(); }
+    } else {
+        const res = await fetch("/connectors/factcheck/connect");
+        if(res.ok){ isConnected = true; updateAuthUI(); }
+    }
 }
 
 async function disconnectFactCheck(){
@@ -294,38 +360,30 @@ async function disconnectFactCheck(){
     location.reload();
 }
 
+// RESTORED ORIGINAL SYNC/DEST FUNCTIONS
 async function loadDestinations(){
     try {
         const res = await fetch(`http://localhost:4000/destination/list/factcheck`);
         const data = await res.json();
         const dropdown = document.getElementById("destDropdown");
         const statusEl = document.getElementById("destStatus");
-        
         dropdown.innerHTML = '<option value="" class="text-slate-500 italic">Select an existing configuration...</option>';
-        
         if(data.destinations?.length){
             data.destinations.forEach(d => {
                 const opt = document.createElement("option");
                 opt.value = d.id;
                 opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database} (@${d.host || '—'})`;
-                if(d.active) {
-                    opt.selected = true;
-                    statusEl.innerText = "Connection Active";
-                    statusEl.classList.replace("text-emerald-400", "text-emerald-400");
-                }
+                if(d.active) { opt.selected = true; statusEl.innerText = "Connection Active"; }
                 dropdown.appendChild(opt);
             });
-        } else {
-            statusEl.innerText = "No destination configured";
-        }
+        } else { statusEl.innerText = "No destination configured"; }
     } catch(e) { console.error(e); }
 }
 
 async function activateDest(id){
     if(!id) return;
     const res = await fetch("http://localhost:4000/destination/activate", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
+        method: "POST", headers: {"Content-Type":"application/json"},
         body: JSON.stringify({ source: "factcheck", dest_id: id })
     });
     if(res.ok) loadDestinations();
@@ -336,36 +394,21 @@ function toggleDest() {
     const wrapper = document.getElementById("dbFields");
     const sql = document.getElementById("sqlFields");
     const bq = document.getElementById("bigqueryFields");
-
-    if(!type){
-        wrapper.classList.add("hidden");
-        return;
-    }
-
+    if(!type){ wrapper.classList.add("hidden"); return; }
     wrapper.classList.remove("hidden");
-
-    if(type === "bigquery"){
-        sql.classList.add("hidden");
-        bq.classList.remove("hidden");
-    } else {
-        sql.classList.remove("hidden");
-        bq.classList.add("hidden");
-    }
+    if(type === "bigquery"){ sql.classList.add("hidden"); bq.classList.remove("hidden"); } 
+    else { sql.classList.remove("hidden"); bq.classList.add("hidden"); }
 }
 
 async function saveDestination(){
     const btn = document.getElementById("saveDestBtn");
     btn.innerText = "AUTHENTICATING..."; btn.disabled = true;
-
     const type = document.getElementById("destType").value;
     let payload = { source: "factcheck", type };
-
     if(type === "bigquery"){
         payload.host = document.getElementById("bqProject")?.value || "";
         payload.database = document.getElementById("bqDataset")?.value || "";
         payload.password = document.getElementById("bqKey")?.value || "";
-        payload.port = "";
-        payload.username = "";
     } else if(type) {
         payload.host = document.getElementById("dbHost").value;
         payload.port = document.getElementById("dbPort").value;
@@ -373,27 +416,17 @@ async function saveDestination(){
         payload.password = document.getElementById("dbPass").value;
         payload.database = document.getElementById("dbName").value;
     }
-
     try {
         const res = await fetch("http://localhost:4000/destination/save", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
+            method: "POST", headers: {"Content-Type": "application/json"},
             body: JSON.stringify(payload)
         });
         if(res.ok) {
             btn.innerText = "SAVED ✓";
-            btn.classList.replace("bg-emerald-600", "bg-emerald-600");
             loadDestinations();
-            setTimeout(() => {
-                btn.innerText = "Authenticate & Save";
-                btn.classList.replace("bg-emerald-600", "bg-emerald-600");
-                btn.disabled = false;
-            }, 2000);
+            setTimeout(() => { btn.innerText = "Authenticate & Save"; btn.disabled = false; }, 2000);
         }
-    } catch(e) {
-        alert("Connection failed");
-        btn.disabled = false;
-    }
+    } catch(e) { alert("Connection failed"); btn.disabled = false; }
 }
 
 async function loadJob(){
@@ -411,42 +444,23 @@ async function loadJob(){
 async function saveJob(){
     const time = `${document.getElementById("hourSelect").value}:${document.getElementById("minSelect").value}`;
     const res = await fetch("/connectors/factcheck/job/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-            sync_type: document.getElementById("syncType").value, 
-            schedule_time: time 
-        })
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sync_type: document.getElementById("syncType").value, schedule_time: time })
     });
     if(res.ok) alert("Job Schedule Updated");
 }
 
 async function runSync(){
     const query = document.getElementById("queryInput").value.trim();
-    if(!query) {
-        alert("Please enter a search query");
-        return;
-    }
-
+    if(!query) return alert("Please enter a search query");
     const btn = document.getElementById("syncBtn");
-    btn.innerText = "SEARCHING..."; 
-    btn.disabled = true;
-
+    btn.innerText = "SEARCHING..."; btn.disabled = true;
     try {
         const res = await fetch(`http://localhost:4000/connectors/factcheck/sync?query=${encodeURIComponent(query)}&sync_type=${document.getElementById("syncType").value}`);
         const d = await res.json();
-
-        if(d.status === "ok" || d.fetched !== undefined){
-            btn.innerText = `SYNCED (${d.fetched || 0} CLAIMS)`;
-        } else {
-            btn.innerText = "FAILED";
-        }
-    } catch(e) {
-        btn.innerText = "FAILED";
-    } finally {
-        setTimeout(() => btn.innerText = "Execute Search", 3000);
-        btn.disabled = false;
-    }
+        btn.innerText = (d.status === "ok" || d.fetched !== undefined) ? `SYNCED (${d.fetched || 0} CLAIMS)` : "FAILED";
+    } catch(e) { btn.innerText = "FAILED"; } 
+    finally { setTimeout(() => { btn.innerText = "Execute Search"; btn.disabled = false; }, 3000); }
 }
 </script>
 

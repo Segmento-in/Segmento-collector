@@ -11,7 +11,6 @@ load_dotenv()
 SOURCE = "factcheck"
 DB = "identity.db"
 
-API_KEY = os.getenv("GOOGLE_API_KEY")
 BASE = "https://factchecktools.googleapis.com/v1alpha1/claims:search"
 
 
@@ -68,15 +67,33 @@ def get_active_destination(uid):
         "database_name": row[5]
     }
 
+def get_api_key(uid):
+
+    con = db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='factcheck'
+        LIMIT 1
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    return row[0] if row else None
 
 # ---------------- API ---------------- #
 
-def factcheck_get(params):
+def factcheck_get(uid, params):
 
-    if not API_KEY:
-        raise Exception("GOOGLE_API_KEY missing")
+    api_key = get_api_key(uid)
 
-    params["key"] = API_KEY
+    if not api_key:
+        raise Exception("FactCheck API key not configured")
+
+    params["key"] = api_key
 
     r = requests.get(BASE, params=params, timeout=20)
 
@@ -84,7 +101,6 @@ def factcheck_get(params):
         raise Exception(r.text)
 
     return r.json()
-
 
 # ---------------- STATE ---------------- #
 

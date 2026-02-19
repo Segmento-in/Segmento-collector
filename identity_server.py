@@ -2524,6 +2524,15 @@ def google_connect():
             "https://www.googleapis.com/auth/forms.body.readonly"
         ]
 
+    elif source == "classroom":
+        scopes = [
+            "https://www.googleapis.com/auth/classroom.courses.readonly",
+            "https://www.googleapis.com/auth/classroom.rosters.readonly",
+            "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
+            "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
+            "https://www.googleapis.com/auth/classroom.announcements.readonly",
+    ]
+        
     elif source == "contacts":
         scopes = ["https://www.googleapis.com/auth/contacts.readonly"]
 
@@ -2613,6 +2622,15 @@ def google_callback():
             "https://www.googleapis.com/auth/forms.body.readonly"
         ]
 
+    elif source == "classroom":
+        scopes = [
+            "https://www.googleapis.com/auth/classroom.courses.readonly",
+            "https://www.googleapis.com/auth/classroom.rosters.readonly",
+            "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
+            "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
+            "https://www.googleapis.com/auth/classroom.announcements.readonly",
+    ]
+        
     elif source == "contacts":
         scopes = ["https://www.googleapis.com/auth/contacts.readonly"]
 
@@ -5676,6 +5694,158 @@ def factcheck_sync():
     result = sync_factcheck(uid, query, sync_type)
 
     return jsonify(result)
+
+@app.route("/connectors/factcheck/save_config", methods=["POST"])
+def factcheck_save_config():
+
+    uid = get_uid()
+    data = request.get_json()
+
+    api_key = data.get("api_key")
+
+    if not api_key:
+        return jsonify({"error": "API key required"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, api_key, created_at)
+        VALUES (?, 'factcheck', ?, datetime('now'))
+    """, (uid, api_key))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/factcheck/connect")
+def factcheck_connect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'factcheck', 1)
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "connected"})
+
+@app.route("/connectors/factcheck/disconnect")
+def factcheck_disconnect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        UPDATE google_connections
+        SET enabled=0
+        WHERE uid=? AND source='factcheck'
+    """, (uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "disconnected"})
+
+@app.route("/api/status/factcheck")
+def factcheck_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # connection
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='factcheck'
+        LIMIT 1
+    """, (uid,))
+    row = cur.fetchone()
+
+    connected = bool(row and row[0] == 1)
+
+    # api key
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='factcheck'
+        LIMIT 1
+    """, (uid,))
+    key = cur.fetchone()
+
+    con.close()
+
+    return jsonify({
+        "connected": connected,
+        "api_key_saved": key is not None
+    })
+
+@app.route("/connectors/factcheck/job/get")
+def factcheck_job_get():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT sync_type, schedule_time
+        FROM connector_jobs
+        WHERE uid=? AND source='factcheck'
+        LIMIT 1
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row[0],
+        "schedule_time": row[1]
+    })
+
+@app.route("/connectors/factcheck/job/save", methods=["POST"])
+def factcheck_job_save():
+
+    uid = get_uid()
+    data = request.get_json()
+
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'factcheck', ?, ?)
+    """, (
+        uid,
+        sync_type,
+        schedule_time
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
 
 # ---------------- GOOGLE NEWS ----------------
 

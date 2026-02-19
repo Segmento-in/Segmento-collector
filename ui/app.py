@@ -4065,6 +4065,21 @@ def classroom_submissions():
 def factcheck_page():
     return render_template("connectors/factcheck.html")
 
+@app.route("/connectors/factcheck/connect")
+def factcheck_connect():
+    r = requests.get(
+        "http://localhost:4000/connectors/factcheck/connect",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/factcheck/disconnect")
+def factcheck_disconnect():
+    r = requests.get(
+        "http://localhost:4000/connectors/factcheck/disconnect",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
 
 @app.route("/connectors/factcheck/sync")
 def factcheck_sync():
@@ -4123,22 +4138,33 @@ def factcheck_dashboard():
 @app.route("/api/status/factcheck")
 def factcheck_status():
 
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
+    r = requests.get(
+        "http://localhost:4000/api/status/factcheck",
+        cookies=request.cookies
+    )
 
-    cur.execute("""
-        SELECT COUNT(*)
-        FROM google_factcheck_claims
-    """)
+    return jsonify(r.json())
 
-    count = cur.fetchone()[0]
+@app.route("/connectors/factcheck/job/get")
+def factcheck_job_get_proxy():
 
-    conn.close()
+    r = requests.get(
+        "http://localhost:4000/connectors/factcheck/job/get",
+        cookies=request.cookies
+    )
 
-    return jsonify({
-        "connected": count > 0
-    })
+    return jsonify(r.json())
 
+@app.route("/connectors/factcheck/job/save", methods=["POST"])
+def factcheck_job_save_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/factcheck/job/save",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
 
 # ---------- DATA ----------
 @app.route("/api/factcheck/claims")
@@ -4160,6 +4186,17 @@ def factcheck_claims():
     conn.close()
 
     return jsonify([dict(r) for r in rows])
+
+@app.route("/connectors/factcheck/save_config", methods=["POST"])
+def factcheck_save_config_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/factcheck/save_config",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
 
 # ================= FACEBOOK PAGES=================
 
