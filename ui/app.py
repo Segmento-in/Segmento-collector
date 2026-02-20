@@ -319,18 +319,32 @@ def reddit_data(table):
 def medium_page():
     return render_template("connectors/medium.html")
 
-@app.route("/connectors/medium/connect", methods=["POST"])
-def medium_connect():
+@app.route("/connectors/medium/connect")
+def medium_connect_proxy():
 
-    data = request.json
-
-    r = requests.post(
+    requests.get(
         "http://localhost:4000/connectors/medium/connect",
-        json=data,
         cookies=request.cookies
     )
 
-    return jsonify(r.json())
+    return redirect("/connectors/medium")
+
+@app.route("/connectors/medium/save_config", methods=["POST"])
+def medium_save_config_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/medium/save_config",
+        json=request.json,
+        cookies=request.cookies
+    )
+
+    try:
+        return jsonify(r.json()), r.status_code
+    except:
+        return jsonify({
+            "error": "identity_server_error",
+            "raw": r.text
+        }), r.status_code
 
 @app.route("/connectors/medium/sync")
 def medium_sync():
@@ -349,23 +363,14 @@ def medium_dashboard():
 
 
 @app.route("/api/status/medium")
-def medium_status():
+def medium_status_proxy():
 
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
+    r = requests.get(
+        "http://localhost:4000/api/status/medium",
+        cookies=request.cookies
+    )
 
-    cur.execute("""SELECT COUNT(DISTINCT uid) FROM medium_posts
-                WHERE uid='demo_user'
-                """)
-
-
-    count = cur.fetchone()[0]
-
-    conn.close()
-
-    return jsonify({"connected": count > 0})
-
-
+    return jsonify(r.json())
 
 @app.route("/api/medium/data/posts")
 def medium_data():

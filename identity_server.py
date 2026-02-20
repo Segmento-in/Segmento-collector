@@ -5023,11 +5023,40 @@ def medium_sync():
 
     return jsonify(sync_user(uid, username))
 
-@app.route("/connectors/medium/connect", methods=["POST"])
+@app.route("/connectors/medium/connect")
 def medium_connect():
 
     uid = get_uid()
-    data = request.json
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='medium'
+    """,(uid,))
+
+    if not cur.fetchone():
+        con.close()
+        return jsonify({"error":"config missing"}),400
+
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, 'medium', 1)
+    """,(uid,))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status":"connected"})
+
+@app.route("/connectors/medium/save_config", methods=["POST"])
+def medium_save_config():
+
+    uid = get_uid()
+    data = request.get_json()
 
     username = data.get("username")
 
@@ -5037,26 +5066,42 @@ def medium_connect():
     con = get_db()
     cur = con.cursor()
 
+    # check existing
     cur.execute("""
-        INSERT OR REPLACE INTO medium_accounts
-        (uid, username, created_at)
-        VALUES (?,?,?)
-    """, (
-        uid,
-        username,
-        datetime.datetime.utcnow().isoformat()
-    ))
+        SELECT id
+        FROM connector_configs
+        WHERE uid=? AND connector='medium'
+        LIMIT 1
+    """,(uid,))
 
-    cur.execute("""
-        INSERT OR REPLACE INTO google_connections
-        (uid, source, enabled)
-        VALUES (?, 'medium', 1)
-    """, (uid,))
+    row = cur.fetchone()
+
+    if row:
+        # UPDATE
+        cur.execute("""
+            UPDATE connector_configs
+            SET config_json=?,
+                created_at=datetime('now')
+            WHERE uid=? AND connector='medium'
+        """,(
+            json.dumps({"username": username}),
+            uid
+        ))
+    else:
+        # INSERT
+        cur.execute("""
+            INSERT INTO connector_configs
+            (uid, connector, config_json, created_at)
+            VALUES (?, 'medium', ?, datetime('now'))
+        """,(
+            uid,
+            json.dumps({"username": username})
+        ))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"saved"})
 
 @app.route("/connectors/medium/disconnect")
 def medium_disconnect():
@@ -5079,6 +5124,37 @@ def medium_disconnect():
     con.close()
 
     return jsonify({"status": "disconnected"})
+
+@app.route("/api/status/medium")
+def medium_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # connection
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='medium'
+    """,(uid,))
+    conn = cur.fetchone()
+
+    # credentials
+    cur.execute("""
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='medium'
+    """,(uid,))
+    cfg = cur.fetchone()
+
+    con.close()
+
+    return jsonify({
+        "connected": bool(conn and conn[0]==1),
+        "has_credentials": bool(cfg)
+    })
 
 @app.route("/connectors/medium/sync")
 def medium_sync_universal():
