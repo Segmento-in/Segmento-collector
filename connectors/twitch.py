@@ -2,15 +2,8 @@ import requests
 import sqlite3
 import datetime
 import json
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 DB = "identity.db"
-
-CLIENT_ID = os.getenv("TWITCH_CLIENT_ID")
-CLIENT_SECRET = os.getenv("TWITCH_CLIENT_SECRET")
 
 TOKEN_URL = "https://id.twitch.tv/oauth2/token"
 BASE = "https://api.twitch.tv/helix"
@@ -22,55 +15,90 @@ def db():
     return sqlite3.connect(DB, timeout=30)
 
 
-# ---------------- AUTH ----------------
+# ---------------- APP CREDENTIALS ----------------
+# Stored in connector_configs
 
-_token = None
-_token_expiry = None
+def get_app_credentials(uid):
+
+    con = db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='twitch'
+        LIMIT 1
+    """,(uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row:
+        raise Exception("Twitch config missing")
+
+    return json.loads(row[0])
 
 
-def get_token():
+# ---------------- TOKEN CACHE ----------------
 
-    global _token, _token_expiry
+_token_cache = {}
 
-    if _token and _token_expiry > datetime.datetime.now():
-        return _token
 
-    if not CLIENT_ID or not CLIENT_SECRET:
-        raise Exception("Twitch credentials missing")
+def get_token(uid):
 
-    r = requests.post(TOKEN_URL, params={
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "grant_type": "client_credentials"
-    })
+    creds = get_app_credentials(uid)
+
+    client_id = creds["client_id"]
+    client_secret = creds["client_secret"]
+
+    cache = _token_cache.get(uid)
+
+    if cache and cache["expiry"] > datetime.datetime.utcnow():
+        return cache["token"], client_id
+
+    r = requests.post(
+        TOKEN_URL,
+        params={
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "grant_type": "client_credentials"
+        },
+        timeout=20
+    )
 
     if r.status_code != 200:
         raise Exception(r.text)
 
     data = r.json()
 
-    _token = data["access_token"]
-    _token_expiry = datetime.datetime.now() + datetime.timedelta(
-        seconds=data["expires_in"] - 60
-    )
+    token = data["access_token"]
 
-    return _token
+    _token_cache[uid] = {
+        "token": token,
+        "expiry": datetime.datetime.utcnow()
+        + datetime.timedelta(seconds=data["expires_in"] - 60)
+    }
+
+    return token, client_id
 
 
 # ---------------- API ----------------
 
-def twitch_get(path, params=None):
+def twitch_get(uid, path, params=None):
 
-    token = get_token()
+    token, client_id = get_token(uid)
 
     headers = {
-        "Client-ID": CLIENT_ID,
+        "Client-ID": client_id,
         "Authorization": f"Bearer {token}"
     }
 
-    url = f"{BASE}/{path}"
-
-    r = requests.get(url, headers=headers, params=params, timeout=20)
+    r = requests.get(
+        f"{BASE}/{path}",
+        headers=headers,
+        params=params,
+        timeout=20
+    )
 
     if r.status_code != 200:
         raise Exception(r.text)
@@ -78,191 +106,90 @@ def twitch_get(path, params=None):
     return r.json()["data"]
 
 
-# ---------------- SYNC USER ----------------
+# ---------------- SYNC ----------------
 
-def sync_user(uid, username):
+def sync_videos(uid, username, sync_type="historical", limit=20):
 
-    users = twitch_get("users", {
-        "login": username
-    })
-
-    if not users:
-        raise Exception("User not found")
-
-    u = users[0]
-
-    con = db()
-    cur = con.cursor()
-
-    now = datetime.datetime.now().isoformat()
-
-    cur.execute("""
-    INSERT OR REPLACE INTO twitch_users
-    (uid, twitch_id, login, display_name,
-     description, followers, view_count,
-     raw_json, fetched_at)
-    VALUES (?,?,?,?,?,?,?,?,?)
-    """, (
-        uid,
-        u["id"],
-        u["login"],
-        u["display_name"],
-        u["description"],
-        None,
-        u["view_count"],
-        json.dumps(u),
-        now
-    ))
-
-    con.commit()
-    con.close()
-
-    return {"user": u["display_name"]}
-
-
-# ---------------- SYNC STREAM ----------------
-
-def sync_stream(uid, username):
-
-    users = twitch_get("users", {
-        "login": username
-    })
+    users = twitch_get(uid, "users", {"login": username})
 
     if not users:
         raise Exception("User not found")
 
     user_id = users[0]["id"]
 
-    streams = twitch_get("streams", {
-        "user_id": user_id
-    })
-
-    if not streams:
-        return {"stream": "offline"}
-
-    s = streams[0]
-
     con = db()
     cur = con.cursor()
 
-    now = datetime.datetime.now().isoformat()
-
-    cur.execute("""
-    INSERT INTO twitch_streams
-    (uid, twitch_id, title, game_name,
-     viewer_count, started_at,
-     raw_json, fetched_at)
-    VALUES (?,?,?,?,?,?,?,?)
-    """, (
-        uid,
-        user_id,
-        s["title"],
-        s["game_name"],
-        s["viewer_count"],
-        s["started_at"],
-        json.dumps(s),
-        now
-    ))
-
-    con.commit()
-    con.close()
-
-    return {"stream": "live"}
-
-
-def sync_videos(uid, username, limit=20, sync_type="historical"):
-
-    # ---------------- GET USER ----------------
-    users = twitch_get("users", {"login": username})
-
-    if not users:
-        raise Exception("User not found")
-
-    user_id = users[0]["id"]
-
-    # ---------------- GET LAST STATE ----------------
     last_video_date = None
-
-    con = db()
-    cur = con.cursor()
 
     if sync_type == "incremental":
         cur.execute("""
             SELECT state_json
             FROM connector_state
             WHERE uid=? AND source='twitch'
-        """, (uid,))
+        """,(uid,))
         row = cur.fetchone()
 
         if row:
-            state = json.loads(row[0])
-            last_video_date = state.get("last_video_date")
+            last_video_date = json.loads(row[0]).get("last_video_date")
 
-    # ---------------- FETCH VIDEOS ----------------
-    videos = twitch_get("videos", {
-        "user_id": user_id,
-        "first": limit
+    videos = twitch_get(uid,"videos",{
+        "user_id":user_id,
+        "first":limit
     })
 
-    now = datetime.datetime.utcnow().isoformat()
+    now=datetime.datetime.utcnow().isoformat()
 
-    rows = []
-    newest_created_at = last_video_date
+    rows=[]
+    newest=last_video_date
 
     for v in videos:
 
-        created_at = v.get("created_at")
+        created=v["created_at"]
 
-        # Incremental filter
-        if sync_type == "incremental" and last_video_date:
-            if created_at <= last_video_date:
+        if sync_type=="incremental" and last_video_date:
+            if created<=last_video_date:
                 continue
 
-        row_dict = {
-            "uid": uid,
-            "twitch_id": user_id,
-            "video_id": v.get("id"),
-            "title": v.get("title"),
-            "views": v.get("view_count"),
-            "duration": v.get("duration"),
-            "created_at": created_at
-        }
-
         cur.execute("""
-            INSERT OR IGNORE INTO twitch_videos
-            (uid, twitch_id, video_id,
-             title, views, duration,
-             created_at, raw_json, fetched_at)
-            VALUES (?,?,?,?,?,?,?,?,?)
-        """, (
+        INSERT OR IGNORE INTO twitch_videos
+        (uid,twitch_id,video_id,title,
+         views,duration,created_at,
+         raw_json,fetched_at)
+        VALUES (?,?,?,?,?,?,?,?,?)
+        """,(
             uid,
             user_id,
-            v.get("id"),
-            v.get("title"),
-            v.get("view_count"),
-            v.get("duration"),
-            created_at,
+            v["id"],
+            v["title"],
+            v["view_count"],
+            v["duration"],
+            created,
             json.dumps(v),
             now
         ))
 
-        if cur.rowcount > 0:
-            rows.append(row_dict)
+        if cur.rowcount>0:
+            rows.append({
+                "video_id":v["id"],
+                "title":v["title"],
+                "views":v["view_count"]
+            })
 
-            if not newest_created_at or created_at > newest_created_at:
-                newest_created_at = created_at
+            if not newest or created>newest:
+                newest=created
 
-    # ---------------- SAVE STATE ----------------
-    if newest_created_at:
+    if newest:
         cur.execute("""
-            INSERT OR REPLACE INTO connector_state
-            (uid, source, state_json, updated_at)
-            VALUES (?, 'twitch', ?, ?)
-        """, (
+        INSERT OR REPLACE INTO connector_state
+        (uid,source,state_json,updated_at)
+        VALUES (?,?,?,?)
+        """,(
             uid,
+            "twitch",
             json.dumps({
-                "username": username,
-                "last_video_date": newest_created_at
+                "username":username,
+                "last_video_date":newest
             }),
             now
         ))
@@ -271,6 +198,6 @@ def sync_videos(uid, username, limit=20, sync_type="historical"):
     con.close()
 
     return {
-        "videos": len(rows),
-        "rows": rows
+        "videos":len(rows),
+        "rows":rows
     }

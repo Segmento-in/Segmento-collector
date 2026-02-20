@@ -5271,47 +5271,67 @@ def tumblr_sync_posts():
 
 # ---------------- TWITCH ----------------
 
-@app.route("/connectors/twitch/connect", methods=["POST"])
+@app.route("/connectors/twitch/connect")
 def twitch_connect():
 
     uid = get_uid()
-    data = request.get_json()
-
-    if not data:
-        return jsonify({"status": "error", "message": "No data provided"}), 400
-
-    username = data.get("username")
-
-    if not username:
-        return jsonify({"status": "error", "message": "Username required"}), 400
 
     con = get_db()
     cur = con.cursor()
 
-    now = datetime.datetime.utcnow().isoformat()
-
-    # Save username inside connector_state
     cur.execute("""
-        INSERT OR REPLACE INTO connector_state
-        (uid, source, state_json, updated_at)
-        VALUES (?, 'twitch', ?, ?)
-    """, (
-        uid,
-        json.dumps({"username": username}),
-        now
-    ))
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='twitch'
+    """,(uid,))
 
-    # Enable connector
+    if not cur.fetchone():
+        con.close()
+        return jsonify({"error":"config missing"}),400
+
     cur.execute("""
         INSERT OR REPLACE INTO google_connections
-        (uid, source, enabled)
-        VALUES (?, 'twitch', 1)
-    """, (uid,))
+        (uid,source,enabled)
+        VALUES (?,?,1)
+    """,(uid,"twitch"))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
+
+@app.route("/api/status/twitch")
+def twitch_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='twitch'
+    """,(uid,))
+
+    connected = bool(
+        (row := cur.fetchone()) and row[0]==1
+    )
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='twitch'
+    """,(uid,))
+
+    has_credentials = bool(cur.fetchone())
+
+    con.close()
+
+    return jsonify({
+        "connected":connected,
+        "has_credentials":has_credentials
+    })
 
 @app.route("/connectors/twitch/disconnect")
 def twitch_disconnect():
@@ -5355,8 +5375,8 @@ def twitch_sync():
 
     # Get username from connector_state
     cur.execute("""
-        SELECT state_json
-        FROM connector_state
+        SELECT config_json
+        FROM connector_configs
         WHERE uid=? AND source='twitch'
     """, (uid,))
     row = cur.fetchone()
@@ -5365,8 +5385,8 @@ def twitch_sync():
         con.close()
         return jsonify({"error": "Username missing"}), 400
 
-    state = json.loads(row[0])
-    username = state.get("username")
+    cfg = json.loads(row[0])
+    username = cfg.get("username")
 
     if not username:
         con.close()
@@ -5429,6 +5449,35 @@ def twitch_sync():
         "status": "stored_locally",
         "videos": result.get("videos", 0)
     })
+
+@app.route("/connectors/twitch/save_config", methods=["POST"])
+def twitch_save_config():
+
+    uid = get_uid()
+    data = request.json or {}
+
+    username = data.get("username")
+
+    if not username:
+        return jsonify({"error":"username required"}),400
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, config_json, created_at)
+        VALUES (?,?,?,datetime('now'))
+    """,(
+        uid,
+        "twitch",
+        json.dumps({"username": username})
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status":"saved"})
 
 #------------------- Tumblr --------------------------
 

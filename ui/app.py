@@ -1447,17 +1447,16 @@ def pinterest_save_config_proxy():
 def twitch_page():
     return render_template("connectors/twitch.html")
 
-
-@app.route("/connectors/twitch/connect", methods=["POST"])
+@app.route("/connectors/twitch/connect")
 def twitch_connect():
 
-    r = requests.post(
+    requests.get(
         "http://localhost:4000/connectors/twitch/connect",
-        json=request.json,
         cookies=request.cookies
     )
 
-    return jsonify(r.json()), r.status_code
+    # CRITICAL
+    return redirect("/connectors/twitch")
 
 @app.route("/connectors/twitch/disconnect")
 def twitch_disconnect():
@@ -1476,24 +1475,23 @@ def twitch_sync():
 @app.route("/api/status/twitch")
 def twitch_status():
 
-    uid = request.cookies.get("uid") or "demo_user"
+    r=requests.get(
+        "http://localhost:4000/api/status/twitch",
+        cookies=request.cookies
+    )
 
-    con = sqlite3.connect("../identity.db")
-    cur = con.cursor()
+    return jsonify(r.json())
 
-    cur.execute("""
-        SELECT enabled
-        FROM google_connections
-        WHERE uid=? AND source='twitch'
-        LIMIT 1
-    """, (uid,))
+@app.route("/connectors/twitch/save_config",methods=["POST"])
+def twitch_save_config_proxy():
 
-    row = cur.fetchone()
-    con.close()
+    r=requests.post(
+        "http://localhost:4000/connectors/twitch/save_config",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
 
-    return jsonify({
-        "connected": bool(row and row[0] == 1)
-    })
+    return jsonify(r.json()),r.status_code
 
 # ================= PEERTUBE =================
 
