@@ -761,30 +761,48 @@ def hackernews_stories():
 def nvd_page():
     return render_template("connectors/nvd.html")
 
+@app.route("/connectors/nvd/save_config", methods=["POST"])
+def nvd_save_config_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/nvd/save_config",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    try:
+        return jsonify(r.json()), r.status_code
+    except:
+        return jsonify({
+            "error": "identity_server returned non-json",
+            "status": r.status_code,
+            "body": r.text
+        }), r.status_code
 
 # CONNECT = FIRST SYNC
 @app.route("/connectors/nvd/connect")
 def nvd_connect():
 
-    r = requests.get("http://localhost:4000/nvd/sync")
+    r = requests.get(
+        "http://localhost:4000/connectors/nvd/connect",
+        cookies=request.cookies
+    )
 
     if r.status_code != 200:
         return r.text, 400
 
     return redirect("/connectors/nvd")
-
 
 # MANUAL SYNC
 @app.route("/connectors/nvd/sync")
 def nvd_sync():
 
-    r = requests.get("http://localhost:4000/nvd/sync")
+    r = requests.get(
+        "http://localhost:4000/connectors/nvd/sync",
+        cookies=request.cookies
+    )
 
-    if r.status_code != 200:
-        return r.text, 400
-
-    return redirect("/connectors/nvd")
-
+    return jsonify(r.json())
 
 @app.route("/dashboard/nvd")
 def nvd_dashboard():

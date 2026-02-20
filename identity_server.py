@@ -8389,38 +8389,19 @@ def nvd_sync_universal():
         "sync_type": sync_type
     })
 
-@app.route("/connectors/nvd/connect", methods=["POST"])
+@app.route("/connectors/nvd/connect")
 def nvd_connect():
 
     uid = get_uid()
-    data = request.json
-
-    keywords = data.get("keywords", [])
-    api_key = data.get("api_key")
 
     con = get_db()
     cur = con.cursor()
 
-    # Save connection state
     cur.execute("""
         INSERT OR REPLACE INTO google_connections
         (uid, source, enabled)
         VALUES (?, 'nvd', 1)
     """, (uid,))
-
-    # Save config into connector_state
-    cur.execute("""
-        INSERT OR REPLACE INTO connector_state
-        (uid, source, state_json, updated_at)
-        VALUES (?, 'nvd', ?, ?)
-    """, (
-        uid,
-        json.dumps({
-            "keywords": keywords,
-            "api_key": api_key
-        }),
-        datetime.datetime.utcnow().isoformat()
-    ))
 
     con.commit()
     con.close()
@@ -8454,16 +8435,28 @@ def nvd_status():
     con = get_db()
     cur = con.cursor()
 
+    # credentials
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='nvd'
+        LIMIT 1
+    """, (uid,))
+    creds = cur.fetchone()
+
+    # connection
     cur.execute("""
         SELECT enabled
         FROM google_connections
         WHERE uid=? AND source='nvd'
+        LIMIT 1
     """, (uid,))
-
     row = cur.fetchone()
+
     con.close()
 
     return jsonify({
+        "has_credentials": bool(creds and creds[0]),
         "connected": bool(row and row[0] == 1)
     })
 
@@ -8484,6 +8477,46 @@ def nvd_job_save():
         uid,
         data.get("sync_type"),
         data.get("schedule_time")
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "saved"})
+
+# ---------------- NVD SAVE CONFIG ----------------
+
+@app.route("/connectors/nvd/save_config", methods=["POST"])
+def nvd_save_config():
+
+    uid = get_uid()
+    data = request.get_json()
+
+    api_key = data.get("api_key")
+    keywords = data.get("keywords", [])
+
+    if not api_key:
+        return jsonify({"error": "API key required"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (
+            uid,
+            connector,
+            api_key,
+            config_json,
+            created_at
+        )
+        VALUES (?, 'nvd', ?, ?, datetime('now'))
+    """, (
+        uid,
+        api_key,
+        json.dumps({
+            "keywords": keywords
+        })
     ))
 
     con.commit()
