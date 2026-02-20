@@ -4495,37 +4495,49 @@ def youtube_job_save():
     return jsonify({"status": "job_saved"})
 
 #----------------Reddit----------------
-
-@app.route("/connectors/reddit/connect", methods=["POST"])
+@app.route("/connectors/reddit/connect")
 def reddit_connect():
 
     uid = get_uid()
-    data = request.json
 
-    from connectors.reddit import save_credentials
-
-    save_credentials(
-        uid,
-        data.get("client_id"),
-        data.get("client_secret"),
-        data.get("username"),
-        data.get("password")
-    )
-
-    # Enable connection
     con = get_db()
     cur = con.cursor()
 
     cur.execute("""
-        INSERT OR REPLACE INTO google_connections
-        (uid, source, enabled)
-        VALUES (?, 'reddit', 1)
+        SELECT client_id, client_secret, config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='reddit'
+        LIMIT 1
     """, (uid,))
+
+    row = cur.fetchone()
+
+    if not row:
+        return jsonify({"error":"Config missing"}),400
+
+    client_id, client_secret, cfg = row
+    cfg=json.loads(cfg)
+
+    from connectors.reddit import connect_reddit
+
+    connect_reddit(
+        uid,
+        client_id,
+        client_secret,
+        cfg["username"],
+        cfg["password"]
+    )
+
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid,source,enabled)
+        VALUES (?, 'reddit',1)
+    """,(uid,))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
 
 @app.route("/connectors/reddit/disconnect")
 def reddit_disconnect():
@@ -4547,6 +4559,71 @@ def reddit_disconnect():
     con.close()
 
     return jsonify({"status": "disconnected"})
+
+@app.route("/api/status/reddit")
+def reddit_status():
+
+    uid=get_uid()
+
+    con=get_db()
+    cur=con.cursor()
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='reddit'
+    """,(uid,))
+    conn=cur.fetchone()
+
+    cur.execute("""
+        SELECT client_id
+        FROM connector_configs
+        WHERE uid=? AND connector='reddit'
+    """,(uid,))
+    cfg=cur.fetchone()
+
+    con.close()
+
+    return jsonify({
+        "connected": bool(conn and conn[0]==1),
+        "has_credentials": bool(cfg)
+    })
+
+@app.route("/connectors/reddit/save_config", methods=["POST"])
+def reddit_save_config():
+
+    uid = get_uid()
+    data = request.json
+
+    client_id = data.get("client_id")
+    client_secret = data.get("client_secret")
+    username = data.get("username")
+    password = data.get("password")
+
+    if not all([client_id, client_secret, username, password]):
+        return jsonify({"error": "Missing fields"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, client_id, client_secret, config_json, created_at)
+        VALUES (?, 'reddit', ?, ?, ?, datetime('now'))
+    """, (
+        uid,
+        client_id,
+        client_secret,
+        json.dumps({
+            "username": username,
+            "password": password
+        })
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "saved"})
 
 @app.route("/connectors/reddit/job/get")
 def reddit_job_get():
@@ -4597,6 +4674,7 @@ def reddit_job_save():
     con.close()
 
     return jsonify({"status": "saved"})
+
 @app.route("/connectors/reddit/sync")
 def reddit_sync_universal():
 

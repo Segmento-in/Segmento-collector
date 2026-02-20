@@ -208,62 +208,46 @@ def github_save_app_proxy():
 def reddit_page():
     return render_template("connectors/reddit.html")
 
-
-
-# ---------- Reddit Login (User Credentials) ----------
-
-@app.route("/connectors/reddit/connect", methods=["GET", "POST"])
+@app.route("/connectors/reddit/connect")
 def reddit_connect():
 
-    # Show credential form
-    if request.method == "GET":
-        return render_template("connectors/reddit_login.html")
-
-
-    # Read form
-    client_id = request.form.get("client_id")
-    client_secret = request.form.get("client_secret")
-    username = request.form.get("username")
-    password = request.form.get("password")
-
-    uid = "demo_user"
-
-
-    payload = {
-        "uid": uid,
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "username": username,
-        "password": password
-    }
-
-
-    # Send to identity server
-    res = requests.post(
-        "http://localhost:4000/reddit/connect",
-        json=payload,
-        timeout=30
+    r = requests.get(
+        "http://localhost:4000/connectors/reddit/connect",
+        cookies=request.cookies
     )
 
+    return jsonify(r.json()), r.status_code
 
-    if res.status_code != 200:
-        return f"Auth Failed: {res.text}", 400
+@app.route("/connectors/reddit/disconnect")
+def reddit_disconnect():
 
+    r = requests.get(
+        "http://localhost:4000/connectors/reddit/disconnect",
+        cookies=request.cookies
+    )
 
-    return redirect("/connectors/reddit")
+    return jsonify(r.json())
 
+@app.route("/connectors/reddit/save_config", methods=["POST"])
+def reddit_save_config_proxy():
 
+    r = requests.post(
+        "http://localhost:4000/connectors/reddit/save_config",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
 
-# ---------- Reddit Sync ----------
+    return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/reddit/sync")
 def reddit_sync():
 
-    res = requests.get("http://localhost:4000/reddit/sync")
+    r = requests.get(
+        "http://localhost:4000/connectors/reddit/sync",
+        cookies=request.cookies
+    )
 
-    return res.json()
-
-
+    return jsonify(r.json())
 
 # ---------- Reddit Dashboard ----------
 
@@ -271,25 +255,36 @@ def reddit_sync():
 def reddit_dashboard():
     return render_template("dashboards/reddit.html")
 
-
-
-# ---------- Reddit Status ----------
-
 @app.route("/api/status/reddit")
 def reddit_status():
 
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
+    r = requests.get(
+        "http://localhost:4000/api/status/reddit",
+        cookies=request.cookies
+    )
 
-    cur.execute("SELECT COUNT(*) FROM reddit_accounts")
+    return jsonify(r.json())
 
-    count = cur.fetchone()[0]
+@app.route("/connectors/reddit/job/get")
+def reddit_job_get():
 
-    conn.close()
+    r = requests.get(
+        "http://localhost:4000/connectors/reddit/job/get",
+        cookies=request.cookies
+    )
 
-    return jsonify({"connected": count > 0})
+    return jsonify(r.json())
 
+@app.route("/connectors/reddit/job/save", methods=["POST"])
+def reddit_job_save():
 
+    r = requests.post(
+        "http://localhost:4000/connectors/reddit/job/save",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
 
 # ---------- Reddit Data API ----------
 
