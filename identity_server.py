@@ -8726,27 +8726,24 @@ def lemmy_status():
 
 # ---------------- OPENSTREETMAP ----------------
 
-@app.route("/connectors/openstreetmap/connect", methods=["POST"])
+@app.route("/connectors/openstreetmap/connect")
 def osm_connect():
 
-    uid = get_uid()
+    uid=get_uid()
 
-    con = get_db()
-    cur = con.cursor()
+    con=get_db()
+    cur=con.cursor()
 
-    now = datetime.datetime.utcnow().isoformat()
-
-    # Mark connector enabled
     cur.execute("""
-        INSERT OR REPLACE INTO google_connections
-        (uid, source, enabled)
-        VALUES (?, 'openstreetmap', 1)
-    """, (uid,))
+    INSERT OR REPLACE INTO google_connections
+    (uid,source,enabled)
+    VALUES (?,?,1)
+    """,(uid,"openstreetmap"))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
 
 @app.route("/connectors/openstreetmap/disconnect")
 def osm_disconnect():
@@ -8844,6 +8841,30 @@ def osm_sync():
         "status": "stored_locally",
         "new_changesets": result.get("new_changesets", 0),
         "new_notes": result.get("new_notes", 0)
+    })
+
+@app.route("/api/status/openstreetmap")
+def osm_status():
+
+    uid=get_uid()
+    con=get_db()
+    cur=con.cursor()
+
+    cur.execute("""
+    SELECT enabled
+    FROM google_connections
+    WHERE uid=? AND source='openstreetmap'
+    """,(uid,))
+
+    connected=bool(
+        (r:=cur.fetchone()) and r[0]==1
+    )
+
+    con.close()
+
+    return jsonify({
+        "connected":connected,
+        "has_credentials":True
     })
 
 # ---------------- NVD ----------------

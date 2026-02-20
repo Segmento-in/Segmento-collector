@@ -1603,28 +1603,25 @@ def peertube_save_proxy():
 def osm_page():
     return render_template("connectors/openstreetmap.html")
 
-
-@app.route("/connectors/openstreetmap/connect", methods=["POST"])
+@app.route("/connectors/openstreetmap/connect")
 def ui_osm_connect():
 
-    r = requests.post(
+    requests.get(
         "http://localhost:4000/connectors/openstreetmap/connect",
         cookies=request.cookies
     )
 
-    return jsonify(r.json())
-
+    return redirect("/connectors/openstreetmap")
 
 @app.route("/connectors/openstreetmap/disconnect")
 def ui_osm_disconnect():
 
-    r = requests.get(
+    requests.get(
         "http://localhost:4000/connectors/openstreetmap/disconnect",
         cookies=request.cookies
     )
 
-    return jsonify(r.json())
-
+    return redirect("/connectors/openstreetmap")
 
 @app.route("/connectors/openstreetmap/sync")
 def ui_osm_sync():
@@ -1644,21 +1641,14 @@ def osm_dashboard():
 # -------- STATUS --------
 
 @app.route("/api/status/openstreetmap")
-def osm_status():
+def osm_status_proxy():
 
-    con = sqlite3.connect("../identity.db")
-    cur = con.cursor()
+    r = requests.get(
+        "http://localhost:4000/api/status/openstreetmap",
+        cookies=request.cookies
+    )
 
-    cur.execute("SELECT COUNT(*) FROM osm_changesets")
-
-    c = cur.fetchone()[0]
-
-    con.close()
-
-    return jsonify({
-        "connected": c > 0
-    })
-
+    return jsonify(r.json())
 
 # -------- DATA --------
 
