@@ -570,6 +570,16 @@ def devto_job_save_proxy():
 def stackoverflow_page():
     return render_template("connectors/stackoverflow.html")
 
+@app.route("/connectors/stackoverflow/save_config", methods=["POST"])
+def stackoverflow_save_config_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/stackoverflow/save_config",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
 
 # CONNECT
 @app.route("/connectors/stackoverflow/connect")

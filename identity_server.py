@@ -6878,6 +6878,43 @@ def stackoverflow_connect():
 
     return jsonify({"status": "connected"})
 
+@app.route("/api/status/stackoverflow")
+def stackoverflow_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # connection
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='stackoverflow'
+        LIMIT 1
+    """, (uid,))
+    row = cur.fetchone()
+
+    connected = bool(row and row[0] == 1)
+
+    # api key
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='stackoverflow'
+        LIMIT 1
+    """, (uid,))
+
+    key_row = cur.fetchone()
+
+    api_key_saved = bool(key_row and key_row[0])
+
+    con.close()
+
+    return jsonify({
+        "has_credentials": api_key_saved,
+        "connected": connected
+    })
 
 @app.route("/connectors/stackoverflow/disconnect")
 def stackoverflow_disconnect():
@@ -7054,6 +7091,33 @@ def stackoverflow_sync_universal():
         "rows_pushed": pushed,
         "sync_type": sync_type
     })
+
+# ---------------- STACKOVERFLOW SAVE CONFIG ----------------
+
+@app.route("/connectors/stackoverflow/save_config", methods=["POST"])
+def stackoverflow_save_config():
+
+    uid = get_uid()
+    data = request.get_json()
+
+    api_key = data.get("api_key")
+
+    if not api_key:
+        return jsonify({"error": "API key required"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, api_key, created_at)
+        VALUES (?, 'stackoverflow', ?, datetime('now'))
+    """, (uid, api_key))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "saved"})
 
 # ---------------- HACKERNEWS ----------------
 

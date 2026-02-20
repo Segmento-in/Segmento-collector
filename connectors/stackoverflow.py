@@ -9,8 +9,6 @@ load_dotenv()
 
 DB = "identity.db"
 
-API_KEY = os.getenv("STACK_API_KEY")
-
 API = "https://api.stackexchange.com/2.3"
 
 
@@ -29,18 +27,35 @@ def db():
 
     return con
 
+def get_api_key(uid):
+
+    con = sqlite3.connect(DB)
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='stackoverflow'
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    if not row:
+        raise Exception("StackOverflow API key missing")
+
+    return row[0]
+
 # ---------------- API ----------------
+def so_get(uid, path, params=None):
 
-def so_get(path, params=None):
-
-    if not API_KEY:
-        raise Exception("STACK_API_KEY missing")
+    api_key = get_api_key(uid)
 
     p = params or {}
 
     p.update({
         "site": "stackoverflow",
-        "key": API_KEY,
+        "key": api_key,
         "pagesize": 100
     })
 
@@ -50,7 +65,6 @@ def so_get(path, params=None):
         raise Exception(r.text)
 
     return r.json()
-
 
 # ---------------- STATE ----------------
 
@@ -95,7 +109,7 @@ def sync_questions(uid, sync_type="historical"):
     else:
         last = get_state(uid, "questions")
 
-    data = so_get("/questions", {
+    data = so_get(uid, "/questions", {
         "fromdate": last,
         "order": "asc",
         "sort": "creation"
@@ -171,7 +185,7 @@ def sync_answers(uid, sync_type="historical"):
     else:
         last = get_state(uid, "answers")
 
-    data = so_get("/answers", {
+    data = so_get(uid, "/answers", {
         "fromdate": last,
         "order": "asc",
         "sort": "creation"
