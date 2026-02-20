@@ -1499,16 +1499,15 @@ def twitch_save_config_proxy():
 def peertube_page():
     return render_template("connectors/peertube.html")
 
-@app.route("/connectors/peertube/connect", methods=["POST"])
-def peertube_connect_proxy():
+@app.route("/connectors/peertube/connect")
+def peertube_connect():
 
-    r = requests.post(
+    requests.get(
         "http://localhost:4000/connectors/peertube/connect",
-        json=request.json,
         cookies=request.cookies
     )
 
-    return jsonify(r.json()), r.status_code
+    return redirect("/connectors/peertube")
 
 @app.route("/connectors/peertube/disconnect")
 def peertube_disconnect_proxy():
@@ -1541,19 +1540,12 @@ def peertube_dashboard():
 @app.route("/api/status/peertube")
 def peertube_status():
 
-    con = sqlite3.connect("../identity.db")
-    cur = con.cursor()
+    r=requests.get(
+        "http://localhost:4000/api/status/peertube",
+        cookies=request.cookies
+    )
 
-    cur.execute("SELECT COUNT(*) FROM peertube_videos")
-
-    c = cur.fetchone()[0]
-
-    con.close()
-
-    return jsonify({
-        "connected": c > 0
-    })
-
+    return jsonify(r.json())
 
 # -------- DATA --------
 
@@ -1593,6 +1585,17 @@ def peertube_channels():
     con.close()
 
     return jsonify(rows)
+
+@app.route("/connectors/peertube/save_config",methods=["POST"])
+def peertube_save_proxy():
+
+    r=requests.post(
+        "http://localhost:4000/connectors/peertube/save_config",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()),r.status_code
 
 # ================= OPENSTREETMAP =================
 

@@ -8001,49 +8001,32 @@ def peertube_sync():
         "rows": len(rows)
     })
 
-@app.route("/connectors/peertube/connect", methods=["POST"])
+@app.route("/connectors/peertube/connect")
 def peertube_connect():
 
-    uid = get_uid()
-    data = request.get_json()
+    uid=get_uid()
 
-    if not data:
-        return jsonify({"status": "error", "message": "No data provided"}), 400
+    con=get_db()
+    cur=con.cursor()
 
-    instance = data.get("instance")
-
-    if not instance:
-        return jsonify({"status": "error", "message": "Instance required"}), 400
-
-    instance = instance.strip().rstrip("/")
-
-    con = get_db()
-    cur = con.cursor()
-
-    now = datetime.datetime.utcnow().isoformat()
-
-    # Save instance inside connector_state
     cur.execute("""
-        INSERT OR REPLACE INTO connector_state
-        (uid, source, state_json, updated_at)
-        VALUES (?, 'peertube', ?, ?)
-    """, (
-        uid,
-        json.dumps({"instance": instance}),
-        now
-    ))
+    SELECT 1 FROM connector_configs
+    WHERE uid=? AND connector='peertube'
+    """,(uid,))
 
-    # Enable connector
+    if not cur.fetchone():
+        return jsonify({"error":"config missing"}),400
+
     cur.execute("""
-        INSERT OR REPLACE INTO google_connections
-        (uid, source, enabled)
-        VALUES (?, 'peertube', 1)
-    """, (uid,))
+    INSERT OR REPLACE INTO google_connections
+    (uid,source,enabled)
+    VALUES (?,?,1)
+    """,(uid,"peertube"))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
 
 @app.route("/connectors/peertube/disconnect")
 def peertube_disconnect():
@@ -8064,6 +8047,68 @@ def peertube_disconnect():
 
     return jsonify({"status": "disconnected"})
 
+@app.route("/connectors/peertube/save_config", methods=["POST"])
+def peertube_save_config():
+
+    uid = get_uid()
+    data = request.json or {}
+
+    instance = data.get("instance")
+
+    if not instance:
+        return jsonify({"error":"instance required"}),400
+
+    instance = instance.strip().rstrip("/")
+
+    con=get_db()
+    cur=con.cursor()
+
+    cur.execute("""
+    INSERT OR REPLACE INTO connector_configs
+    (uid,connector,config_json,created_at)
+    VALUES (?,?,?,datetime('now'))
+    """,(
+        uid,
+        "peertube",
+        json.dumps({"instance":instance})
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status":"saved"})
+
+@app.route("/api/status/peertube")
+def peertube_status():
+
+    uid=get_uid()
+    con=get_db()
+    cur=con.cursor()
+
+    cur.execute("""
+    SELECT enabled
+    FROM google_connections
+    WHERE uid=? AND source='peertube'
+    """,(uid,))
+
+    connected=bool(
+        (r:=cur.fetchone()) and r[0]==1
+    )
+
+    cur.execute("""
+    SELECT 1
+    FROM connector_configs
+    WHERE uid=? AND connector='peertube'
+    """,(uid,))
+
+    has_credentials=bool(cur.fetchone())
+
+    con.close()
+
+    return jsonify({
+        "connected":connected,
+        "has_credentials":has_credentials
+    })
 # ---------------- MASTODON ----------------
 
 @app.route("/connectors/mastodon/sync")
