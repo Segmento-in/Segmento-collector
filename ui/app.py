@@ -1912,17 +1912,25 @@ def ui_producthunt_save():
 def discourse_page():
     return render_template("connectors/discourse.html")
 
-
-@app.route("/connectors/discourse/connect", methods=["POST"])
+@app.route("/connectors/discourse/connect")
 def ui_discourse_connect():
 
-    r = requests.post(
+    requests.get(
         "http://localhost:4000/connectors/discourse/connect",
         cookies=request.cookies
     )
 
-    return jsonify(r.json()), r.status_code
+    return redirect("/connectors/discourse")
 
+@app.route("/api/status/discourse")
+def discourse_status():
+
+    r=requests.get(
+        "http://localhost:4000/api/status/discourse",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
 
 @app.route("/connectors/discourse/disconnect")
 def ui_discourse_disconnect():
@@ -1948,22 +1956,6 @@ def ui_discourse_sync():
 @app.route("/dashboard/discourse")
 def discourse_dashboard():
     return render_template("dashboards/discourse.html")
-
-@app.route("/api/status/discourse")
-def discourse_status():
-
-    r = requests.get(
-        "http://127.0.0.1:4000/discourse/data/topics",
-        headers={
-            "Cookie": request.headers.get("Cookie", "")
-        }
-    )
-
-    data = r.json()
-
-    return jsonify({
-        "connected": len(data) > 0
-    })
 
 @app.route("/api/discourse/topics")
 def ui_discourse_topics():

@@ -8425,24 +8425,66 @@ def mastodon_save_config():
 
 # ---------------- DISCOURSE ----------------
 
-@app.route("/connectors/discourse/connect", methods=["POST"])
+@app.route("/connectors/discourse/connect")
 def discourse_connect():
 
-    uid = get_uid()
+    uid=get_uid()
 
-    con = get_db()
-    cur = con.cursor()
+    con=get_db()
+    cur=con.cursor()
 
     cur.execute("""
-        INSERT OR REPLACE INTO google_connections
-        (uid, source, enabled)
-        VALUES (?, 'discourse', 1)
-    """, (uid,))
+    SELECT 1 FROM connector_configs
+    WHERE uid=? AND connector='discourse'
+    """,(uid,))
+
+    if not cur.fetchone():
+        return jsonify({"error":"config missing"}),400
+
+    cur.execute("""
+    INSERT OR REPLACE INTO google_connections
+    VALUES (?,?,1)
+    """,(uid,"discourse"))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
+
+@app.route("/connectors/discourse/save_config",methods=["POST"])
+def discourse_save():
+
+    uid=get_uid()
+    data=request.json or {}
+
+    forum=data.get("forum")
+    api_key=data.get("api_key")
+    api_user=data.get("api_user","system")
+
+    if not forum:
+        return jsonify({"error":"forum required"}),400
+
+    con=get_db()
+    cur=con.cursor()
+
+    cur.execute("""
+    INSERT OR REPLACE INTO connector_configs
+    (uid,connector,config_json,created_at)
+    VALUES (?,?,?,datetime('now'))
+    """,(
+        uid,
+        "discourse",
+        json.dumps({
+            "forum":forum,
+            "api_key":api_key,
+            "api_user":api_user
+        })
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status":"saved"})
 
 @app.route("/connectors/discourse/disconnect")
 def discourse_disconnect():
@@ -8462,6 +8504,38 @@ def discourse_disconnect():
     con.close()
 
     return jsonify({"status": "disconnected"})
+
+@app.route("/api/status/discourse")
+def discourse_status():
+
+    uid=get_uid()
+
+    con=get_db()
+    cur=con.cursor()
+
+    cur.execute("""
+    SELECT enabled
+    FROM google_connections
+    WHERE uid=? AND source='discourse'
+    """,(uid,))
+
+    connected=bool(
+        (r:=cur.fetchone()) and r[0]==1
+    )
+
+    cur.execute("""
+    SELECT 1 FROM connector_configs
+    WHERE uid=? AND connector='discourse'
+    """,(uid,))
+
+    has_credentials=bool(cur.fetchone())
+
+    con.close()
+
+    return jsonify({
+        "connected":connected,
+        "has_credentials":has_credentials
+    })
 
 @app.route("/connectors/discourse/sync")
 def discourse_sync():
