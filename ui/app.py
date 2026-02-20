@@ -1009,27 +1009,39 @@ def telegram_save_config_proxy():
 def tumblr_page():
     return render_template("connectors/tumblr.html")
 
-@app.route("/connectors/tumblr/connect", methods=["POST"])
-def tumblr_connect():
+@app.route("/connectors/tumblr/connect")
+def tumblr_connect_proxy():
 
-    data = request.json
-
-    r = requests.post(
+    r=requests.get(
         "http://localhost:4000/connectors/tumblr/connect",
-        json=data,
         cookies=request.cookies
     )
 
-    return jsonify(r.json())
+    return redirect("/connectors/tumblr")
 
+@app.route("/connectors/tumblr/save_config", methods=["POST"])
+def tumblr_save_config_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/tumblr/save_config",
+        json=request.json,
+        cookies=request.cookies
+    )
+
+    try:
+        return jsonify(r.json()), r.status_code
+    except:
+        return jsonify({
+            "error": "identity_server error",
+            "raw": r.text
+        }), r.status_code
 
 @app.route("/connectors/tumblr/sync")
-def tumblr_sync():
+def tumblr_sync_proxy():
 
-    blog = request.args.get("blog")
-
-    r = requests.get(
-        f"http://localhost:4000/connectors/tumblr/sync?blog={blog}"
+    r=requests.get(
+        "http://localhost:4000/connectors/tumblr/sync",
+        cookies=request.cookies
     )
 
     return jsonify(r.json())
@@ -1038,30 +1050,27 @@ def tumblr_sync():
 def tumblr_dashboard():
     return render_template("dashboards/tumblr.html")
 
+@app.route("/connectors/tumblr/disconnect")
+def tumblr_disconnect_proxy():
+
+    r=requests.get(
+        "http://localhost:4000/connectors/tumblr/disconnect",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
 
 # -------- STATUS --------
 
 @app.route("/api/status/tumblr")
-def tumblr_status():
+def tumblr_status_proxy():
 
-    uid = request.cookies.get("uid") or "demo_user"
+    r = requests.get(
+        "http://localhost:4000/api/status/tumblr",
+        cookies=request.cookies
+    )
 
-    conn = sqlite3.connect("../identity.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT enabled
-        FROM google_connections
-        WHERE uid=? AND source='tumblr'
-        LIMIT 1
-    """, (uid,))
-
-    row = cur.fetchone()
-    conn.close()
-
-    return jsonify({
-        "connected": bool(row and row[0] == 1)
-    })
+    return jsonify(r.json())
 
 # -------- DATA APIs --------
 

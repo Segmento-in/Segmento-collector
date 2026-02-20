@@ -17,23 +17,22 @@ def db():
 
 def get_api_key(uid):
 
-    con = db()
-    cur = con.cursor()
+    con=db()
+    cur=con.cursor()
 
     cur.execute("""
         SELECT api_key
-        FROM tumblr_accounts
-        WHERE uid=?
-    """, (uid,))
+        FROM connector_configs
+        WHERE uid=? AND connector='tumblr'
+    """,(uid,))
 
-    row = cur.fetchone()
+    row=cur.fetchone()
     con.close()
 
     if not row:
-        raise Exception("Tumblr not connected")
+        raise Exception("Tumblr not configured")
 
     return row[0]
-
 
 # ---------------- API ----------------
 

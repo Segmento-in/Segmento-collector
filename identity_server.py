@@ -5194,7 +5194,6 @@ def tumblr_sync_posts():
     return jsonify(sync_posts(uid, blog))
 
 # ---------------- TWITCH ----------------
-# ---------------- TWITCH ----------------
 
 @app.route("/connectors/twitch/connect", methods=["POST"])
 def twitch_connect():
@@ -5356,135 +5355,160 @@ def twitch_sync():
     })
 
 #------------------- Tumblr --------------------------
-@app.route("/connectors/tumblr/connect", methods=["POST"])
-def tumblr_connect():
+
+@app.route("/connectors/tumblr/save_config", methods=["POST"])
+def tumblr_save_config():
 
     uid = get_uid()
-    data = request.json
+    data = request.get_json()
 
     api_key = data.get("api_key")
 
     if not api_key:
-        return jsonify({"error": "api_key required"}), 400
+        return jsonify({"error":"API key required"}),400
 
     con = get_db()
     cur = con.cursor()
 
     cur.execute("""
-        INSERT OR REPLACE INTO tumblr_accounts
-        (uid, api_key, created_at)
-        VALUES (?,?,?)
-    """, (
-        uid,
-        api_key,
-        datetime.datetime.utcnow().isoformat()
-    ))
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, api_key, created_at)
+        VALUES (?, 'tumblr', ?, datetime('now'))
+    """,(uid, api_key))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status":"saved"})
+        
+@app.route("/connectors/tumblr/connect")
+def tumblr_connect():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # check config exists
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='tumblr'
+    """,(uid,))
+
+    row = cur.fetchone()
+
+    if not row:
+        con.close()
+        return jsonify({"error":"config missing"}),400
 
     cur.execute("""
         INSERT OR REPLACE INTO google_connections
         (uid, source, enabled)
         VALUES (?, 'tumblr', 1)
-    """, (uid,))
+    """,(uid,))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
 
 @app.route("/connectors/tumblr/disconnect")
 def tumblr_disconnect():
 
-    uid = get_uid()
+    uid=get_uid()
 
-    con = get_db()
-    cur = con.cursor()
-
-    cur.execute("DELETE FROM tumblr_accounts WHERE uid=?", (uid,))
+    con=get_db()
+    cur=con.cursor()
 
     cur.execute("""
         UPDATE google_connections
         SET enabled=0
         WHERE uid=? AND source='tumblr'
-    """, (uid,))
+    """,(uid,))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "disconnected"})
+    return jsonify({"status":"disconnected"})
 
 @app.route("/connectors/tumblr/sync")
 def tumblr_sync_universal():
 
-    uid = get_uid()
-    blog_name = request.args.get("blog")
+    uid=get_uid()
 
-    if not blog_name:
-        return jsonify({"error": "blog required"}), 400
+    con=get_db()
+    cur=con.cursor()
 
-    con = get_db()
-    cur = con.cursor()
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='tumblr'
+    """,(uid,))
+
+    if not cur.fetchone():
+        con.close()
+        return jsonify({"error":"not connected"}),400
 
     cur.execute("""
         SELECT sync_type
         FROM connector_jobs
         WHERE uid=? AND source='tumblr'
         LIMIT 1
-    """, (uid,))
+    """,(uid,))
 
-    job = cur.fetchone()
-    sync_type = job[0] if job else "historical"
+    job=cur.fetchone()
+    sync_type=job[0] if job else "historical"
 
     con.close()
 
     from connectors.tumblr import sync_posts
 
-    res = sync_posts(uid, blog_name, sync_type)
+    result=sync_posts(uid,sync_type)
 
-    total = res["posts"]
-    rows = res["rows"]
+    rows=result.get("rows",[])
 
-    # Destination
+    return jsonify({
+        "posts":len(rows),
+        "sync_type":sync_type
+    })
+
+@app.route("/api/status/tumblr")
+def tumblr_status():
+
+    uid = get_uid()
+
     con = get_db()
     cur = con.cursor()
 
+    # ---------- connection ----------
     cur.execute("""
-        SELECT dest_type, host, port, username, password, database_name
-        FROM destination_configs
-        WHERE uid=? AND source='tumblr' AND is_active=1
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='tumblr'
         LIMIT 1
-    """, (uid,))
+    """,(uid,))
+    conn = cur.fetchone()
 
-    dest_row = cur.fetchone()
+    connected = bool(conn and conn[0] == 1)
+
+    # ---------- credentials ----------
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='tumblr'
+        LIMIT 1
+    """,(uid,))
+    cfg = cur.fetchone()
+
+    has_credentials = bool(cfg and cfg[0])
+
     con.close()
 
-    if not dest_row:
-        return jsonify({
-            "posts": total,
-            "rows_pushed": 0,
-            "sync_type": sync_type
-        })
-
-    dest = {
-        "type": dest_row[0],
-        "host": dest_row[1],
-        "port": dest_row[2],
-        "username": dest_row[3],
-        "password": dest_row[4],
-        "database_name": dest_row[5]
-    }
-
-    from destinations.destination_router import push_to_destination
-
-    pushed = 0
-    if rows:
-        pushed = push_to_destination(dest, "tumblr_posts", rows)
-
     return jsonify({
-        "posts": total,
-        "rows_pushed": pushed,
-        "sync_type": sync_type
+        "connected": connected,
+        "has_credentials": has_credentials
     })
-
 
 # ---------------- DISCORD (BOT MODE) ----------------
 
