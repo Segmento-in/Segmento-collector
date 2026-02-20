@@ -2,72 +2,98 @@
 {% block content %}
 
 <section class="bg-slate-900 min-h-screen px-6 py-24 relative overflow-hidden">
-  
+
   <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full"></div>
   <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-amber-500/5 blur-[120px] rounded-full"></div>
 
-  <div class="max-w-7xl mx-auto relative z-10 space-y-24">
+  <div class="max-w-7xl mx-auto relative z-10 space-y-32">
 
-    <!-- Hero -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-      <div data-aos="fade-right">
-        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/30 bg-orange-500/5 text-orange-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
-          </span>
-          HACKERNEWS_FIREBASE_READY
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div data-aos="fade-right" class="pt-8">
+        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
+          <span id="statusDot" class="h-2 w-2 rounded-full bg-slate-600"></span>
+          <span id="statusText">NOT CONNECTED</span>
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
-            Hacker <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-300">News</span>
+          Hacker <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">News</span>
         </h1>
-        <p class="text-slate-300 text-xl mb-10 leading-relaxed font-medium max-w-xl">
-          The Segmento Hacker News Connector monitors top stories, job postings, and user submissions from the Y Combinator community to track industry sentiment.
+        <p class="text-slate-300 text-lg mb-6 leading-relaxed font-medium max-w-xl">
+          Segmento Hacker News Connector pulls real-time top stories, comments, 
+          job postings and user karma changes from the official Firebase API.
         </p>
 
-        <div class="flex flex-wrap gap-4 items-center" id="connectSection">
-            <button onclick="connectHackerNews()" id="connectBtn" 
-                    class="px-10 py-4 bg-orange-600 text-white rounded-2xl font-black hover:bg-white hover:text-orange-600 transition-all shadow-xl shadow-orange-600/20">
-              Connect Hacker News
-            </button>
-            <button onclick="disconnectHackerNews()" id="disconnectBtn" class="hidden px-10 py-4 bg-slate-700 text-white rounded-2xl font-black hover:bg-slate-600 transition-all">
-              Disconnect
-            </button>
-            <a href="/dashboard/hackernews" class="px-10 py-4 border border-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">
-              Dashboard
-            </a>
+        <div class="space-y-4 text-slate-400 text-sm max-w-lg mb-10">
+          <div class="flex gap-3">
+            <svg class="w-5 h-5 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Uses official public Firebase API — no API keys or authentication tokens required.</span>
+          </div>
+          <div class="flex gap-3">
+            <svg class="w-5 h-5 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Real-time listener + periodic full scan for historical catch-up.</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 items-center">
+          <a href="/dashboard/hackernews" id="dashboardBtn" 
+             class="px-10 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white hover:text-orange-900 transition-all shadow-xl">
+            Dashboard
+          </a>
+          <button onclick="disconnectHackerNews()" id="disconnectBtn" 
+                  class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
+            Disconnect
+          </button>
         </div>
       </div>
 
-      <div class="flex justify-center items-center" data-aos="zoom-in">
-        <div class="relative w-full max-w-[500px] h-[350px] bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ff6600 1px, transparent 1px); background-size: 30px 30px;"></div>
-            <div class="flex items-center justify-between w-full px-12 relative z-10">
-                <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
-                    <img src="/static/images/logos/hackernews.png" class="w-12 h-12 object-contain">
-                </div>
-                <div class="flex-1 h-[2px] mx-4 relative bg-slate-700">
-                    <div class="absolute inset-0 bg-gradient-to-r from-orange-600 to-amber-400 animate-[flow_2s_infinite_linear]"></div>
-                </div>
-                <div class="w-20 h-20 bg-slate-800 border-2 border-orange-500 rounded-full flex items-center justify-center shadow-2xl">
-                    <svg class="w-10 h-10 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                </div>
+      <div class="relative" data-aos="zoom-in">
+        <div id="connectSection" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl">
+          
+          <div class="flex justify-between mb-10 px-2">
+            <div class="flex flex-col items-center gap-2">
+              <div id="step1-circle" class="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-bold transition-all">1</div>
+              <span id="step1-label" class="text-[9px] font-mono text-orange-400 uppercase tracking-tighter font-bold">Authorize</span>
             </div>
-            <div class="absolute bottom-4 left-4 right-4 bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/5 font-mono text-[10px] text-orange-500 flex justify-between">
-                <span id="protocolStatus" class="animate-pulse">● FIREBASE_HN_V0</span>
-                <span id="dbStatus" class="text-slate-400 tracking-tighter">LISTENING_FOR_TOP_STORIES</span>
+            <div id="line1" class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all">2</div>
+              <span id="step2-label" class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Connected</span>
             </div>
+          </div>
+
+          <div id="credentialsForm" class="space-y-4">
+            <div id="inputGroup" class="py-8 text-center">
+              <p class="text-slate-400 text-sm mb-6">Click below to start listening to Hacker News real-time stream.</p>
+              <button id="authBtn" onclick="connectHackerNews()" 
+                      class="w-full py-5 bg-orange-600 text-white rounded-2xl font-black hover:bg-white hover:text-orange-600 transition-all shadow-lg shadow-orange-600/20 text-xs uppercase tracking-widest mt-2">
+                Connect Hacker News
+              </button>
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-white/5">
+              <h4 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">Setup Notes</h4>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 shrink-0"></span>
+                  <span>Public Firebase endpoint — no credentials needed.</span>
+                </li>
+                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 shrink-0"></span>
+                  <span>Initial sync may take several minutes depending on selected depth.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Controls: Sync Engine + Destination -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
-        <!-- Sync Engine -->
         <div class="lg:col-span-1">
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
                 <div class="flex items-center gap-3 mb-8">
@@ -114,7 +140,6 @@
             </div>
         </div>
 
-        <!-- Destination Setup – ORANGE THEME -->
         <div class="lg:col-span-2">
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
                 <div class="flex items-center justify-between mb-8">
@@ -180,7 +205,6 @@
         </div>
     </div>
 
-    <!-- Pipeline Steps -->
     <div>
       <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">How HN <span class="text-orange-500">Sync Works</span></h2>
       <div class="grid md:grid-cols-3 gap-8">
@@ -198,7 +222,6 @@
       </div>
     </div>
 
-    <!-- Schema -->
     <div class="pt-12">
       <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">Data <span class="text-orange-500">Architecture</span></h2>
       
@@ -230,7 +253,6 @@
       </div>
     </div>
 
-    <!-- Extraction Entities -->
     <div class="mb-32">
       <h2 class="text-4xl font-black mb-12 text-center text-white">Extraction Points</h2>
       <div class="grid md:grid-cols-3 gap-6">
@@ -265,36 +287,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function checkHackerNewsStatus(){
     try {
-        const res = await fetch("http://localhost:4000/api/status/hackernews").then(r => r.json());
-        const connectBtn = document.getElementById("connectBtn");
-        const disconnectBtn = document.getElementById("disconnectBtn");
-        const badge = document.getElementById("statusBadge");
+        const res = await fetch("/api/status/hackernews").then(r => r.json());
+        const isConnected = res.connected || false;
 
-        if(res.connected){
-            connectBtn.classList.add("hidden");
-            disconnectBtn.classList.remove("hidden");
-            badge.innerHTML = `<span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
-              </span> CONNECTED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/30 bg-orange-500/5 text-orange-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        const authBtn = document.getElementById("authBtn");
+        const inputGroup = document.getElementById("inputGroup");
+        const disconnectBtn = document.getElementById("disconnectBtn");
+
+        if(isConnected){
+            updateStatusBadge("CONNECTED", "emerald");
+            inputGroup.classList.add('hidden');
+            disconnectBtn.classList.remove('hidden');
+            updateSteps(2);
+        } else {
+            updateStatusBadge("NOT CONNECTED", "slate");
+            inputGroup.classList.remove('hidden');
+            disconnectBtn.classList.add('hidden');
+            updateSteps(1);
         }
-    } catch(e) { console.error(e); }
+    } catch(e) {}
+}
+
+function updateStatusBadge(text, color) {
+    const badge = document.getElementById("statusBadge");
+    const dot = document.getElementById("statusDot");
+    const textEl = document.getElementById("statusText");
+
+    textEl.innerText = text;
+
+    if(color === "emerald") {
+        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        dot.className = "h-2 w-2 rounded-full bg-emerald-500 animate-pulse";
+    } else {
+        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        dot.className = "h-2 w-2 rounded-full bg-slate-600";
+    }
+}
+
+function updateSteps(step){
+    const circles = [document.getElementById("step1-circle"), document.getElementById("step2-circle")];
+    const labels = [document.getElementById("step1-label"), document.getElementById("step2-label")];
+    const line1 = document.getElementById("line1");
+
+    circles.forEach((c, i) => {
+        c.innerHTML = i + 1;
+        c.className = "w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all";
+    });
+    labels.forEach(l => l.className = "text-[9px] font-mono text-slate-500 uppercase tracking-tighter");
+    line1.className = "flex-1 h-[1px] bg-slate-700 mt-4 mx-2";
+
+    for(let i=0; i<step; i++) {
+        circles[i].className = "w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-bold transition-all";
+        labels[i].className = "text-[9px] font-mono text-orange-400 uppercase tracking-tighter font-bold";
+        if(i > 0) line1.className = "flex-1 h-[1px] bg-orange-600 mt-4 mx-2";
+        if(i < step - 1 || (step === 2)) {
+            circles[i].innerHTML = "✓";
+            circles[i].className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all";
+        }
+    }
 }
 
 function connectHackerNews(){
     window.location.href = "/connectors/hackernews/connect";
 }
 
-async function disconnectHackerNews(){
-    if(!confirm("Disconnect Hacker News?")) return;
-    await fetch("/connectors/hackernews/disconnect");
-    location.reload();
+function disconnectHackerNews() {
+    if(!confirm("Disconnect Hacker News stream?")) return;
+    fetch("/connectors/hackernews/disconnect").then(() => location.reload());
 }
 
 async function loadDestinations(){
     try {
-        const res = await fetch(`http://localhost:4000/destination/list/hackernews`);
+        const res = await fetch(`/destination/list/hackernews`);
         const data = await res.json();
         const dropdown = document.getElementById("destDropdown");
         const statusEl = document.getElementById("destStatus");
@@ -321,7 +385,7 @@ async function loadDestinations(){
 
 async function activateDest(id){
     if(!id) return;
-    const res = await fetch("http://localhost:4000/destination/activate", {
+    const res = await fetch("/destination/activate", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({ source: "hackernews", dest_id: id })
@@ -373,7 +437,7 @@ async function saveDestination(){
     }
 
     try {
-        const res = await fetch("http://localhost:4000/destination/save", {
+        const res = await fetch("/destination/save", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(payload)
