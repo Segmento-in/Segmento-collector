@@ -840,123 +840,58 @@ def nvd_cves():
 def discord_page():
     return render_template("connectors/discord.html")
 
-
-@app.route("/connectors/discord/connect", methods=["POST"])
-def discord_connect():
-
-    data = request.json
+@app.route("/connectors/discord/save_config", methods=["POST"])
+def discord_save_config_proxy():
 
     r = requests.post(
-        "http://localhost:4000/connectors/discord/connect",
-        json=data
+        "http://localhost:4000/connectors/discord/save_config",
+        json=request.get_json(),
+        cookies=request.cookies
     )
 
-    print("STATUS:", r.status_code)
-    print("TEXT:", r.text)
-    return jsonify({
-        "status_code": r.status_code,
-        "raw": r.text
-    })
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/discord/connect")
+def discord_connect_proxy():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/discord/connect"
+    )
+
+    if r.status_code != 200:
+        return r.text, 400
+
+    return redirect("/connectors/discord")
+
+@app.route("/connectors/discord/disconnect")
+def discord_disconnect_proxy():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/discord/disconnect",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
 
 @app.route("/connectors/discord/sync")
 def discord_sync():
 
     r = requests.get(
-        "http://localhost:4000/connectors/discord/sync"
-    )
-
-    try:
-        return jsonify(r.json())
-    except:
-        return jsonify({"error": "sync failed"}), 500
-    
-@app.route("/connectors/discord/disconnect")
-def discord_disconnect():
-
-    r = requests.get(
-        "http://localhost:4000/connectors/discord/disconnect"
+        "http://localhost:4000/connectors/discord/sync",
+        cookies=request.cookies
     )
 
     return jsonify(r.json())
 
-@app.route("/dashboard/discord")
-def discord_dashboard():
-    return render_template("dashboards/discord.html")
-
-
-# ---------- STATUS ----------
-
 @app.route("/api/status/discord")
-def discord_status():
+def discord_status_proxy():
 
-    conn = sqlite3.connect("../identity.db")
-    cur = conn.cursor()
+    r = requests.get(
+        "http://localhost:4000/api/status/discord",
+        cookies=request.cookies
+    )
 
-    cur.execute("SELECT COUNT(*) FROM discord_guilds")
-
-    count = cur.fetchone()[0]
-
-    conn.close()
-
-    return jsonify({"connected": count > 0})
-
-
-# ---------- DATA APIs ----------
-
-@app.route("/api/discord/guilds")
-def discord_guilds():
-
-    conn = sqlite3.connect("../identity.db")
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-
-    cur.execute("SELECT * FROM discord_guilds")
-
-    rows = cur.fetchall()
-    conn.close()
-
-    return jsonify([dict(r) for r in rows])
-
-
-@app.route("/api/discord/channels/<gid>")
-def discord_channels(gid):
-
-    conn = sqlite3.connect("../identity.db")
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT *
-        FROM discord_channels
-        WHERE guild_id=?
-    """, (gid,))
-
-    rows = cur.fetchall()
-    conn.close()
-
-    return jsonify([dict(r) for r in rows])
-
-
-@app.route("/api/discord/messages/<cid>")
-def discord_messages(cid):
-
-    conn = sqlite3.connect("../identity.db")
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT *
-        FROM discord_messages
-        WHERE channel_id=?
-        ORDER BY timestamp DESC
-        LIMIT 200
-    """, (cid,))
-
-    rows = cur.fetchall()
-
-    conn.close()
-
-    return jsonify([dict(r) for r in rows])
+    return jsonify(r.json())
 
 # ================= TELEGRAM =================
 

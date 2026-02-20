@@ -18,8 +18,17 @@ API = "https://discord.com/api/v10"
 # ---------------- DB ----------------
 
 def db():
-    return sqlite3.connect(DB, timeout=30)
+    con = sqlite3.connect(
+        DB,
+        timeout=60,
+        check_same_thread=False,
+        isolation_level=None
+    )
 
+    con.execute("PRAGMA journal_mode=WAL;")
+    con.execute("PRAGMA synchronous=NORMAL;")
+
+    return con
 
 # ---------------- API (BOT AUTH) ----------------
 
@@ -62,8 +71,8 @@ def discord_get(path, uid, params=None):
         return discord_get(path, uid, params)
 
     if r.status_code != 200:
-        raise Exception(r.text)
-
+        print("[DISCORD ERROR]", r.status_code, r.text[:300])
+        return []
 
     return r.json()
 
@@ -151,9 +160,6 @@ def sync_messages(uid, channel_id, sync_type="historical"):
     inserted_rows = []
     newest_id = None
 
-    # ------------------------------
-    # GET LAST STATE
-    # ------------------------------
     last_id = None
 
     cur.execute("""
@@ -166,9 +172,6 @@ def sync_messages(uid, channel_id, sync_type="historical"):
     if row:
         last_id = row[0]
 
-    # ------------------------------
-    # INCREMENTAL MODE
-    # ------------------------------
     if sync_type == "incremental":
 
         if not last_id:
@@ -180,9 +183,6 @@ def sync_messages(uid, channel_id, sync_type="historical"):
             "after": last_id
         }
 
-    # ------------------------------
-    # HISTORICAL MODE
-    # ------------------------------
     else:
         params = {
             "limit": 50
@@ -227,9 +227,6 @@ def sync_messages(uid, channel_id, sync_type="historical"):
             if not newest_id or message_id > newest_id:
                 newest_id = message_id
 
-    # ------------------------------
-    # SAVE STATE
-    # ------------------------------
     if newest_id:
         cur.execute("""
             INSERT OR REPLACE INTO discord_state

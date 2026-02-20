@@ -6,68 +6,86 @@
   <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-600/10 blur-[120px] rounded-full"></div>
   <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/5 blur-[120px] rounded-full"></div>
 
-  <div class="max-w-7xl mx-auto relative z-10 space-y-24">
+  <div class="max-w-7xl mx-auto relative z-10 space-y-32">
 
-    <!-- Hero -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-      <div data-aos="fade-right">
-        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/5 text-indigo-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-          </span>
-          DISCORD_BOT_READY
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div data-aos="fade-right" class="pt-8">
+        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
+          <span id="statusDot" class="h-2 w-2 rounded-full bg-slate-600"></span>
+          <span id="statusText">NOT CONNECTED</span>
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
-            Discord <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Connector</span>
+            Discord <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-400">Connector</span>
         </h1>
-        <p class="text-slate-300 text-xl mb-10 leading-relaxed font-medium max-w-xl">
-          Bridge your community discussions into your data lake. Segmento syncs servers, channels, and message histories using secure bot-level integration.
+        <p class="text-slate-300 text-lg mb-6 leading-relaxed font-medium max-w-xl">
+          Sync server messages, member activity, and channel analytics directly from your Discord Guilds into your data warehouse using a Bot Token.
         </p>
 
-        <div class="flex flex-wrap gap-4 items-center" id="connectSection">
-            <button onclick="connectDiscord()" id="connectBtn" 
-                    class="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-white hover:text-indigo-600 transition-all shadow-xl shadow-indigo-600/20">
-              Connect Discord
-            </button>
-            <button onclick="disconnectDiscord()" id="disconnectBtn" class="hidden px-10 py-4 bg-slate-700 text-white rounded-2xl font-black hover:bg-slate-600 transition-all">
-              Disconnect
-            </button>
-            <a href="/dashboard/discord" class="px-10 py-4 border border-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">
-              Dashboard
-            </a>
+        <div class="space-y-4 text-slate-400 text-sm max-w-lg mb-10">
+          <div class="flex gap-3">
+            <svg class="w-5 h-5 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Your Bot must have 'Server Members' and 'Message Content' intents enabled in the Discord Developer Portal.</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 items-center">
+            <a href="/dashboard/discord" id="dashboardBtn" class="px-10 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white hover:text-indigo-900 transition-all shadow-xl">Dashboard</a>
+            <button onclick="disconnectDiscord()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">Disconnect</button>
         </div>
       </div>
 
-      <div class="flex justify-center items-center" data-aos="zoom-in">
-        <div class="relative w-full max-w-[500px] h-[350px] bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#5865F2 1px, transparent 1px); background-size: 30px 30px;"></div>
-            <div class="flex items-center justify-between w-full px-12 relative z-10">
-                <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
-                    <img src="/static/images/logos/discord.png" class="w-12 h-12 object-contain">
-                </div>
-                <div class="flex-1 h-[2px] mx-4 relative bg-slate-700">
-                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-blue-400 animate-[flow_2s_infinite_linear]"></div>
-                </div>
-                <div class="w-20 h-20 bg-slate-800 border-2 border-indigo-500 rounded-full flex items-center justify-center shadow-2xl">
-                    <svg class="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
-                    </svg>
+      <div class="relative" data-aos="zoom-in">
+        <div id="connectSection" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl">
+          
+          <div class="flex justify-between mb-10 px-2">
+            <div class="flex flex-col items-center gap-2">
+              <div id="step1-circle" class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold transition-all">1</div>
+              <span id="step1-label" class="text-[9px] font-mono text-indigo-400 uppercase tracking-tighter font-bold">App Token</span>
+            </div>
+            <div id="line1" class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all">2</div>
+              <span id="step2-label" class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Authorize</span>
+            </div>
+            <div id="line2" class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step3-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all">3</div>
+              <span id="step3-label" class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Connected</span>
+            </div>
+          </div>
+
+          <div id="credentialsForm" class="space-y-4">
+            <div id="inputGroup" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Discord Bot Token</label>
+                    <input id="bot_token" type="password" placeholder="MTAx..." class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-400 transition-all shadow-inner">
                 </div>
             </div>
-            <div class="absolute bottom-4 left-4 right-4 bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/5 font-mono text-[10px] text-indigo-400 flex justify-between">
-                <span id="protocolStatus" class="animate-pulse">● WSS_GATEWAY_CONNECTED</span>
-                <span id="dbStatus" class="text-slate-400 tracking-tighter">DISCORD_v10</span>
+
+            <button id="authBtn" onclick="handleAuthAction()" class="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black hover:bg-white hover:text-indigo-600 transition-all shadow-lg shadow-indigo-600/20 text-xs uppercase tracking-widest mt-2">
+              Save Bot Token
+            </button>
+
+            <div class="mt-8 pt-8 border-t border-white/5">
+              <h4 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">Setup Instructions</h4>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
+                  <span>Create a Bot at <a href="https://discord.com/developers/applications" target="_blank" class="text-indigo-400 underline italic">Discord Dev Portal</a>.</span>
+                </li>
+                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                  <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
+                  <span>Copy the Bot Token and paste it into the field above.</span>
+                </li>
+              </ul>
             </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Controls: Sync Engine + Destination -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
-        <!-- Sync Engine -->
         <div class="lg:col-span-1">
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
                 <div class="flex items-center gap-3 mb-8">
@@ -78,34 +96,25 @@
                     </div>
                     <h3 class="text-white font-black text-xl">Sync Engine</h3>
                 </div>
-                
                 <div class="space-y-6">
                     <div>
                         <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh Strategy</label>
                         <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-indigo-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
-                            <option value="incremental">Incremental</option>
-                            <option value="historical">Historical (Full)</option>
+                            <option value="historical">Historical (Full Load)</option>
+                            <option value="incremental" selected>Incremental (Delta)</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Daily Schedule</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="relative">
-                                <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-indigo-500 outline-none">
-                                    {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}" class="bg-slate-800">{{ '%02d' % h }}</option>{% endfor %}
-                                </select>
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 pointer-events-none">H</span>
-                            </div>
-                            <div class="relative">
-                                <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-indigo-500 outline-none">
-                                    {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}" class="bg-slate-800">{{ '%02d' % m }}</option>{% endfor %}
-                                </select>
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 pointer-events-none">M</span>
-                            </div>
+                            <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 text-center font-bold">
+                                {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}">{{ '%02d' % h }}</option>{% endfor %}
+                            </select>
+                            <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 text-center font-bold">
+                                {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}">{{ '%02d' % m }}</option>{% endfor %}
+                            </select>
                         </div>
                     </div>
-
                     <div class="pt-6 space-y-3">
                         <button onclick="saveJob()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update Schedule</button>
                         <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-indigo-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
@@ -114,25 +123,24 @@
             </div>
         </div>
 
-        <!-- Destination Setup – INDIGO THEME -->
         <div class="lg:col-span-2">
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
                 <div class="flex items-center justify-between mb-8">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
-                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                             </svg>
                         </div>
                         <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
                     </div>
-                    <div id="destStatus" class="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase font-bold tracking-tighter">System Ready</div>
+                    <div id="destStatus" class="text-[10px] font-mono text-blue-400 bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-500/20 uppercase font-bold tracking-tighter">System Ready</div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="md:col-span-2">
                         <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block">Target Platform</label>
-                        <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-indigo-500 transition-all outline-none">
+                        <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-blue-500 transition-all outline-none">
                             <option value="">Select Connector...</option>
                             <option value="mysql">MySQL</option>
                             <option value="postgres">PostgreSQL</option>
@@ -140,57 +148,41 @@
                             <option value="snowflake">SnowFlake</option>
                         </select>
                     </div>
-
                     <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                         <div id="sqlFields" class="contents">
-                            <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-indigo-500 outline-none text-sm transition-all">
-                            <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-indigo-500 outline-none text-sm transition-all">
-                            <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-indigo-500 outline-none text-sm transition-all">
-                            <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-indigo-500 outline-none text-sm transition-all">
-                            <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-indigo-500 outline-none text-sm transition-all">
+                            <input id="dbHost" placeholder="Host" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
+                            <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
+                            <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
+                            <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
+                            <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
                         </div>
-
-                        <div id="bigqueryFields" class="hidden contents">
-                            <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-indigo-500 outline-none text-sm transition-all">
-                            <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-indigo-500 outline-none text-sm transition-all">
-                            <div class="md:col-span-2">
-                                <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-indigo-500 outline-none text-sm transition-all resize-y"></textarea>
-                            </div>
-                        </div>
-
                         <div class="md:col-span-2 pt-2">
-                            <button onclick="saveDestination()" id="saveDestBtn" 
-                                    class="w-full py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-indigo-600/30 text-xs uppercase tracking-widest">
-                              Authenticate & Save
-                            </button>
+                            <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-blue-600/30 text-xs uppercase tracking-widest">Authenticate & Save</button>
                         </div>
                     </div>
                 </div>
-
                 <div class="mt-8 pt-8 border-t border-white/5">
                     <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection Switcher</label>
-                    <div class="relative">
-                        <select id="destDropdown" onchange="activateDest(this.value)" 
-                                class="w-full p-4 rounded-xl bg-black/40 text-indigo-300 border border-indigo-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
-                            <option value="">Loading connections...</option>
-                        </select>
-                    </div>
+                    <select id="destDropdown" onchange="activateDest(this.value)" class="w-full p-4 rounded-xl bg-black/40 text-blue-300 border border-blue-500/20 outline-none text-sm font-bold">
+                        <option value="">Loading connections...</option>
+                    </select>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Pipeline Steps -->
-    <div>
-      <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">Communication <span class="text-indigo-400">Sync Pipeline</span></h2>
+    <div class="max-w-7xl mx-auto relative z-10 pt-16 pb-24">
+      <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">
+        Extraction <span class="text-indigo-400">Section</span>
+      </h2>
       <div class="grid md:grid-cols-3 gap-8">
         {% for step, title, desc in [
-          ('01', 'Bot Handshake', 'Establish a secure WebSocket connection via your Discord Bot token.'),
-          ('02', 'Guild Mapping', 'Segmento crawls authorized servers to index channels and roles.'),
-          ('03', 'Message Archiving', 'Conversations and attachments are synced into structured SQLite tables.')
+          ('01', 'Gateway Socket', 'Establishing a real-time connection to Discord WebSocket for event streaming.'),
+          ('02', 'Channel Crawler', 'Recursively traversing authorized guilds and mapping channel hierarchies.'),
+          ('03', 'Payload Analysis', 'Parsing message JSON and indexing attachments into relational storage.')
         ] %}
         <div class="group p-10 bg-slate-800/40 border border-white/5 rounded-[2.5rem] hover:bg-slate-800/80 transition-all hover:-translate-y-2">
-          <div class="text-5xl font-black text-slate-700/30 mb-6 group-hover:text-indigo-500 transition-colors">{{step}}</div>
+          <div class="text-5xl font-black text-slate-700/30 mb-6 group-hover:text-indigo-400 transition-colors">{{step}}</div>
           <h3 class="text-2xl font-bold text-white mb-3">{{title}}</h3>
           <p class="text-slate-400 leading-relaxed text-sm">{{desc}}</p>
         </div>
@@ -198,16 +190,17 @@
       </div>
     </div>
 
-    <!-- Schema -->
-    <div class="pt-12">
-      <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">Database <span class="text-indigo-400">Architecture</span></h2>
+    <div class="max-w-7xl mx-auto relative z-10 pt-16 pb-24">
+      <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">
+        Relational <span class="text-indigo-400">Schema & ERD</span>
+      </h2>
       
       <div class="grid lg:grid-cols-2 gap-12 items-start">
         <div class="grid grid-cols-1 gap-4">
           {% for table, columns in [
-            ('discord_guilds', ['id', 'name', 'owner_id', 'member_count', 'icon_url']),
             ('discord_messages', ['id', 'channel_id', 'author_id', 'content', 'timestamp', 'attachments']),
-            ('discord_users', ['id', 'username', 'discriminator', 'avatar', 'is_bot'])
+            ('discord_members', ['id', 'username', 'discriminator', 'joined_at', 'roles', 'avatar_url']),
+            ('discord_guilds', ['id', 'name', 'owner_id', 'member_count', 'premium_tier'])
           ] %}
           <div class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-indigo-500/30 transition-all group">
             <div class="flex items-center gap-3 mb-4">
@@ -230,223 +223,190 @@
       </div>
     </div>
 
-    <!-- Extraction Entities -->
-    <div class="mb-32">
-      <h2 class="text-4xl font-black mb-12 text-center text-white">Data Points Collected</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        {% for table in ['discord_guilds', 'discord_messages', 'discord_users'] %}
-        <div class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-indigo-600/5 hover:border-indigo-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
-          <div class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-indigo-600 transition-all duration-500 shadow-xl">
-            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
-          </div>
-          <span class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">{{table}}</span>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
   </div>
+
 </section>
 
-<style>
-  @keyframes flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
-  .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
-  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
-</style>
-
 <script>
+let isConnected = false;
+let hasCredentials = false;
+
 document.addEventListener("DOMContentLoaded", () => {
-    checkDiscordStatus();
+    checkStatus();
     loadDestinations();
     loadJob();
 });
 
-async function checkDiscordStatus(){
+async function checkStatus(){
     try {
-        const res = await fetch("http://localhost:4000/api/status/discord").then(r => r.json());
-        const connectBtn = document.getElementById("connectBtn");
+        const res = await fetch("/api/status/discord").then(r => r.json());
+        isConnected = res.connected;
+        hasCredentials = res.has_credentials;
+
+        const authBtn = document.getElementById("authBtn");
+        const inputGroup = document.getElementById("inputGroup");
         const disconnectBtn = document.getElementById("disconnectBtn");
-        const badge = document.getElementById("statusBadge");
 
-        if(res.connected){
-            connectBtn.classList.add("hidden");
-            disconnectBtn.classList.remove("hidden");
-            badge.innerHTML = `<span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-              </span> CONNECTED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/5 text-indigo-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        if(isConnected){
+            updateStatusBadge("CONNECTED", "emerald");
+            inputGroup.classList.add('hidden');
+            authBtn.classList.add('hidden');
+            disconnectBtn.classList.remove('hidden');
+            updateSteps(3);
+        } 
+        else if (hasCredentials) {
+            updateStatusBadge("TOKEN_SAVED", "indigo");
+            inputGroup.classList.add('hidden');
+            authBtn.innerText = "Connect Discord";
+            authBtn.classList.remove('hidden');
+            disconnectBtn.classList.add('hidden');
+            updateSteps(2);
         }
-    } catch(e) { console.error(e); }
-}
-
-async function connectDiscord(){
-    const token = prompt("Enter Discord Bot Token:");
-
-    await fetch("/connectors/discord/connect", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ bot_token: token })
-    });
-
-    location.reload();
-}
-
-async function disconnectDiscord(){
-    if(!confirm("Disconnect Discord?")) return;
-    await fetch("/connectors/discord/disconnect");
-    location.reload();
-}
-
-async function loadDestinations(){
-    try {
-        const res = await fetch(`http://localhost:4000/destination/list/discord`);
-        const data = await res.json();
-        const dropdown = document.getElementById("destDropdown");
-        const statusEl = document.getElementById("destStatus");
-        
-        dropdown.innerHTML = '<option value="">Loading connections...</option>';
-        
-        if(data.destinations?.length){
-            data.destinations.forEach(d => {
-                const opt = document.createElement("option");
-                opt.value = d.id;
-                opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database} (@${d.host || '—'})`;
-                if(d.active) {
-                    opt.selected = true;
-                    statusEl.innerText = "Connection Active";
-                    statusEl.classList.replace("text-indigo-400", "text-emerald-400");
-                }
-                dropdown.appendChild(opt);
-            });
-        } else {
-            statusEl.innerText = "No destination configured";
-        }
-    } catch(e) { console.error(e); }
-}
-
-async function activateDest(id){
-    if(!id) return;
-    const res = await fetch("http://localhost:4000/destination/activate", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ source: "discord", dest_id: id })
-    });
-    if(res.ok) loadDestinations();
-}
-
-function toggleDest() {
-    const type = document.getElementById("destType").value;
-    const wrapper = document.getElementById("dbFields");
-    const sql = document.getElementById("sqlFields");
-    const bq = document.getElementById("bigqueryFields");
-
-    if(!type){
-        wrapper.classList.add("hidden");
-        return;
-    }
-
-    wrapper.classList.remove("hidden");
-
-    if(type === "bigquery"){
-        sql.classList.add("hidden");
-        bq.classList.remove("hidden");
-    } else {
-        sql.classList.remove("hidden");
-        bq.classList.add("hidden");
-    }
-}
-
-async function saveDestination(){
-    const btn = document.getElementById("saveDestBtn");
-    btn.innerText = "AUTHENTICATING..."; btn.disabled = true;
-
-    const type = document.getElementById("destType").value;
-    let payload = { source: "discord", type };
-
-    if(type === "bigquery"){
-        payload.host = document.getElementById("bqProject")?.value || "";
-        payload.database = document.getElementById("bqDataset")?.value || "";
-        payload.password = document.getElementById("bqKey")?.value || "";
-        payload.port = "";
-        payload.username = "";
-    } else if(type) {
-        payload.host = document.getElementById("dbHost").value;
-        payload.port = document.getElementById("dbPort").value;
-        payload.username = document.getElementById("dbUser").value;
-        payload.password = document.getElementById("dbPass").value;
-        payload.database = document.getElementById("dbName").value;
-    }
-
-    try {
-        const res = await fetch("http://localhost:4000/destination/save", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
-        });
-        if(res.ok) {
-            btn.innerText = "SAVED ✓";
-            btn.classList.replace("bg-indigo-600", "bg-emerald-600");
-            loadDestinations();
-            setTimeout(() => {
-                btn.innerText = "Authenticate & Save";
-                btn.classList.replace("bg-emerald-600", "bg-indigo-600");
-                btn.disabled = false;
-            }, 2000);
-        }
-    } catch(e) {
-        alert("Connection failed");
-        btn.disabled = false;
-    }
-}
-
-async function loadJob(){
-    try {
-        const data = await fetch("/connectors/discord/job/get").then(r => r.json());
-        if(data.schedule_time){
-            const [h, m] = data.schedule_time.split(':');
-            document.getElementById("hourSelect").value = h;
-            document.getElementById("minSelect").value = m;
-            document.getElementById("syncType").value = data.sync_type || "incremental";
+        else {
+            updateStatusBadge("NOT CONNECTED", "slate");
+            inputGroup.classList.remove('hidden');
+            authBtn.innerText = "Save Bot Token";
+            authBtn.classList.remove('hidden');
+            disconnectBtn.classList.add('hidden');
+            updateSteps(1);
         }
     } catch(e) {}
 }
 
-async function saveJob(){
-    const time = `${document.getElementById("hourSelect").value}:${document.getElementById("minSelect").value}`;
-    const res = await fetch("/connectors/discord/job/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-            sync_type: document.getElementById("syncType").value, 
-            schedule_time: time 
-        })
+function updateStatusBadge(text, color) {
+    const badge = document.getElementById("statusBadge");
+    const dot = document.getElementById("statusDot");
+    const textEl = document.getElementById("statusText");
+
+    textEl.innerText = text;
+    if(color === "emerald") {
+        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        dot.className = "h-2 w-2 rounded-full bg-emerald-500 animate-pulse";
+    } else if (color === "indigo") {
+        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        dot.className = "h-2 w-2 rounded-full bg-indigo-500 animate-pulse";
+    } else {
+        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        dot.className = "h-2 w-2 rounded-full bg-slate-600";
+    }
+}
+
+function updateSteps(step){
+    const circles = [document.getElementById("step1-circle"), document.getElementById("step2-circle"), document.getElementById("step3-circle")];
+    const labels = [document.getElementById("step1-label"), document.getElementById("step2-label"), document.getElementById("step3-label")];
+    const lines = [document.getElementById("line1"), document.getElementById("line2")];
+
+    circles.forEach((c, i) => {
+        c.innerHTML = i + 1;
+        c.className = "w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all";
     });
-    if(res.ok) alert("Job Schedule Updated");
+    labels.forEach(l => l.className = "text-[9px] font-mono text-slate-500 uppercase tracking-tighter");
+    lines.forEach(l => l.className = "flex-1 h-[1px] bg-slate-700 mt-4 mx-2");
+
+    for(let i=0; i<step; i++) {
+        circles[i].className = "w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold transition-all";
+        labels[i].className = "text-[9px] font-mono text-indigo-400 uppercase tracking-tighter font-bold";
+        if(i > 0) lines[i-1].className = "flex-1 h-[1px] bg-indigo-600 mt-4 mx-2";
+        if(i < step - 1 || (step === 3)) {
+            circles[i].innerHTML = "✓";
+            circles[i].className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all";
+        }
+    }
+}
+
+async function handleAuthAction(){
+    if (!hasCredentials) {
+        const token = document.getElementById("bot_token").value;
+        if(!token) return alert("Please enter a Bot Token");
+        
+        const res = await fetch("/connectors/discord/save_config", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ bot_token: token })
+        });
+        
+        if(res.ok) checkStatus();
+    } else {
+        await fetch("/connectors/discord/connect");
+        location.reload();
+    }
+}
+
+function disconnectDiscord() {
+    fetch("/connectors/discord/disconnect").then(() => location.reload());
+}
+
+async function loadDestinations(){
+  try {
+    const res = await fetch(`/destination/list/discord`);
+    const data = await res.json();
+    const dropdown = document.getElementById("destDropdown");
+    const statusEl = document.getElementById("destStatus");
+    dropdown.innerHTML = '<option value="">Select configuration...</option>';
+    if(data.destinations?.length){
+      data.destinations.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d.id;
+        opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database}`;
+        if(d.active) { opt.selected = true; statusEl.innerText = "Connection Active"; }
+        dropdown.appendChild(opt);
+      });
+    }
+  } catch(e) {}
+}
+
+async function saveDestination(){
+  const btn = document.getElementById("saveDestBtn");
+  btn.innerText = "AUTHENTICATING..."; btn.disabled = true;
+  const type = document.getElementById("destType").value;
+  let payload = { source: "discord", type, host: document.getElementById("dbHost").value, port: document.getElementById("dbPort").value, username: document.getElementById("dbUser").value, password: document.getElementById("dbPass").value, database: document.getElementById("dbName").value };
+  
+  const res = await fetch("/destination/save", {
+    method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)
+  });
+  if(res.ok) {
+    btn.innerText = "SAVED ✓";
+    loadDestinations();
+    setTimeout(() => { btn.innerText = "Authenticate & Save"; btn.disabled = false; }, 2000);
+  }
+}
+
+function toggleDest() {
+  const type = document.getElementById("destType").value;
+  document.getElementById("dbFields").classList.toggle("hidden", !type);
+}
+
+async function loadJob(){
+  try {
+    const data = await fetch("/connectors/discord/job/get").then(r => r.json());
+    if(data.schedule_time){
+      const [h, m] = data.schedule_time.split(':');
+      document.getElementById("hourSelect").value = h;
+      document.getElementById("minSelect").value = m;
+      document.getElementById("syncType").value = data.sync_type || "incremental";
+    }
+  } catch(e) {}
+}
+
+async function saveJob(){
+  const time = `${document.getElementById("hourSelect").value}:${document.getElementById("minSelect").value}`;
+  const res = await fetch("/connectors/discord/job/save", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sync_type: document.getElementById("syncType").value, schedule_time: time })
+  });
+  if(res.ok) alert("Job Schedule Updated");
 }
 
 async function runSync(){
-    const btn = document.getElementById("syncBtn");
-    btn.innerText = "SYNCING..."; 
-    btn.disabled = true;
-
-    try {
-        const res = await fetch("/connectors/discord/sync");
-        const d = await res.json();
-
-        if(d.status === "ok" || d.messages !== undefined){
-            btn.innerText = `SYNCED (${d.messages || 0} MESSAGES)`;
-        } else {
-            btn.innerText = "FAILED";
-        }
-    } catch(e) {
-        btn.innerText = "FAILED";
-    } finally {
-        setTimeout(() => btn.innerText = "Run Manual Sync", 3000);
-        btn.disabled = false;
-    }
+  const btn = document.getElementById("syncBtn");
+  btn.innerText = "SYNCING..."; btn.disabled = true;
+  try {
+    const res = await fetch("/connectors/discord/sync");
+    const d = await res.json();
+    btn.innerText = d.status === "ok" ? `SYNCED (${d.messages || 0} MESSAGES)` : "FAILED";
+  } catch(e) { btn.innerText = "FAILED"; }
+  finally { setTimeout(() => { btn.innerText = "Run Manual Sync"; btn.disabled = false; }, 3000); }
 }
 </script>
 

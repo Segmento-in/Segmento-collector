@@ -5425,19 +5425,28 @@ def tumblr_sync_universal():
 
 # ---------------- DISCORD (BOT MODE) ----------------
 
-@app.route("/connectors/discord/connect", methods=["POST"])
+@app.route("/connectors/discord/connect")
 def discord_connect():
 
     uid = get_uid()
-    print("CONNECT UID:", uid)
-    data = request.json
-
-    bot_token = data.get("bot_token")
 
     con = get_db()
     cur = con.cursor()
 
-    # Save bot token
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='discord'
+        LIMIT 1
+    """, (uid,))
+
+    row = cur.fetchone()
+
+    if not row:
+        return jsonify({"error":"token missing"}),400
+
+    bot_token = row[0]
+
     cur.execute("""
         INSERT OR REPLACE INTO discord_connections
         (uid, bot_token, created_at)
@@ -5445,10 +5454,9 @@ def discord_connect():
     """, (
         uid,
         bot_token,
-        datetime.datetime.now().isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
-    # Mark enabled
     cur.execute("""
         INSERT OR REPLACE INTO google_connections
         (uid, source, enabled)
@@ -5458,7 +5466,7 @@ def discord_connect():
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
 
 @app.route("/connectors/discord/disconnect")
 def discord_disconnect():
@@ -5490,9 +5498,6 @@ def discord_sync_universal():
     con = get_db()
     cur = con.cursor()
 
-    # --------------------------------------------------
-    # 1️⃣ CHECK CONNECTION
-    # --------------------------------------------------
     cur.execute("""
         SELECT enabled
         FROM google_connections
@@ -5504,9 +5509,6 @@ def discord_sync_universal():
         con.close()
         return jsonify({"error": "not connected"}), 400
 
-    # --------------------------------------------------
-    # 2️⃣ GET SYNC TYPE
-    # --------------------------------------------------
     cur.execute("""
         SELECT sync_type
         FROM connector_jobs
@@ -5518,9 +5520,6 @@ def discord_sync_universal():
 
     from connectors.discord import sync_guilds, sync_channels, sync_messages
 
-    # --------------------------------------------------
-    # 3️⃣ SYNC GUILDS
-    # --------------------------------------------------
     sync_guilds(uid)
 
     cur.execute("SELECT guild_id FROM discord_guilds WHERE uid=?", (uid,))
@@ -5529,7 +5528,7 @@ def discord_sync_universal():
     total_messages = 0
     all_rows = []
 
-    # 🔥 Reduced safety limits (faster sync)
+    # Reduced safety limits (faster sync)
     max_global_messages = 200
     max_channels_per_guild = 3
 
@@ -5568,9 +5567,6 @@ def discord_sync_universal():
         if total_messages >= max_global_messages:
             break
 
-    # --------------------------------------------------
-    # 4️⃣ DESTINATION LOOKUP
-    # --------------------------------------------------
     cur.execute("""
         SELECT dest_type, host, port, username, password, database_name
         FROM destination_configs
@@ -5613,6 +5609,64 @@ def discord_sync_universal():
         "rows_pushed": pushed,
         "sync_type": sync_type
     })
+
+@app.route("/api/status/discord")
+def discord_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # connection
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='discord'
+    """,(uid,))
+    conn = cur.fetchone()
+
+    # token saved
+    cur.execute("""
+        SELECT api_key
+        FROM connector_configs
+        WHERE uid=? AND connector='discord'
+    """,(uid,))
+    cfg = cur.fetchone()
+
+    con.close()
+
+    return jsonify({
+        "connected": bool(conn and conn[0]==1),
+        "has_credentials": bool(cfg and cfg[0])
+    })
+
+# ---------------- DISCORD SAVE CONFIG ----------------
+
+@app.route("/connectors/discord/save_config", methods=["POST"])
+def discord_save_config():
+
+    uid = get_uid()
+    data = request.json
+
+    bot_token = data.get("bot_token")
+
+    if not bot_token:
+        return jsonify({"error": "bot_token required"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, api_key, created_at)
+        VALUES (?, 'discord', ?, datetime('now'))
+    """, (uid, bot_token))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "saved"})
 
 # ---------------- GOOGLE BOOKS ----------------
 
