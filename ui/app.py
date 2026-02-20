@@ -1121,14 +1121,15 @@ def tumblr_posts(blog):
 def mastodon_page():
     return render_template("connectors/mastodon.html")
 
-@app.route("/connectors/mastodon/connect", methods=["POST"])
-def mastodon_connect():
-    r = requests.post(
+@app.route("/connectors/mastodon/connect")
+def mastodon_connect_proxy():
+
+    requests.get(
         "http://localhost:4000/connectors/mastodon/connect",
-        json=request.json,
         cookies=request.cookies
     )
-    return jsonify(r.json())
+
+    return redirect("/connectors/mastodon")
 
 @app.route("/connectors/mastodon/disconnect")
 def mastodon_disconnect():
@@ -1154,21 +1155,20 @@ def mastodon_dashboard():
 # -------- STATUS --------
 
 @app.route("/api/status/mastodon")
-def mastodon_status():
+def mastodon_status_proxy():
 
-    con = sqlite3.connect("../identity.db")
-    cur = con.cursor()
+    r = requests.get(
+        "http://localhost:4000/api/status/mastodon",
+        cookies=request.cookies
+    )
 
-    cur.execute("SELECT COUNT(*) FROM mastodon_state")
-
-    c = cur.fetchone()[0]
-
-    con.close()
-
-    return jsonify({
-        "connected": c > 0
-    })
-
+    try:
+        return jsonify(r.json()), r.status_code
+    except:
+        return jsonify({
+            "error": "identity_server failure",
+            "raw": r.text
+        }), r.status_code
 
 # -------- DATA --------
 
@@ -1211,22 +1211,32 @@ def mastodon_tags():
 
     return jsonify(rows)
 
+@app.route("/connectors/mastodon/save_config",methods=["POST"])
+def mastodon_save_config_proxy():
+
+    r=requests.post(
+        "http://localhost:4000/connectors/mastodon/save_config",
+        json=request.json,
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()),r.status_code
+
 # ================= LEMMY =================
 
 @app.route("/connectors/lemmy")
 def lemmy_page():
     return render_template("connectors/lemmy.html")
 
-@app.route("/connectors/lemmy/connect", methods=["POST"])
-def lemmy_connect():
+@app.route("/connectors/lemmy/connect")
+def lemmy_connect_proxy():
 
-    r = requests.post(
+    requests.get(
         "http://localhost:4000/connectors/lemmy/connect",
-        json=request.json,
         cookies=request.cookies
     )
 
-    return jsonify(r.json())
+    return redirect("/connectors/lemmy")
 
 @app.route("/connectors/lemmy/sync")
 def lemmy_sync():
@@ -1246,22 +1256,21 @@ def lemmy_dashboard():
 # -------- STATUS --------
 
 @app.route("/api/status/lemmy")
-def lemmy_status():
+def lemmy_status_proxy():
 
-    con = sqlite3.connect("../identity.db")
-    cur = con.cursor()
+    r = requests.get(
+        "http://localhost:4000/api/status/lemmy",
+        cookies=request.cookies
+    )
 
-    cur.execute("SELECT COUNT(*) FROM lemmy_state")
-
-    c = cur.fetchone()[0]
-
-    con.close()
-
-    return jsonify({
-        "connected": c > 0
-    })
-
-
+    try:
+        return jsonify(r.json())
+    except:
+        return jsonify({
+            "connected": False,
+            "has_credentials": False
+        }), 500
+    
 # -------- DATA --------
 
 @app.route("/api/lemmy/posts")
@@ -1322,6 +1331,17 @@ def lemmy_users():
     con.close()
 
     return jsonify(rows)
+
+@app.route("/connectors/lemmy/save_config",methods=["POST"])
+def lemmy_save_config_proxy():
+
+    r=requests.post(
+        "http://localhost:4000/connectors/lemmy/save_config",
+        json=request.json,
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()),r.status_code
 
 # ================= PINTEREST =================
 

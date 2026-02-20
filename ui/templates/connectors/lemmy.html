@@ -3,118 +3,130 @@
 
 <section class="bg-slate-900 min-h-screen px-6 py-24 relative overflow-hidden">
   
-  <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-emerald-600/10 blur-[120px] rounded-full"></div>
-  <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-cyan-500/5 blur-[120px] rounded-full"></div>
+  <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-lime-600/10 blur-[120px] rounded-full"></div>
+  <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-emerald-500/5 blur-[120px] rounded-full"></div>
 
-  <div class="max-w-7xl mx-auto relative z-10 space-y-24">
+  <div class="max-w-7xl mx-auto relative z-10 space-y-32">
 
-    <!-- Hero -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-      <div data-aos="fade-right">
-        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-          </span>
-          FEDERATED_NODE_CONNECTED
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div data-aos="fade-right" class="pt-8">
+        <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
+          <span id="statusDot" class="h-2 w-2 rounded-full bg-slate-600"></span>
+          <span id="statusText">NOT CONNECTED</span>
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
-            Lemmy <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white">Connector</span>
+            Lemmy <span class="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-300">Sync</span>
         </h1>
-        <p class="text-slate-300 text-xl mb-10 leading-relaxed font-medium max-w-xl">
-          The Segmento Lemmy Connector bridges the fediverse, ingesting community threads, post metadata, and user interactions into a unified relational schema.
+        <p class="text-slate-300 text-lg mb-10 leading-relaxed font-medium max-w-xl">
+          Connect your Lemmy instance to ingest communities, posts, and federated activity streams into your analytics warehouse.
         </p>
 
-        <div class="flex flex-wrap gap-4 items-center" id="connectSection">
-            <button onclick="connectLemmy()" id="connectBtn" 
-                    class="px-10 py-4 bg-emerald-600 text-white rounded-2xl font-black hover:bg-white hover:text-emerald-600 transition-all shadow-xl shadow-emerald-600/20">
-              Establish Link
-            </button>
-            <button onclick="disconnectLemmy()" id="disconnectBtn" class="hidden px-10 py-4 bg-slate-700 text-white rounded-2xl font-black hover:bg-slate-600 transition-all">
-              Disconnect
-            </button>
-            <a href="/dashboard/lemmy" class="px-10 py-4 border border-slate-700 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">
-              Dashboard
-            </a>
+        <div class="flex flex-wrap gap-4 items-center">
+            <a href="/dashboard" class="px-10 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white hover:text-lime-900 transition-all shadow-xl">Dashboard</a>
+            <button onclick="disconnectLemmy()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">Disconnect</button>
         </div>
       </div>
 
-      <div class="flex justify-center items-center" data-aos="zoom-in">
-        <div class="relative w-full max-w-[500px] h-[350px] bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
-            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#10b981 1px, transparent 1px); background-size: 30px 30px;"></div>
-            <div class="flex items-center justify-between w-full px-12 relative z-10">
-                <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-2xl">
-                    <img src="/static/images/logos/lemmy.png" class="w-12 h-12 object-contain">
-                </div>
-                <div class="flex-1 h-[2px] mx-4 relative bg-slate-700">
-                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500 to-white animate-[flow_2s_infinite_linear]"></div>
-                </div>
-                <div class="w-20 h-20 bg-slate-800 border-2 border-emerald-500 rounded-full flex items-center justify-center shadow-2xl">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
+      <div class="relative" data-aos="zoom-in">
+        <div id="connectSection" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl">
+          
+          <div class="flex justify-between mb-10 px-2">
+            <div class="flex flex-col items-center gap-2">
+              <div id="step1-circle" class="w-8 h-8 rounded-full bg-lime-600 text-white flex items-center justify-center text-xs font-bold transition-all">1</div>
+              <span id="step1-label" class="text-[9px] font-mono text-lime-400 uppercase tracking-tighter font-bold">Instance</span>
+            </div>
+            <div id="line1" class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all">2</div>
+              <span id="step2-label" class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Authorize</span>
+            </div>
+            <div id="line2" class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex flex-col items-center gap-2">
+              <div id="step3-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all">3</div>
+              <span id="step3-label" class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Connected</span>
+            </div>
+          </div>
+
+          <div id="credentialsForm" class="space-y-4">
+            <div id="inputGroup" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Lemmy Instance URL</label>
+                    <input id="instance_url" type="text" placeholder="https://lemmy.world" class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-lime-400 transition-all shadow-inner">
                 </div>
             </div>
-            <div class="absolute bottom-4 left-4 right-4 bg-black/40 backdrop-blur-md p-3 rounded-xl border border-white/5 font-mono text-[10px] text-emerald-400 flex justify-between">
-                <span id="protocolStatus" class="animate-pulse">● ACTIVITYPUB_v1_LISTENING</span>
-                <span id="dbStatus" class="text-slate-400 tracking-tighter">STORAGE_VERIFIED</span>
+
+            <button id="authBtn" onclick="handleAuthAction()" class="w-full py-5 bg-lime-600 text-white rounded-2xl font-black hover:bg-white hover:text-lime-600 transition-all shadow-lg shadow-lime-600/20 text-xs uppercase tracking-widest mt-2">
+              Save Configuration
+            </button>
+
+            <div class="mt-8 pt-8 border-t border-white/5">
+              <h4 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">Deployment Note</h4>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                Provide the full URL of the Lemmy instance you wish to index. No private account credentials are required for public community discovery.
+              </p>
             </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Controls: Sync Engine + Destination -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" data-aos="fade-up">
+        <div class="p-8 bg-slate-800/40 border border-white/5 rounded-3xl backdrop-blur-sm group hover:border-lime-500/30 transition-all">
+            <span class="text-lime-500 font-mono text-xs mb-4 block">01</span>
+            <h4 class="text-white font-bold text-lg mb-2 tracking-tight">Community Discovery</h4>
+            <p class="text-slate-400 text-sm leading-relaxed">Mapping local and federated communities hosted on the target instance.</p>
+        </div>
+        <div class="p-8 bg-slate-800/40 border border-white/5 rounded-3xl backdrop-blur-sm group hover:border-lime-500/30 transition-all">
+            <span class="text-lime-500 font-mono text-xs mb-4 block">02</span>
+            <h4 class="text-white font-bold text-lg mb-2 tracking-tight">Post Aggregation</h4>
+            <p class="text-slate-400 text-sm leading-relaxed">Extracting structured post data, comments, and engagement scores.</p>
+        </div>
+        <div class="p-8 bg-slate-800/40 border border-white/5 rounded-3xl backdrop-blur-sm group hover:border-lime-500/30 transition-all">
+            <span class="text-lime-500 font-mono text-xs mb-4 block">03</span>
+            <h4 class="text-white font-bold text-lg mb-2 tracking-tight">Federation Sync</h4>
+            <p class="text-slate-400 text-sm leading-relaxed">Tracking ActivityPub events and cross-instance communication streams.</p>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
-        <!-- Sync Engine -->
         <div class="lg:col-span-1">
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
                 <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
-                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 bg-lime-500/10 rounded-xl flex items-center justify-center border border-lime-500/20">
+                        <svg class="w-5 h-5 text-lime-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
                     </div>
                     <h3 class="text-white font-black text-xl">Sync Engine</h3>
                 </div>
-                
                 <div class="space-y-6">
                     <div>
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh Strategy</label>
-                        <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-emerald-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
-                            <option value="incremental">Incremental</option>
-                            <option value="historical">Historical (Full)</option>
+                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Sync Strategy</label>
+                        <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-lime-500 outline-none text-sm cursor-pointer">
+                            <option value="incremental">Incremental (New Only)</option>
+                            <option value="historical">Historical Audit</option>
                         </select>
                     </div>
-
                     <div>
                         <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Daily Schedule</label>
                         <div class="grid grid-cols-2 gap-3">
-                            <div class="relative">
-                                <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-emerald-500 outline-none">
-                                    {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}" class="bg-slate-800">{{ '%02d' % h }}</option>{% endfor %}
-                                </select>
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 pointer-events-none">H</span>
-                            </div>
-                            <div class="relative">
-                                <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-emerald-500 outline-none">
-                                    {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}" class="bg-slate-800">{{ '%02d' % m }}</option>{% endfor %}
-                                </select>
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 pointer-events-none">M</span>
-                            </div>
+                            <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 text-center font-bold">
+                                {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}">{{ '%02d' % h }}</option>{% endfor %}
+                            </select>
+                            <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 text-center font-bold">
+                                {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}">{{ '%02d' % m }}</option>{% endfor %}
+                            </select>
                         </div>
                     </div>
-
                     <div class="pt-6 space-y-3">
                         <button onclick="saveJob()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update Schedule</button>
-                        <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-emerald-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
+                        <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-lime-600 hover:bg-lime-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-lime-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Destination Setup – EMERALD THEME -->
         <div class="lg:col-span-2">
             <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
                 <div class="flex items-center justify-between mb-8">
@@ -126,301 +138,142 @@
                         </div>
                         <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
                     </div>
-                    <div id="destStatus" class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20 uppercase font-bold tracking-tighter">System Ready</div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="md:col-span-2">
                         <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block">Target Platform</label>
-                        <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-emerald-500 transition-all outline-none">
+                        <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-lime-500 outline-none">
                             <option value="">Select Connector...</option>
                             <option value="mysql">MySQL</option>
                             <option value="postgres">PostgreSQL</option>
                             <option value="bigquery">BigQuery</option>
-                            <option value="snowflake">SnowFlake</option>
+                            <option value="snowflake">Snowflake</option>
                         </select>
                     </div>
-
-                    <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
-                        <div id="sqlFields" class="contents">
-                            <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-emerald-500 outline-none text-sm transition-all">
-                            <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-emerald-500 outline-none text-sm transition-all">
-                            <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-emerald-500 outline-none text-sm transition-all">
-                            <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-emerald-500 outline-none text-sm transition-all">
-                            <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-emerald-500 outline-none text-sm transition-all">
-                        </div>
-
-                        <div id="bigqueryFields" class="hidden contents">
-                            <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-emerald-500 outline-none text-sm transition-all">
-                            <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-emerald-500 outline-none text-sm transition-all">
-                            <div class="md:col-span-2">
-                                <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-emerald-500 outline-none text-sm transition-all resize-y"></textarea>
-                            </div>
-                        </div>
-
+                    <div id="dbFields" class="hidden md:contents">
+                        <input id="dbHost" placeholder="Host" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
+                        <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
+                        <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
+                        <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
+                        <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 outline-none text-sm">
                         <div class="md:col-span-2 pt-2">
-                            <button onclick="saveDestination()" id="saveDestBtn" 
-                                    class="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-emerald-600/30 text-xs uppercase tracking-widest">
-                              Authenticate & Save
-                            </button>
+                            <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-lime-600 hover:bg-lime-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-lime-600/30 text-xs uppercase tracking-widest">Authenticate & Save</button>
                         </div>
                     </div>
                 </div>
-
-                <div class="mt-8 pt-8 border-t border-white/5">
-                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection Switcher</label>
-                    <div class="relative">
-                        <select id="destDropdown" onchange="activateDest(this.value)" 
-                                class="w-full p-4 rounded-xl bg-black/40 text-emerald-300 border border-emerald-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
-                            <option value="">Loading connections...</option>
-                        </select>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-
-    <!-- Pipeline Steps -->
-    <div>
-      <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">The Fediverse <span class="text-emerald-400">Pipeline</span></h2>
-      <div class="grid md:grid-cols-3 gap-8">
-        {% for step, title, desc in [
-          ('01', 'Instance Discovery', 'Resolving Lemmy instance API endpoints via ActivityPub protocols.'),
-          ('02', 'Community Crawl', 'Indexing posts, comments, and community-specific metadata across the network.'),
-          ('03', 'Storage Hub', 'Converting federated JSON blobs into indexed SQLite records.')
-        ] %}
-        <div class="group p-10 bg-slate-800/40 border border-white/5 rounded-[2.5rem] hover:bg-slate-800/80 transition-all hover:-translate-y-2">
-          <div class="text-5xl font-black text-slate-700/30 mb-6 group-hover:text-emerald-500 transition-colors">{{step}}</div>
-          <h3 class="text-2xl font-bold text-white mb-3">{{title}}</h3>
-          <p class="text-slate-400 leading-relaxed text-sm">{{desc}}</p>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- Schema -->
-    <div class="pt-12">
-      <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">Database <span class="text-emerald-400">Architecture</span></h2>
-      
-      <div class="grid lg:grid-cols-2 gap-12 items-start">
-        <div class="grid grid-cols-1 gap-4">
-          {% for table, columns in [
-            ('lemmy_posts', ['id', 'name', 'body', 'community_id', 'creator_id', 'published', 'score']),
-            ('lemmy_communities', ['id', 'name', 'title', 'description', 'actor_id', 'local']),
-            ('lemmy_users', ['id', 'name', 'display_name', 'actor_id', 'bio', 'admin'])
-          ] %}
-          <div class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-emerald-500/30 transition-all group">
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-3 h-3 rounded-full bg-emerald-600 group-hover:animate-pulse"></div>
-                <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">{{table}}</h4>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                {% for col in columns %}
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400">{{col}}</span>
-                {% endfor %}
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        
-        <div class="relative bg-slate-800 border border-white/10 rounded-[3rem] p-10 shadow-3xl sticky top-10">
-          <div class="absolute inset-0 bg-emerald-600/5 rounded-[3rem] blur-xl"></div>
-          <img src="/static/images/erd/lemmy_erd.png" class="relative z-10 mx-auto max-w-full rounded-2xl opacity-90 grayscale hover:grayscale-0 transition-all duration-700"/>
-        </div>
-      </div>
-    </div>
-
-    <!-- Extraction Entities -->
-    <div class="mb-32">
-      <h2 class="text-4xl font-black mb-12 text-center text-white">Ingested Entities</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        {% for table in ['lemmy_posts', 'lemmy_communities', 'lemmy_users'] %}
-        <div class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-emerald-600/5 hover:border-emerald-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
-          <div class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-600 transition-all duration-500 shadow-xl">
-            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-            </svg>
-          </div>
-          <span class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">{{table}}</span>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
   </div>
 </section>
 
-<style>
-  @keyframes flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
-  .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
-  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
-</style>
-
 <script>
+let isConnected = false;
+let hasCredentials = false;
+
 document.addEventListener("DOMContentLoaded", () => {
-    checkLemmyStatus();
-    loadDestinations();
-    loadJob();
+    checkStatus();
 });
 
-async function checkLemmyStatus(){
+async function checkStatus(){
     try {
-        const res = await fetch("http://localhost:4000/api/status/lemmy").then(r => r.json());
-        const connectBtn = document.getElementById("connectBtn");
+        const res = await fetch("/api/status/lemmy").then(r => r.json());
+        isConnected = res.connected;
+        hasCredentials = res.has_credentials;
+
+        const authBtn = document.getElementById("authBtn");
+        const inputGroup = document.getElementById("inputGroup");
         const disconnectBtn = document.getElementById("disconnectBtn");
-        const badge = document.getElementById("statusBadge");
 
-        if(res.connected){
-            connectBtn.classList.add("hidden");
-            disconnectBtn.classList.remove("hidden");
-            badge.innerHTML = `<span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span> CONNECTED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        if(isConnected){
+            updateStatusBadge("CONNECTED", "lime");
+            inputGroup.classList.add('hidden');
+            authBtn.classList.add('hidden');
+            disconnectBtn.classList.remove('hidden');
+            updateSteps(3);
+        } 
+        else if (hasCredentials) {
+            updateStatusBadge("CONFIG SAVED", "lime");
+            inputGroup.classList.add('hidden');
+            authBtn.innerText = "Connect Lemmy";
+            authBtn.classList.remove('hidden');
+            disconnectBtn.classList.add('hidden');
+            updateSteps(2);
         }
-    } catch(e) { console.error(e); }
-}
-
-async function connectLemmy(){
-
-    const instance = prompt("Enter Lemmy instance (default: https://lemmy.world)");
-
-    const res = await fetch("/connectors/lemmy/connect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            instance: instance || "https://lemmy.world"
-        })
-    });
-
-    const data = await res.json();
-
-    if(data.status === "connected"){
-        location.reload();
-    } else {
-        alert("Connection failed");
-    }
-}
-
-async function disconnectLemmy(){
-    if(!confirm("Disconnect Lemmy?")) return;
-    await fetch("/connectors/lemmy/disconnect");
-    location.reload();  // Auto-reload after disconnect
-}
-
-async function loadDestinations(){
-    try {
-        const res = await fetch(`http://localhost:4000/destination/list/lemmy`);
-        const data = await res.json();
-        const dropdown = document.getElementById("destDropdown");
-        const statusEl = document.getElementById("destStatus");
-        
-        dropdown.innerHTML = '<option value="">Loading connections...</option>';
-        
-        if(data.destinations?.length){
-            data.destinations.forEach(d => {
-                const opt = document.createElement("option");
-                opt.value = d.id;
-                opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database} (@${d.host || '—'})`;
-                if(d.active) {
-                    opt.selected = true;
-                    statusEl.innerText = "Connection Active";
-                    statusEl.classList.replace("text-emerald-400", "text-emerald-400");
-                }
-                dropdown.appendChild(opt);
-            });
-        } else {
-            statusEl.innerText = "No destination configured";
-        }
-    } catch(e) { console.error(e); }
-}
-
-async function activateDest(id){
-    if(!id) return;
-    await fetch("http://localhost:4000/destination/activate", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ source: "lemmy", dest_id: id })
-    });
-    loadDestinations();
-}
-
-function toggleDest() {
-    const type = document.getElementById("destType").value;
-    const wrapper = document.getElementById("dbFields");
-    const sql = document.getElementById("sqlFields");
-    const bq = document.getElementById("bigqueryFields");
-
-    if(!type){
-        wrapper.classList.add("hidden");
-        return;
-    }
-
-    wrapper.classList.remove("hidden");
-
-    if(type === "bigquery"){
-        sql.classList.add("hidden");
-        bq.classList.remove("hidden");
-    } else {
-        sql.classList.remove("hidden");
-        bq.classList.add("hidden");
-    }
-}
-
-async function saveDestination(){
-    const btn = document.getElementById("saveDestBtn");
-    btn.innerText = "AUTHENTICATING..."; btn.disabled = true;
-
-    const type = document.getElementById("destType").value;
-    let payload = { source: "lemmy", type };
-
-    if(type === "bigquery"){
-        payload.host = document.getElementById("bqProject")?.value || "";
-        payload.database = document.getElementById("bqDataset")?.value || "";
-        payload.password = document.getElementById("bqKey")?.value || "";
-        payload.port = "";
-        payload.username = "";
-    } else if(type) {
-        payload.host = document.getElementById("dbHost").value;
-        payload.port = document.getElementById("dbPort").value;
-        payload.username = document.getElementById("dbUser").value;
-        payload.password = document.getElementById("dbPass").value;
-        payload.database = document.getElementById("dbName").value;
-    }
-
-    try {
-        const res = await fetch("http://localhost:4000/destination/save", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
-        });
-        if(res.ok) {
-            btn.innerText = "SAVED ✓";
-            btn.classList.replace("bg-emerald-600", "bg-emerald-600");
-            loadDestinations();
-            setTimeout(() => {
-                btn.innerText = "Authenticate & Save";
-                btn.classList.replace("bg-emerald-600", "bg-emerald-600");
-                btn.disabled = false;
-            }, 2000);
-        }
-    } catch(e) {
-        alert("Connection failed");
-        btn.disabled = false;
-    }
-}
-
-async function loadJob(){
-    try {
-        const data = await fetch("/connectors/lemmy/job/get").then(r => r.json());
-        if(data.schedule_time){
-            const [h, m] = data.schedule_time.split(':');
-            document.getElementById("hourSelect").value = h;
-            document.getElementById("minSelect").value = m;
-            document.getElementById("syncType").value = data.sync_type || "incremental";
+        else {
+            updateStatusBadge("NOT CONNECTED", "slate");
+            inputGroup.classList.remove('hidden');
+            authBtn.innerText = "Save Configuration";
+            authBtn.classList.remove('hidden');
+            disconnectBtn.classList.add('hidden');
+            updateSteps(1);
         }
     } catch(e) {}
+}
+
+function updateStatusBadge(text, color) {
+    const badge = document.getElementById("statusBadge");
+    const dot = document.getElementById("statusDot");
+    const textEl = document.getElementById("statusText");
+    textEl.innerText = text;
+    
+    if(color === "lime") {
+        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-lime-500/30 bg-lime-500/10 text-lime-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        dot.className = "h-2 w-2 rounded-full bg-lime-500 animate-pulse";
+    } else {
+        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+        dot.className = "h-2 w-2 rounded-full bg-slate-600";
+    }
+}
+
+function updateSteps(step){
+    const circles = [document.getElementById("step1-circle"), document.getElementById("step2-circle"), document.getElementById("step3-circle")];
+    const lines = [document.getElementById("line1"), document.getElementById("line2")];
+
+    circles.forEach((c, i) => {
+        c.innerHTML = i + 1;
+        c.className = "w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all";
+    });
+    
+    for(let i=0; i<step; i++) {
+        circles[i].className = "w-8 h-8 rounded-full bg-lime-600 text-white flex items-center justify-center text-xs font-bold transition-all";
+        if(i > 0) lines[i-1].className = "flex-1 h-[1px] bg-lime-600 mt-4 mx-2";
+        if(i < step - 1 || step === 3) {
+            circles[i].innerHTML = "✓";
+            circles[i].className = "w-8 h-8 rounded-full bg-lime-500 text-white flex items-center justify-center text-xs font-bold transition-all";
+        }
+    }
+}
+
+async function handleAuthAction(){
+    if (!hasCredentials) {
+        const url = document.getElementById("instance_url").value.trim();
+        if(!url) return alert("Instance URL is required");
+        const res = await fetch("/connectors/lemmy/save_config", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ instance: url })
+        });
+        if(res.ok) checkStatus();
+    } else {
+        await fetch("/connectors/lemmy/connect");
+        location.reload();
+    }
+}
+
+function disconnectLemmy() {
+    fetch("/connectors/lemmy/disconnect").then(() => location.reload());
+}
+
+async function runSync(){
+    const btn = document.getElementById("syncBtn");
+    btn.innerText = "SYNCING..."; btn.disabled = true;
+    try {
+        const res = await fetch("/connectors/lemmy/sync");
+        const d = await res.json();
+        btn.innerText = d.status === "ok" ? `SYNCED (${d.posts || 0} POSTS)` : "FAILED";
+    } catch(e) { btn.innerText = "FAILED"; }
+    finally { setTimeout(() => { btn.innerText = "Run Manual Sync"; btn.disabled = false; }, 3000); }
 }
 
 async function saveJob(){
@@ -436,26 +289,9 @@ async function saveJob(){
     if(res.ok) alert("Job Schedule Updated");
 }
 
-async function runSync(){
-    const btn = document.getElementById("syncBtn");
-    btn.innerText = "SYNCING..."; 
-    btn.disabled = true;
-
-    try {
-        const res = await fetch("/connectors/lemmy/sync");
-        const d = await res.json();
-
-        if(d.status === "ok" || d.posts !== undefined){
-            btn.innerText = `SYNCED (${d.posts || 0} POSTS)`;
-        } else {
-            btn.innerText = "FAILED";
-        }
-    } catch(e) {
-        btn.innerText = "FAILED";
-    } finally {
-        setTimeout(() => btn.innerText = "Run Manual Sync", 3000);
-        btn.disabled = false;
-    }
+function toggleDest() {
+  const type = document.getElementById("destType").value;
+  document.getElementById("dbFields").classList.toggle("hidden", !type);
 }
 </script>
 

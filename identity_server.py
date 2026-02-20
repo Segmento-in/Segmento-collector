@@ -8104,39 +8104,88 @@ def mastodon_sync_universal():
         "sync_type": sync_type
     })
 
-@app.route("/connectors/mastodon/connect", methods=["POST"])
+@app.route("/connectors/mastodon/connect")
 def mastodon_connect():
 
-    uid = get_uid()
-    data = request.json or {}
+    uid=get_uid()
 
-    instance = data.get("instance", os.getenv("MASTODON_INSTANCE", "https://mastodon.social"))
+    con=get_db()
+    cur=con.cursor()
 
-    con = get_db()
-    cur = con.cursor()
+    cur.execute("""
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='mastodon'
+        LIMIT 1
+    """,(uid,))
 
-    # Save instance in connector_state
+    row=cur.fetchone()
+
+    if not row:
+        con.close()
+        return jsonify({"error":"config missing"}),400
+
+    state=json.loads(row[0])
+    instance=state.get("instance")
+
     cur.execute("""
         INSERT OR REPLACE INTO connector_state
-        (uid, source, state_json, updated_at)
-        VALUES (?, 'mastodon', ?, ?)
-    """, (
+        (uid,source,state_json,updated_at)
+        VALUES(?,?,?,?)
+    """,(
         uid,
-        json.dumps({"instance": instance}),
+        "mastodon",
+        json.dumps({"instance":instance}),
         datetime.datetime.utcnow().isoformat()
     ))
 
-    # Enable connector
     cur.execute("""
         INSERT OR REPLACE INTO google_connections
-        (uid, source, enabled)
-        VALUES (?, 'mastodon', 1)
-    """, (uid,))
+        (uid,source,enabled)
+        VALUES(?, 'mastodon',1)
+    """,(uid,))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
+
+@app.route("/api/status/mastodon")
+def mastodon_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # connection
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='mastodon'
+        LIMIT 1
+    """,(uid,))
+    row = cur.fetchone()
+
+    connected = bool(row and row[0] == 1)
+
+    # credentials
+    cur.execute("""
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='mastodon'
+        LIMIT 1
+    """,(uid,))
+    cfg = cur.fetchone()
+
+    has_credentials = bool(cfg)
+
+    con.close()
+
+    return jsonify({
+        "connected": connected,
+        "has_credentials": has_credentials
+    })
 
 @app.route("/connectors/mastodon/disconnect")
 def mastodon_disconnect():
@@ -8156,6 +8205,36 @@ def mastodon_disconnect():
     con.close()
 
     return jsonify({"status": "disconnected"})
+
+# ---------------- MASTODON SAVE CONFIG ----------------
+
+@app.route("/connectors/mastodon/save_config", methods=["POST"])
+def mastodon_save_config():
+
+    uid = get_uid()
+    data = request.json or {}
+
+    instance = data.get("instance")
+
+    if not instance:
+        return jsonify({"error":"instance required"}),400
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, config_json, created_at)
+        VALUES (?, 'mastodon', ?, datetime('now'))
+    """,(
+        uid,
+        json.dumps({"instance":instance})
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status":"saved"})
 
 # ---------------- DISCOURSE ----------------
 
@@ -8326,39 +8405,50 @@ def discourse_categories():
 
 # ---------------- LEMMY ----------------
 
-@app.route("/connectors/lemmy/connect", methods=["POST"])
+@app.route("/connectors/lemmy/connect")
 def lemmy_connect():
 
-    uid = get_uid()
-    data = request.json or {}
+    uid=get_uid()
 
-    instance = data.get("instance") or os.getenv("LEMMY_INSTANCE", "https://lemmy.world")
+    con=get_db()
+    cur=con.cursor()
 
-    con = get_db()
-    cur = con.cursor()
-
-    # Save connection
     cur.execute("""
-        INSERT OR REPLACE INTO google_connections
-        (uid, source, enabled)
-        VALUES (?, 'lemmy', 1)
-    """, (uid,))
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='lemmy'
+        LIMIT 1
+    """,(uid,))
 
-    # Save state
+    row=cur.fetchone()
+
+    if not row:
+        con.close()
+        return jsonify({"error":"config missing"}),400
+
+    state=json.loads(row[0])
+
     cur.execute("""
         INSERT OR REPLACE INTO connector_state
-        (uid, source, state_json, updated_at)
-        VALUES (?, 'lemmy', ?, ?)
-    """, (
+        (uid,source,state_json,updated_at)
+        VALUES(?,?,?,?)
+    """,(
         uid,
-        json.dumps({"instance": instance}),
+        "lemmy",
+        json.dumps(state),
         datetime.datetime.utcnow().isoformat()
     ))
+
+    cur.execute("""
+        INSERT OR REPLACE INTO google_connections
+        (uid,source,enabled)
+        VALUES(?, 'lemmy',1)
+    """,(uid,))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "connected"})
+    return jsonify({"status":"connected"})
 
 @app.route("/connectors/lemmy/disconnect")
 def lemmy_disconnect():
@@ -8471,6 +8561,73 @@ def lemmy_sync_universal():
         "posts": result.get("new_posts", 0),
         "rows_pushed": pushed,
         "sync_type": sync_type
+    })
+
+# ---------------- LEMMY SAVE CONFIG ----------------
+
+@app.route("/connectors/lemmy/save_config", methods=["POST"])
+def lemmy_save_config():
+
+    uid = get_uid()
+    data = request.json or {}
+
+    instance = data.get("instance")
+
+    if not instance:
+        return jsonify({"error":"instance required"}),400
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, config_json, created_at)
+        VALUES (?, 'lemmy', ?, datetime('now'))
+    """,(
+        uid,
+        json.dumps({"instance":instance})
+    ))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status":"saved"})
+
+@app.route("/api/status/lemmy")
+def lemmy_status():
+
+    uid=get_uid()
+
+    con=get_db()
+    cur=con.cursor()
+
+    # connected
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='lemmy'
+        LIMIT 1
+    """,(uid,))
+    row=cur.fetchone()
+
+    connected = bool(row and row[0]==1)
+
+    # credentials
+    cur.execute("""
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='lemmy'
+        LIMIT 1
+    """,(uid,))
+    cfg=cur.fetchone()
+
+    has_credentials = bool(cfg)
+
+    con.close()
+
+    return jsonify({
+        "connected":connected,
+        "has_credentials":has_credentials
     })
 
 # ---------------- OPENSTREETMAP ----------------
