@@ -495,6 +495,15 @@ def gitlab_data(table):
 def devto_page():
     return render_template("connectors/devto.html")
 
+@app.route("/api/status/devto")
+def devto_status_proxy():
+
+    r = requests.get(
+        "http://localhost:4000/api/status/devto",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
 
 @app.route("/connectors/devto/connect")
 def devto_connect():
@@ -532,6 +541,28 @@ def devto_sync():
 @app.route("/dashboard/devto")
 def devto_dashboard():
     return render_template("dashboards/devto.html")
+
+@app.route("/connectors/devto/job/get")
+def devto_job_get_proxy():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/devto/job/get",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
+
+
+@app.route("/connectors/devto/job/save", methods=["POST"])
+def devto_job_save_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/devto/job/save",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
 
 # ================= STACKOVERFLOW =================
 

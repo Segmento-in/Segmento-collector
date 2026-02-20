@@ -6181,6 +6181,33 @@ def devto_connect():
 
     return redirect("http://localhost:3000/connectors/devto")
 
+# ---------------- DEVTO STATUS ----------------
+
+@app.route("/api/status/devto")
+def devto_status():
+
+    uid = get_uid()
+
+    con = get_db()
+    cur = con.cursor()
+
+    # API connectors have implicit credentials
+    has_credentials = True
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='devto'
+        LIMIT 1
+    """, (uid,))
+
+    row = cur.fetchone()
+    con.close()
+
+    return jsonify({
+        "has_credentials": has_credentials,
+        "connected": bool(row and row[0] == 1)
+    })
 
 @app.route("/connectors/devto/disconnect")
 def devto_disconnect():
