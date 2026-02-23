@@ -255,7 +255,8 @@ def init_db():
         password TEXT,
         database_name TEXT,
 
-        created_at TEXT
+        created_at TEXT,
+        is_active INTEGER DEFAULT 1
     )
     """)
 

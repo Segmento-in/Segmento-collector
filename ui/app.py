@@ -4428,6 +4428,16 @@ def destination_list_proxy(source):
     )
     return jsonify(r.json()), r.status_code
 
+@app.route("/destination/activate", methods=["POST"])
+def activate_destination_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/destination/activate",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
 # ================= MAIN ==========================
 
 if __name__ == "__main__":
