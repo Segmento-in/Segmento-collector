@@ -31,3 +31,7 @@ uploads/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Secret files
+secrets.json
+secret.key
