@@ -35,9 +35,6 @@
         </div>
 
         <div class="flex flex-wrap gap-4 items-center">
-          <a href="/dashboard/gmail" id="dashboardBtn" class="px-10 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white hover:text-red-900 transition-all shadow-xl">
-            Dashboard
-          </a>
           <button onclick="disconnectGmail()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
             Disconnect
           </button>
@@ -45,35 +42,35 @@
       </div>
 
       <div class="relative" data-aos="zoom-in">
-        <div id="connectSection" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl">
+        <div id="connectSection" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl transition-all duration-500">
           <div class="flex justify-between mb-10 px-2">
             <div class="flex flex-col items-center gap-2">
-              <div id="step1-circle" class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold">1</div>
+              <div id="step1-circle" class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-all duration-300">1</div>
               <span class="text-[9px] font-mono text-red-400 uppercase tracking-tighter">Credentials</span>
             </div>
             <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
             <div class="flex flex-col items-center gap-2">
-              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold">2</div>
+              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300">2</div>
               <span class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Authorize</span>
             </div>
             <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
             <div class="flex flex-col items-center gap-2">
-              <div id="step3-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold">3</div>
+              <div id="step3-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300">3</div>
               <span class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Connected</span>
             </div>
           </div>
 
-          <div id="credentialsForm" class="space-y-4">
+          <div id="credentialsForm" class="space-y-4 transition-opacity duration-500 opacity-100">
             <div>
               <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Google Client ID</label>
-              <input id="clientId" placeholder="Enter Client ID" class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-red-400 transition-all shadow-inner">
+              <input id="clientId" placeholder="Enter Client ID" class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-red-400 transition-all shadow-inner hover:shadow-red-500/20">
             </div>
             <div>
               <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Google Client Secret</label>
-              <input id="clientSecret" type="password" placeholder="Enter Client Secret" class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-red-400 transition-all shadow-inner">
+              <input id="clientSecret" type="password" placeholder="Enter Client Secret" class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-red-400 transition-all shadow-inner hover:shadow-red-500/20">
             </div>
             
-            <button id="saveCredsBtn" onclick="saveCredentials()" class="w-full py-5 bg-red-600 text-white rounded-2xl font-black hover:bg-white hover:text-red-600 transition-all shadow-lg shadow-red-600/20 text-xs uppercase tracking-widest mt-2">
+            <button id="saveCredsBtn" onclick="saveCredentials()" class="w-full py-5 bg-red-600 text-white rounded-2xl font-black hover:bg-white hover:text-red-600 transition-all shadow-lg shadow-red-600/20 text-xs uppercase tracking-widest mt-2 hover:shadow-red-600/40">
               Save Credentials & Continue
             </button>
 
@@ -99,144 +96,166 @@
               </ul>
             </div>
           </div>
+
+          <div id="successState" class="hidden text-center space-y-6 transition-opacity duration-500 opacity-0">
+            <svg class="w-16 h-16 mx-auto text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="text-white text-2xl font-bold">Connection Established</h3>
+            <p class="text-slate-400 text-sm">Your Gmail connector is now active and ready for synchronization.</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+    <div id="syncDestinationSection" class="relative transition-all duration-500">
+      <div id="accessOverlay" class="absolute inset-0 bg-slate-900/90 flex items-center justify-center z-20 rounded-[2.5rem]">
+        <div class="text-center space-y-4 p-8 bg-slate-800/50 rounded-3xl border border-white/10 shadow-2xl">
+          <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="text-white text-2xl font-black tracking-tight">Connect to Unlock</h3>
+          <p class="text-slate-300 text-sm max-w-xs leading-relaxed">Establish a connection to access sync engine and warehouse destination settings.</p>
+        </div>
+      </div>
+
+      <div id="syncContent" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start opacity-65 blur-sm pointer-events-none">
         <div class="lg:col-span-1">
-            <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
-                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-white font-black text-xl">Sync Engine</h3>
-                </div>
-                
-                <div class="space-y-6">
-                    <div>
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh Strategy</label>
-                        <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-red-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
-                            <option value="incremental">Incremental (Delta)</option>
-                            <option value="historical">Historical (Full Load)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Daily Schedule</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="relative">
-                                <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-red-500 outline-none">
-                                    {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}" class="bg-slate-800">{{ '%02d' % h }}</option>{% endfor %}
-                                </select>
-                            </div>
-                            <div class="relative">
-                                <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-red-500 outline-none">
-                                    {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}" class="bg-slate-800">{{ '%02d' % m }}</option>{% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-6 space-y-3">
-                        <button onclick="saveJob()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update Schedule</button>
-                        <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-emerald-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
-                    </div>
-                </div>
+          <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
+            <div class="flex items-center gap-3 mb-8">
+              <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+              </div>
+              <h3 class="text-white font-black text-xl">Sync Engine</h3>
             </div>
+            
+            <div class="space-y-6">
+              <div>
+                <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh Strategy</label>
+                <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-red-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
+                  <option value="incremental">Incremental (Delta)</option>
+                  <option value="historical">Historical (Full Load)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Daily Schedule</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="relative">
+                    <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-red-500 outline-none">
+                      {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}" class="bg-slate-800">{{ '%02d' % h }}</option>{% endfor %}
+                    </select>
+                  </div>
+                  <div class="relative">
+                    <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-red-500 outline-none">
+                      {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}" class="bg-slate-800">{{ '%02d' % m }}</option>{% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-6 space-y-3">
+                <button onclick="saveJob()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update Schedule</button>
+                <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-emerald-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="lg:col-span-2">
-            <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center border border-rose-500/20">
-                            <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
-                    </div>
-                    <div id="destStatus" class="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-4 py-1.5 rounded-full border border-rose-500/20 uppercase font-bold tracking-tighter">System Ready</div>
+          <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center border border-rose-500/20">
+                  <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="md:col-span-2">
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block">Target Platform</label>
-                        <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-red-500 transition-all outline-none">
-                            <option value="">Select Connector...</option>
-                            <option value="mysql">MySQL</option>
-                            <option value="postgres">PostgreSQL</option>
-                            <option value="bigquery">BigQuery</option>
-                            <option value="snowflake">SnowFlake</option>
-                            <option value="clickhouse">ClickHouse</option>
-                            <option value="s3">AWS S3</option>
-                        </select>
-                    </div>
-
-                    <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
-                    <div id="sqlFields" class="contents">
-                        <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                    </div>
-
-                    <div id="bigqueryFields" class="hidden contents">
-                        <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <div class="md:col-span-2">
-                            <textarea id="bqKey" placeholder="Service Account JSON Key"
-                                rows="3"
-                                class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
-                        </div>
-                    </div>
-
-                    <div id="s3Fields" class="hidden contents">
-                        <input id="s3Bucket" placeholder="Bucket Name (segmento-data)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <input id="s3Region" placeholder="Region (ap-south-1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <input id="s3AccessKey" placeholder="Access Key ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                        <input id="s3SecretKey" type="password" placeholder="Secret Access Key" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                    </div>
-
-                    <div id="formatField" class="hidden md:col-span-2">
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block">
-                            Data Format
-                        </label>
-                        <div class="flex gap-4">
-                          <button onclick="selectFormat('parquet')" id="format-parquet" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
-                            <span class="font-bold">Parquet</span>
-                            <div class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
-                              <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
-                            </div>
-                          </button>
-                          <button onclick="selectFormat('json')" id="format-json" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
-                            <span class="font-bold">JSON</span>
-                            <div class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
-                              <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
-                            </div>
-                          </button>
-                        </div>
-                        <input type="hidden" id="dataFormat" value="parquet">
-                    </div>
-
-                    <div class="md:col-span-2 pt-2">
-                        <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black"> Authenticate & Save </button>
-                    </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-8 border-t border-white/5">
-                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection Switcher</label>
-                    <select id="destDropdown" onchange="activateDest(this.value)" class="w-full p-4 rounded-xl bg-black/40 text-rose-300 border border-rose-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
-                        <option value="">Loading connections...</option>
-                    </select>
-                </div>
+                <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
+              </div>
+              <div id="destStatus" class="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-4 py-1.5 rounded-full border border-rose-500/20 uppercase font-bold tracking-tighter">System Ready</div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div class="md:col-span-2">
+                <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block">Target Platform</label>
+                <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-red-500 transition-all outline-none">
+                  <option value="">Select Connector...</option>
+                  <option value="mysql">MySQL</option>
+                  <option value="postgres">PostgreSQL</option>
+                  <option value="bigquery">BigQuery</option>
+                  <option value="snowflake">SnowFlake</option>
+                  <option value="clickhouse">ClickHouse</option>
+                  <option value="s3">AWS S3</option>
+                </select>
+              </div>
+
+              <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
+                <div id="sqlFields" class="contents">
+                  <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                </div>
+
+                <div id="bigqueryFields" class="hidden contents">
+                  <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <div class="md:col-span-2">
+                    <textarea id="bqKey" placeholder="Service Account JSON Key"
+                        rows="3"
+                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
+                  </div>
+                </div>
+
+                <div id="s3Fields" class="hidden contents">
+                  <input id="s3Bucket" placeholder="Bucket Name (segmento-data)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3Region" placeholder="Region (ap-south-1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3AccessKey" placeholder="Access Key ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3SecretKey" type="password" placeholder="Secret Access Key" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                </div>
+
+                <div id="formatField" class="hidden md:col-span-2">
+                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block">
+                    Data Format
+                  </label>
+                  <div class="flex gap-4">
+                    <button onclick="selectFormat('parquet')" id="format-parquet" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                      <span class="font-bold">Parquet</span>
+                      <div class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                        <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                      </div>
+                    </button>
+                    <button onclick="selectFormat('json')" id="format-json" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                      <span class="font-bold">JSON</span>
+                      <div class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                        <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                      </div>
+                    </button>
+                  </div>
+                  <input type="hidden" id="dataFormat" value="parquet">
+                </div>
+
+                <div class="md:col-span-2 pt-2">
+                  <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black"> Authenticate & Save </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-white/5">
+              <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection Switcher</label>
+              <select id="destDropdown" onchange="activateDest(this.value)" class="w-full p-4 rounded-xl bg-black/40 text-rose-300 border border-rose-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
+                <option value="">Loading connections...</option>
+              </select>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <div class="pt-12">
@@ -250,33 +269,33 @@
           ] %}
           <div class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-red-500/30 transition-all group">
             <div class="flex items-center gap-3 mb-4">
-                <div class="w-3 h-3 rounded-full bg-red-600 group-hover:animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div>
-                <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">{{table}}</h4>
+              <div class="w-3 h-3 rounded-full bg-red-600 group-hover:animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.8)]"></div>
+              <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">{{table}}</h4>
             </div>
             <div class="flex flex-wrap gap-2">
-                {% for col in columns %}
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-red-300 transition-colors">{{col}}</span>
-                {% endfor %}
+              {% for col in columns %}
+              <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-red-300 transition-colors">{{col}}</span>
+              {% endfor %}
             </div>
           </div>
           {% endfor %}
         </div>
         
         <div class="sticky top-10 group">
-            <div class="absolute -inset-4 bg-red-500/10 rounded-[4rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-            <div class="relative bg-slate-800/80 border border-white/10 rounded-[3.5rem] p-4 shadow-3xl overflow-hidden backdrop-blur-md">
-                <div class="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/5 to-transparent flex items-center px-8 justify-between">
-                    <div class="flex gap-2">
-                        <div class="w-2 h-2 rounded-full bg-red-500/40"></div>
-                        <div class="w-2 h-2 rounded-full bg-yellow-500/40"></div>
-                        <div class="w-2 h-2 rounded-full bg-green-500/40"></div>
-                    </div>
-                    <span class="text-[9px] font-mono text-slate-500 tracking-widest uppercase">Gmail_Entity_Diagram.vuerd</span>
-                </div>
-                <div class="mt-12 p-6 rounded-[2.5rem] bg-slate-900/50 border border-white/5">
-                    <img src="/static/images/erd/gmail_erd.png" class="mx-auto max-w-full rounded-2xl opacity-80 group-hover:opacity-100 transition-all duration-700 transform group-hover:scale-[1.02]"/>
-                </div>
+          <div class="absolute -inset-4 bg-red-500/10 rounded-[4rem] blur-2xl opacity-30 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="relative bg-slate-800/80 border border-white/10 rounded-[3.5rem] p-4 shadow-3xl overflow-hidden backdrop-blur-md">
+            <div class="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/5 to-transparent flex items-center px-8 justify-between">
+              <div class="flex gap-2">
+                <div class="w-2 h-2 rounded-full bg-red-500/40"></div>
+                <div class="w-2 h-2 rounded-full bg-yellow-500/40"></div>
+                <div class="w-2 h-2 rounded-full bg-green-500/40"></div>
+              </div>
+              <span class="text-[9px] font-mono text-slate-500 tracking-widest uppercase">Gmail_Entity_Diagram.vuerd</span>
             </div>
+            <div class="mt-12 p-6 rounded-[2.5rem] bg-slate-900/50 border border-white/5">
+              <img src="/static/images/erd/gmail_erd.png" class="mx-auto max-w-full rounded-2xl opacity-80 group-hover:opacity-100 transition-all duration-700 transform group-hover:scale-[1.02]"/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -328,22 +347,30 @@ async function checkGmailStatus(){
         const data = await res.json();
         const badge = document.getElementById("statusBadge");
         const disconnectBtn = document.getElementById("disconnectBtn");
+        const syncContent = document.getElementById("syncContent");
+        const accessOverlay = document.getElementById("accessOverlay");
 
         if(data.connected){
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
             badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
             disconnectBtn.classList.remove("hidden");
             updateFlowUI(3);
+            syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+            accessOverlay.classList.add("hidden");
         }
         else if(data.has_credentials){
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
             badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
             disconnectBtn.classList.add("hidden");
             updateFlowUI(1);
+            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            accessOverlay.classList.remove("hidden");
         }
         else{
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
             disconnectBtn.classList.add("hidden");
+            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            accessOverlay.classList.remove("hidden");
         }
     } catch(e){ console.error(e); }
 }
@@ -353,26 +380,28 @@ function updateFlowUI(step) {
     const s2 = document.getElementById("step2-circle");
     const s3 = document.getElementById("step3-circle");
     const btn = document.getElementById("saveCredsBtn");
+    const form = document.getElementById("credentialsForm");
+    const success = document.getElementById("successState");
 
     if (step >= 1) {
-        s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
         s1.innerHTML = "✓";
-        s2.className = "w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold";
+        s2.className = "w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
         
         btn.innerText = "Authorize with Google";
-        btn.className = "w-full py-5 bg-white text-red-600 rounded-2xl font-black hover:bg-red-600 hover:text-white transition-all shadow-lg text-xs uppercase tracking-widest mt-2";
+        btn.className = "w-full py-5 bg-white text-red-600 rounded-2xl font-black hover:bg-red-600 hover:text-white transition-all shadow-lg text-xs uppercase tracking-widest mt-2 hover:shadow-red-600/40";
         btn.onclick = () => window.location.href = "/connectors/gmail/connect";
     }
 
     if (step >= 3) {
-        s2.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s2.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
         s2.innerHTML = "✓";
-        s3.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold";
+        s3.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
         s3.innerHTML = "✓";
 
-        btn.innerText = "Connection Established";
-        btn.className = "w-full py-5 bg-emerald-600 text-white rounded-2xl font-black transition-all text-xs uppercase tracking-widest mt-2 cursor-default";
-        btn.onclick = null;
+        form.classList.add("opacity-0", "hidden");
+        success.classList.remove("hidden");
+        success.classList.add("opacity-100");
     }
 }
 
