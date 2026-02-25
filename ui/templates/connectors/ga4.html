@@ -189,18 +189,47 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div class="md:col-span-2">
-                <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block">Target Platform</label>
-                <select id="destType" onchange="toggleDest()" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 focus:border-indigo-500 transition-all outline-none">
-                  <option value="">Select Connector...</option>
-                  <option value="mysql">MySQL</option>
-                  <option value="postgres">PostgreSQL</option>
-                  <option value="bigquery">BigQuery</option>
-                  <option value="snowflake">SnowFlake</option>
-                  <option value="clickhouse">ClickHouse</option>
-                  <option value="s3">AWS S3</option>
-                </select>
-              </div>
+              <div class="md:col-span-2 relative">
+                <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Target Platform</label>
+                
+                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-rose-500 transition-all">
+                    <div id="selectedOption" class="flex items-center gap-3">
+                        <span class="text-slate-500">Select Connector...</span>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <input type="hidden" id="destType" value="">
+
+                <div id="dropdownMenu" class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
+                    <div class="p-2 space-y-1">
+                        <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
+                            <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
+                        </div>
+                        <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
+                            <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+                        </div>
+                        <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                            <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+                            <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+                        </div>
+                        <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                          <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
+                          <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+                        </div>
+                        <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
+                            <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+                        </div>
+                        <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                          <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
+                          <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
               <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                 <div id="sqlFields" class="contents">
