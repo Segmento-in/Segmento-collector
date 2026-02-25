@@ -33,12 +33,6 @@
             <span>OAuth 2.0 protocol ensures only restricted scopes are requested for data ingestion.</span>
           </div>
         </div>
-
-        <div class="flex flex-wrap gap-4 items-center">
-          <button onclick="disconnectGmail()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
-            Disconnect
-          </button>
-        </div>
       </div>
 
       <div class="relative" data-aos="zoom-in">
@@ -97,13 +91,52 @@
             </div>
           </div>
 
-          <div id="successState" class="hidden text-center space-y-6 transition-opacity duration-500 opacity-0">
-            <svg class="w-16 h-16 mx-auto text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <h3 class="text-white text-2xl font-bold">Connection Established</h3>
-            <p class="text-slate-400 text-sm">Your Gmail connector is now active and ready for synchronization.</p>
+          <div id="successState"
+            class="hidden text-center space-y-8 transition-opacity duration-500 opacity-0 relative pt-4 pb-20">
+
+          <div class="space-y-4">
+              <svg class="w-20 h-20 mx-auto text-emerald-500 animate-pulse-once"
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <h3 class="text-white text-3xl font-bold tracking-tight">
+                  Successfully Connected
+              </h3>
+              <p class="text-slate-300 text-base max-w-md mx-auto">
+                  Your Gmail account is now linked and ready for data synchronization.
+              </p>
+              <p id="connectedAs"
+                class="text-emerald-400 text-sm font-medium"></p>
           </div>
+          <!-- Disconnect CTA -->
+          <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-xs px-6">
+              <button onclick="disconnectGmail()" id="disconnectBtn"
+                  class="group relative w-full py-4 px-6 bg-transparent
+                        border-2 border-red-600/70 text-red-400
+                        font-semibold rounded-2xl
+                        hover:bg-red-700/20 hover:border-red-500
+                        hover:text-white transition-all duration-300">
+                  <span class="flex items-center justify-center gap-2">
+                      <svg class="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24">
+                          <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7"/>
+                      </svg>
+                      Disconnect this account
+                  </span>
+              </button>
+              <p class="text-center text-[11px] text-slate-500 mt-2">
+                  Revokes access and stops future syncs
+              </p>
+          </div>
+        </div>
         </div>
       </div>
     </div>
@@ -354,6 +387,14 @@
   .format-option.selected { border-color: #ef4444; color: white; background-color: rgba(239, 68, 68, 0.05); }
   .format-option.selected .radio-indicator { border-color: #ef4444; }
   .format-option.selected .dot { transform: scale(1); }
+
+  @keyframes pulse-once {
+    0%,100% { opacity:1; }
+    50% { opacity:.6; }
+  }
+  .animate-pulse-once{
+    animation:pulse-once 2s ease-in-out;
+  }
 </style>
 
 <script>
@@ -374,34 +415,62 @@ async function checkGmailStatus(){
     try {
         const res = await fetch("/api/status/gmail");
         const data = await res.json();
+
         const badge = document.getElementById("statusBadge");
-        const disconnectBtn = document.getElementById("disconnectBtn");
+        const connectedAs = document.getElementById("connectedAs");
         const syncContent = document.getElementById("syncContent");
         const accessOverlay = document.getElementById("accessOverlay");
 
-        if(data.connected){
-            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.remove("hidden");
+        if (data.connected) {
+
+            badge.innerHTML =
+            `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
+
+            badge.className =
+            "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
+            if(data.email){
+                connectedAs.innerHTML =
+                    `Connected as <strong>${data.email}</strong>`;
+            }
+
             updateFlowUI(3);
-            syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+
+            syncContent.classList.remove(
+                "opacity-65","blur-sm","pointer-events-none"
+            );
             accessOverlay.classList.add("hidden");
         }
+
         else if(data.has_credentials){
-            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.add("hidden");
+
+            badge.innerHTML =
+            `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
+
+            badge.className =
+            "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
             updateFlowUI(1);
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+
+            syncContent.classList.add(
+                "opacity-65","blur-sm","pointer-events-none"
+            );
             accessOverlay.classList.remove("hidden");
         }
+
         else{
-            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
-            disconnectBtn.classList.add("hidden");
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            badge.innerHTML =
+            `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
+
+            syncContent.classList.add(
+                "opacity-65","blur-sm","pointer-events-none"
+            );
             accessOverlay.classList.remove("hidden");
         }
-    } catch(e){ console.error(e); }
+
+    } catch(e){
+        console.error(e);
+    }
 }
 
 function updateFlowUI(step) {
@@ -449,11 +518,28 @@ async function saveCredentials(){
 }
 
 async function disconnectGmail(){
-    if(!confirm("Are you sure you want to terminate this Google connection?")) return;
-    try {
-        const res = await fetch("/connectors/gmail/disconnect");
-        if(res.ok) { location.reload(); }
-    } catch(e) { alert("Disconnect failed"); }
+
+    if(!confirm(
+        "Disconnecting will stop all future Gmail syncs.\n\nContinue?"
+    )) return;
+    const btn = document.getElementById("disconnectBtn");
+
+    btn.disabled = true;
+    btn.innerText = "Disconnecting...";
+
+    try{
+        const res =
+            await fetch("/connectors/gmail/disconnect");
+        if(res.ok){
+            alert("Connection revoked.");
+            location.reload();
+        }
+        else{
+            alert("Failed to disconnect.");
+        }
+    }catch(e){
+        alert("Disconnect error.");
+    }
 }
 
 async function loadDestinations(){

@@ -437,6 +437,44 @@ async function runSync(){
   finally { setTimeout(() => { btn.innerText = "Run Manual Sync"; btn.disabled = false; }, 3000); }
 }
 
+function toggleDropdown() {
+    const menu = document.getElementById('dropdownMenu');
+    menu.classList.toggle('hidden');
+}
+
+function selectDestination(value, label, logoUrl) {
+    // 1. Update the hidden input for your existing save logic
+    document.getElementById('destType').value = value;
+
+    // 2. Update the Trigger UI
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain">` : ''; // Fallback logic if needed
+    
+    // Using the icons from the options list
+    const selectedDiv = document.getElementById('selectedOption');
+    const clickedElement = event.currentTarget;
+    const imgClone = clickedElement.querySelector('img').cloneNode(true);
+    
+    selectedDiv.innerHTML = '';
+    selectedDiv.appendChild(imgClone);
+    const textSpan = document.createElement('span');
+    textSpan.className = "text-white font-bold";
+    textSpan.innerText = label;
+    selectedDiv.appendChild(textSpan);
+
+    // 3. Hide menu
+    document.getElementById('dropdownMenu').classList.add('hidden');
+
+    // 4. Trigger your existing form field visibility logic
+    toggleDestFields(value);
+}
+
+// Close dropdown if user clicks outside
+window.onclick = function(event) {
+    if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
+        document.getElementById('dropdownMenu').classList.add('hidden');
+    }
+}
+
 // Modified version of original toggleDest function
 function toggleDestFields(type) {
     const fields = document.getElementById("dbFields");
