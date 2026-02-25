@@ -6400,7 +6400,7 @@ def trends_sync():
 
     return jsonify(result)
 
-@app.route("/connectors/trends/connect")
+@app.route("/connectors/trends/connect", methods=["POST"])
 def trends_connect():
 
     uid = get_uid()

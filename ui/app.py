@@ -3335,7 +3335,7 @@ def ui_trends_sync():
 
     return jsonify(r.json())
 
-@app.route("/connectors/trends/connect")
+@app.route("/connectors/trends/connect", methods=["POST"])
 def ui_trends_connect():
 
     r = requests.get(

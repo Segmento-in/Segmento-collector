@@ -33,12 +33,6 @@
             <span>OAuth 2.0 protocol ensures restricted read-only access to your Analytics data.</span>
           </div>
         </div>
-
-        <div class="flex flex-wrap gap-4 items-center">
-          <button onclick="disconnectGA4()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
-            Disconnect
-          </button>
-        </div>
       </div>
 
       <div class="relative" data-aos="zoom-in">
@@ -87,7 +81,7 @@
                 </li>
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
-                  <span>Enable the <b>Google Analytics Data API</b> from the Library</span>
+                  <span>Enable the <b>Google Analytics Admin API</b> and <b>Google Analytics Data API</b></span>
                 </li>
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
@@ -99,23 +93,67 @@
                 </li>
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
-                  <span>Find your Property ID in GA4 Admin > Property Settings</span>
+                  <span>Get Property ID from GA4 Admin > Properties > Property Settings</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div id="successState" class="hidden text-center space-y-6 transition-opacity duration-500 opacity-0">
-            <svg class="w-16 h-16 mx-auto text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <h3 class="text-white text-2xl font-bold">Connection Established</h3>
-            <p class="text-slate-400 text-sm">Your Google Analytics GA4 connector is now active and ready for synchronization.</p>
+          <!-- ──────────────────────────────────────────────── -->
+          <!--                   SUCCESS STATE                   -->
+          <!-- ──────────────────────────────────────────────── -->
+          <div id="successState"
+               class="hidden text-center space-y-8 transition-opacity duration-500 opacity-0 relative pt-4 pb-20">
+
+            <div class="space-y-4">
+              <svg class="w-20 h-20 mx-auto text-emerald-500 animate-pulse-once"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <h3 class="text-white text-3xl font-bold tracking-tight">
+                  Successfully Connected
+              </h3>
+              <p class="text-slate-300 text-base max-w-md mx-auto">
+                  Your Google Analytics GA4 property is now linked and ready for data synchronization.
+              </p>
+              <p id="connectedAs"
+                 class="text-emerald-400 text-sm font-medium"></p>
+            </div>
+
+            <!-- Disconnect button – moved here like in Gmail -->
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-xs px-6">
+              <button onclick="disconnectGA4()" id="disconnectBtn"
+                      class="group relative w-full py-4 px-6 bg-transparent
+                            border-2 border-red-600/70 text-red-400
+                            font-semibold rounded-2xl
+                            hover:bg-red-700/20 hover:border-red-500
+                            hover:text-white transition-all duration-300">
+                <span class="flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5"
+                       fill="none"
+                       stroke="currentColor"
+                       viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7"/>
+                  </svg>
+                  Disconnect this account
+                </span>
+              </button>
+              <p class="text-center text-[11px] text-slate-500 mt-2">
+                Revokes access and stops future syncs
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Sync + Destination section (same structure as Gmail) -->
     <div id="syncDestinationSection" class="relative transition-all duration-500">
       <div id="accessOverlay" class="absolute inset-0 bg-slate-900/90 flex items-center justify-center z-20 rounded-[2.5rem]">
         <div class="text-center space-y-4 p-8 bg-slate-800/50 rounded-3xl border border-white/10 shadow-2xl">
@@ -130,6 +168,7 @@
       </div>
 
       <div id="syncContent" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start opacity-65 blur-sm pointer-events-none">
+        <!-- Sync Engine column -->
         <div class="lg:col-span-1">
           <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
             <div class="flex items-center gap-3 mb-8">
@@ -174,6 +213,7 @@
           </div>
         </div>
 
+        <!-- Warehouse Destination column -->
         <div class="lg:col-span-2">
           <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
             <div class="flex items-center justify-between mb-8">
@@ -192,44 +232,44 @@
               <div class="md:col-span-2 relative">
                 <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Target Platform</label>
                 
-                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-rose-500 transition-all">
-                    <div id="selectedOption" class="flex items-center gap-3">
-                        <span class="text-slate-500">Select Connector...</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-indigo-500 transition-all">
+                  <div id="selectedOption" class="flex items-center gap-3">
+                    <span class="text-slate-500">Select Connector...</span>
+                  </div>
+                  <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
                 <input type="hidden" id="destType" value="">
 
                 <div id="dropdownMenu" class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
-                    <div class="p-2 space-y-1">
-                        <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
-                        </div>
-                        <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
-                        </div>
-                        <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
-                        </div>
-                        <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
-                          <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
-                        </div>
-                        <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
-                        </div>
-                        <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
-                          <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
-                        </div>
+                  <div class="p-2 space-y-1">
+                    <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
                     </div>
+                    <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+                    </div>
+                    <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+                    </div>
+                    <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
+                      <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+                    </div>
+                    <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+                    </div>
+                    <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+                    </div>
+                  </div>
                 </div>
-            </div>
+              </div>
 
               <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                 <div id="sqlFields" class="contents">
@@ -244,19 +284,23 @@
                   <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <div class="md:col-span-2">
-                    <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
+                    <textarea id="bqKey" placeholder="Service Account JSON Key"
+                              rows="3"
+                              class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
                   </div>
                 </div>
 
                 <div id="s3Fields" class="hidden contents">
                   <input id="s3Bucket" placeholder="Bucket Name (my-ga4-backup)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="s3Region" placeholder="Region (us-east-1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3Region" placeholder="Region (ap-south-1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="s3AccessKey" placeholder="Access Key ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="s3SecretKey" type="password" placeholder="Secret Access Key" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                 </div>
 
                 <div id="formatField" class="hidden md:col-span-2">
-                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Data Format</label>
+                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block">
+                    Data Format
+                  </label>
                   <div class="flex gap-4">
                     <button onclick="selectFormat('parquet')" id="format-parquet" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
                       <span class="font-bold">Parquet</span>
@@ -275,9 +319,7 @@
                 </div>
 
                 <div class="md:col-span-2 pt-2">
-                  <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-indigo-600/30 text-xs uppercase tracking-widest">
-                    Authenticate & Save
-                  </button>
+                  <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black"> Authenticate & Save </button>
                 </div>
               </div>
             </div>
@@ -293,14 +335,15 @@
       </div>
     </div>
 
+    <!-- Schema & Data Extracted sections remain unchanged -->
     <div class="pt-12">
       <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">GA4 <span class="text-indigo-500">Schema</span></h2>
       <div class="grid lg:grid-cols-2 gap-12 items-start">
         <div class="grid grid-cols-1 gap-4">
           {% for table, columns in [
-            ('ga4_events', ['property_id', 'event_date', 'event_timestamp', 'event_name', 'event_params_json', 'user_id', 'session_id', 'device_category', 'traffic_source']),
-            ('ga4_users', ['property_id', 'user_id', 'first_session_date', 'last_session_date', 'total_sessions', 'total_events', 'total_conversions', 'total_revenue', 'acquisition_source', 'acquisition_medium']),
-            ('ga4_sessions', ['property_id', 'session_id', 'user_id', 'start_timestamp', 'end_timestamp', 'duration_seconds', 'page_views', 'events_count', 'bounce_rate', 'exit_rate', 'source', 'medium', 'campaign'])
+            ('ga4_events', ['property_id', 'event_date', 'event_timestamp', 'event_name', 'event_params', 'event_previous_timestamp', 'event_value_in_usd', 'event_bundle_sequence_id', 'event_server_timestamp_offset', 'user_id', 'user_pseudo_id', 'privacy_info', 'user_properties', 'user_first_touch_timestamp', 'user_ltv', 'device', 'geo', 'app_info', 'traffic_source', 'stream_id', 'platform']),
+            ('ga4_users', ['property_id', 'user_id', 'user_pseudo_id', 'first_touch_timestamp', 'ltv_revenue', 'ltv_currency', 'device_category', 'mobile_brand_name', 'mobile_model_name', 'os_version', 'language', 'time_zone_offset_seconds', 'ads_consent_granted', 'country', 'region', 'city', 'medium', 'source', 'campaign']),
+            ('ga4_sessions', ['property_id', 'session_id', 'user_pseudo_id', 'start_timestamp', 'end_timestamp', 'duration', 'page_views', 'engaged_time', 'engagement_rate', 'bounce', 'exit', 'entrance', 'events_count', 'conversions_count'])
           ] %}
           <div class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-indigo-500/30 transition-all group">
             <div class="flex items-center gap-3 mb-4">
@@ -341,7 +384,7 @@
         {% for table in ['ga4_events', 'ga4_users', 'ga4_sessions'] %}
         <div class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-indigo-600/5 hover:border-indigo-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
           <div class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-indigo-600 transition-all duration-500 shadow-xl">
-            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M5 10l3-3 3 3 4-4M19 10V6a2 2 0 00-2-2H7a2 2 0 00-2 2v4m14 0v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-8"/></svg>
+            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </div>
           <span class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">{{table}}</span>
         </div>
@@ -356,13 +399,25 @@
   .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
   select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
 
-  /* Format Option Styling */
+  /* Format Option Styling – using indigo theme */
   .format-option.selected { border-color: #6366f1; color: white; background-color: rgba(99,102,241,0.05); }
   .format-option.selected .radio-indicator { border-color: #6366f1; }
   .format-option.selected .dot { transform: scale(1); }
+
+  @keyframes pulse-once {
+    0%,100% { opacity:1; }
+    50% { opacity:.6; }
+  }
+  .animate-pulse-once {
+    animation: pulse-once 2s ease-in-out;
+  }
 </style>
 
 <script>
+// ────────────────────────────────────────────────
+//                   JAVASCRIPT
+// ────────────────────────────────────────────────
+
 document.addEventListener("DOMContentLoaded", () => {
     checkGA4Status();
     loadDestinations();
@@ -380,34 +435,39 @@ async function checkGA4Status(){
     try {
         const res = await fetch("/api/status/ga4");
         const data = await res.json();
+
         const badge = document.getElementById("statusBadge");
-        const disconnectBtn = document.getElementById("disconnectBtn");
+        const connectedAs = document.getElementById("connectedAs");
         const syncContent = document.getElementById("syncContent");
         const accessOverlay = document.getElementById("accessOverlay");
 
-        if(data.connected){
+        if (data.connected) {
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
             badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.remove("hidden");
+
+            if(data.email){
+                connectedAs.innerHTML = `Connected as <strong>${data.email}</strong>`;
+            }
+
             updateFlowUI(3);
-            syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.remove("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.add("hidden");
         }
         else if(data.has_credentials){
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
             badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.add("hidden");
             updateFlowUI(1);
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.add("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.remove("hidden");
         }
         else{
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
-            disconnectBtn.classList.add("hidden");
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.add("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.remove("hidden");
         }
-    } catch(e){ console.error(e); }
+    } catch(e){
+        console.error(e);
+    }
 }
 
 function updateFlowUI(step) {
@@ -444,33 +504,39 @@ async function saveCredentials(){
     const clientId = document.getElementById("clientId").value.trim();
     const clientSecret = document.getElementById("clientSecret").value.trim();
     const propertyId = document.getElementById("propertyId").value.trim();
-    
-    if(!clientId || !clientSecret || !propertyId) { 
-        alert("Client ID, Secret, and Property ID are all required."); 
-        return; 
-    }
-
+    if(!clientId || !clientSecret || !propertyId) { alert("All fields required"); return; }
     try {
         const res = await fetch("/connectors/ga4/save_app", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ 
-                client_id: clientId, 
-                client_secret: clientSecret,
-                property_id: propertyId
-            })
+            body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, property_id: propertyId })
         });
         if(res.ok) { checkGA4Status(); }
-        else { alert("Failed to save credentials"); }
     } catch(e) { alert("Save failed"); }
 }
 
 async function disconnectGA4(){
-    if(!confirm("Are you sure you want to terminate this Google Analytics GA4 connection?")) return;
-    try {
+    if(!confirm("Disconnecting will stop all future GA4 syncs.\n\nContinue?")) return;
+
+    const btn = document.getElementById("disconnectBtn");
+    btn.disabled = true;
+    btn.innerText = "Disconnecting...";
+
+    try{
         const res = await fetch("/connectors/ga4/disconnect");
-        if(res.ok) { location.reload(); }
-    } catch(e) { alert("Disconnect failed"); }
+        if(res.ok){
+            alert("Connection revoked.");
+            location.reload();
+        }
+        else{
+            alert("Failed to disconnect.");
+        }
+    }catch(e){
+        alert("Disconnect error.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Disconnect this account";
+    }
 }
 
 async function loadDestinations(){
@@ -508,22 +574,16 @@ function toggleDest(){
     fields.classList.remove("hidden");
 
     document.getElementById("sqlFields")
-        .classList.toggle("hidden",
-            type === "bigquery" || type === "s3");
+        .classList.toggle("hidden", type === "bigquery" || type === "s3");
 
     document.getElementById("bigqueryFields")
-        .classList.toggle("hidden",
-            type !== "bigquery");
+        .classList.toggle("hidden", type !== "bigquery");
 
     document.getElementById("s3Fields")
-        .classList.toggle("hidden",
-            type !== "s3");
+        .classList.toggle("hidden", type !== "s3");
 
     document.getElementById("formatField")
-        .classList.toggle(
-            "hidden",
-            !(type === "bigquery" || type === "s3")
-        );
+        .classList.toggle("hidden", !(type === "bigquery" || type === "s3"));
 }
 
 async function saveDestination(){
@@ -616,19 +676,15 @@ async function activateDest(id){
     });
     loadDestinations();
 }
+
 function toggleDropdown() {
     const menu = document.getElementById('dropdownMenu');
     menu.classList.toggle('hidden');
 }
 
 function selectDestination(value, label, logoUrl) {
-    // 1. Update the hidden input for your existing save logic
     document.getElementById('destType').value = value;
 
-    // 2. Update the Trigger UI
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain">` : ''; // Fallback logic if needed
-    
-    // Using the icons from the options list
     const selectedDiv = document.getElementById('selectedOption');
     const clickedElement = event.currentTarget;
     const imgClone = clickedElement.querySelector('img').cloneNode(true);
@@ -640,21 +696,16 @@ function selectDestination(value, label, logoUrl) {
     textSpan.innerText = label;
     selectedDiv.appendChild(textSpan);
 
-    // 3. Hide menu
     document.getElementById('dropdownMenu').classList.add('hidden');
-
-    // 4. Trigger your existing form field visibility logic
     toggleDestFields(value);
 }
 
-// Close dropdown if user clicks outside
 window.onclick = function(event) {
     if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
         document.getElementById('dropdownMenu').classList.add('hidden');
     }
 }
 
-// Modified version of original toggleDest function
 function toggleDestFields(type) {
     const fields = document.getElementById("dbFields");
     if(!type){

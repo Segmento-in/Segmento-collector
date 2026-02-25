@@ -3,8 +3,8 @@
 
 <section class="bg-slate-900 min-h-screen px-6 py-24 relative overflow-hidden">
   
-  <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-cyan-500/10 blur-[120px] rounded-full"></div>
-  <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-500/5 blur-[120px] rounded-full"></div>
+  <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-cyan-600/10 blur-[120px] rounded-full"></div>
+  <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-teal-600/5 blur-[120px] rounded-full"></div>
 
   <div class="max-w-7xl mx-auto relative z-10 space-y-24">
 
@@ -16,7 +16,7 @@
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
-          Web <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-500">Fonts</span> <span class="text-white">Connector</span>
+          Web <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">Fonts</span> <span class="text-white">Connector</span>
         </h1>
         
         <p class="text-slate-300 text-lg mb-6 leading-relaxed font-medium max-w-xl">
@@ -32,12 +32,6 @@
             <svg class="w-5 h-5 text-cyan-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
             <span>Complete font catalog sync: families, variants, subsets, popularity metrics.</span>
           </div>
-        </div>
-
-        <div class="flex flex-wrap gap-4 items-center">
-          <button onclick="disconnectFonts()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
-            Disconnect
-          </button>
         </div>
       </div>
 
@@ -65,9 +59,9 @@
               <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Google Fonts API Key</label>
               <input id="apiKeyInput" type="password" placeholder="AIzaSyYourGoogleFontsApiKeyHere..." class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 transition-all shadow-inner hover:shadow-cyan-500/20">
             </div>
-
+            
             <button id="saveCredsBtn" onclick="saveCredentials()" class="w-full py-5 bg-cyan-600 text-white rounded-2xl font-black hover:bg-white hover:text-cyan-600 transition-all shadow-lg shadow-cyan-600/20 text-xs uppercase tracking-widest mt-2 hover:shadow-cyan-600/40">
-              Save API Key & Activate
+              Save API Key & Continue
             </button>
 
             <div class="mt-8 pt-8 border-t border-white/5">
@@ -79,7 +73,7 @@
                 </li>
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 shrink-0"></span>
-                  <span>Create or select a project → Enable **Google Fonts Developer API**</span>
+                  <span>Create or select a project → Enable <b>Google Fonts Developer API</b></span>
                 </li>
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 mt-1.5 shrink-0"></span>
@@ -89,12 +83,51 @@
             </div>
           </div>
 
-          <div id="successState" class="hidden text-center space-y-6 transition-opacity duration-500 opacity-0">
-            <svg class="w-16 h-16 mx-auto text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <h3 class="text-white text-2xl font-bold">Connection Established</h3>
-            <p class="text-slate-400 text-sm">Your Google Web Fonts connector is now active and ready for synchronization.</p>
+          <div id="successState"
+               class="hidden text-center space-y-8 transition-opacity duration-500 opacity-0 relative pt-4 pb-20">
+
+            <div class="space-y-4">
+              <svg class="w-20 h-20 mx-auto text-emerald-500 animate-pulse-once"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <h3 class="text-white text-3xl font-bold tracking-tight">
+                Successfully Connected
+              </h3>
+              <p class="text-slate-300 text-base max-w-md mx-auto">
+                Google Fonts catalog is now ready for synchronization.
+              </p>
+              <p id="connectedAs" class="text-emerald-400 text-sm font-medium"></p>
+            </div>
+
+            <!-- Disconnect CTA -->
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-xs px-6">
+              <button onclick="disconnectFonts()" id="disconnectBtn"
+                      class="group relative w-full py-4 px-6 bg-transparent
+                            border-2 border-cyan-600/70 text-cyan-400
+                            font-semibold rounded-2xl
+                            hover:bg-cyan-700/20 hover:border-cyan-500
+                            hover:text-white transition-all duration-300">
+                <span class="flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5"
+                       fill="none"
+                       stroke="currentColor"
+                       viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7"/>
+                  </svg>
+                  Disconnect this connector
+                </span>
+              </button>
+              <p class="text-center text-[11px] text-slate-500 mt-2">
+                Revokes access and stops future syncs
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -176,44 +209,44 @@
               <div class="md:col-span-2 relative">
                 <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Target Platform</label>
                 
-                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-rose-500 transition-all">
-                    <div id="selectedOption" class="flex items-center gap-3">
-                        <span class="text-slate-500">Select Connector...</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-cyan-500 transition-all">
+                  <div id="selectedOption" class="flex items-center gap-3">
+                    <span class="text-slate-500">Select Connector...</span>
+                  </div>
+                  <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
                 <input type="hidden" id="destType" value="">
 
                 <div id="dropdownMenu" class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
-                    <div class="p-2 space-y-1">
-                        <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
-                        </div>
-                        <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
-                        </div>
-                        <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
-                        </div>
-                        <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
-                          <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
-                        </div>
-                        <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
-                        </div>
-                        <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
-                          <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
-                        </div>
+                  <div class="p-2 space-y-1">
+                    <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
                     </div>
+                    <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+                    </div>
+                    <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+                    </div>
+                    <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
+                      <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+                    </div>
+                    <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+                    </div>
+                    <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+                    </div>
+                  </div>
                 </div>
-            </div>
+              </div>
 
               <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                 <div id="sqlFields" class="contents">
@@ -228,7 +261,9 @@
                   <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <div class="md:col-span-2">
-                    <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
+                    <textarea id="bqKey" placeholder="Service Account JSON Key"
+                              rows="3"
+                              class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
                   </div>
                 </div>
 
@@ -240,7 +275,9 @@
                 </div>
 
                 <div id="formatField" class="hidden md:col-span-2">
-                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Data Format</label>
+                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block">
+                    Data Format
+                  </label>
                   <div class="flex gap-4">
                     <button onclick="selectFormat('parquet')" id="format-parquet" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
                       <span class="font-bold">Parquet</span>
@@ -259,9 +296,7 @@
                 </div>
 
                 <div class="md:col-span-2 pt-2">
-                  <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-cyan-600/30 text-xs uppercase tracking-widest">
-                    Authenticate & Save
-                  </button>
+                  <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-2xl font-black"> Authenticate & Save </button>
                 </div>
               </div>
             </div>
@@ -340,10 +375,17 @@
   .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
   select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
 
-  /* Format Option Styling */
   .format-option.selected { border-color: #06b6d4; color: white; background-color: rgba(6,182,212,0.05); }
   .format-option.selected .radio-indicator { border-color: #06b6d4; }
   .format-option.selected .dot { transform: scale(1); }
+
+  @keyframes pulse-once {
+    0%,100% { opacity:1; }
+    50% { opacity:.6; }
+  }
+  .animate-pulse-once{
+    animation:pulse-once 2s ease-in-out;
+  }
 </style>
 
 <script>
@@ -364,34 +406,60 @@ async function checkFontsStatus(){
     try {
         const res = await fetch("/api/status/webfonts");
         const data = await res.json();
+
         const badge = document.getElementById("statusBadge");
-        const disconnectBtn = document.getElementById("disconnectBtn");
+        const connectedAs = document.getElementById("connectedAs");
         const syncContent = document.getElementById("syncContent");
         const accessOverlay = document.getElementById("accessOverlay");
 
-        if(data.connected){
-            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.remove("hidden");
+        if (data.connected) {
+            badge.innerHTML =
+            `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
+
+            badge.className =
+            "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
+            if(data.message){
+                connectedAs.innerHTML =
+                    `Ready to sync <strong>${data.message}</strong>`;
+            }
+
             updateFlowUI(3);
-            syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+
+            syncContent.classList.remove(
+                "opacity-65","blur-sm","pointer-events-none"
+            );
             accessOverlay.classList.add("hidden");
         }
+
         else if(data.has_credentials){
-            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> API KEY SAVED`;
-            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.add("hidden");
+            badge.innerHTML =
+            `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> API KEY SAVED`;
+
+            badge.className =
+            "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
             updateFlowUI(1);
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+
+            syncContent.classList.add(
+                "opacity-65","blur-sm","pointer-events-none"
+            );
             accessOverlay.classList.remove("hidden");
         }
+
         else{
-            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
-            disconnectBtn.classList.add("hidden");
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            badge.innerHTML =
+            `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
+
+            syncContent.classList.add(
+                "opacity-65","blur-sm","pointer-events-none"
+            );
             accessOverlay.classList.remove("hidden");
         }
-    } catch(e){ console.error(e); }
+
+    } catch(e){
+        console.error(e);
+    }
 }
 
 function updateFlowUI(step) {
@@ -426,8 +494,7 @@ function updateFlowUI(step) {
 
 async function saveCredentials(){
     const apiKey = document.getElementById("apiKeyInput").value.trim();
-    if(!apiKey){ alert("API Key is required"); return; }
-
+    if(!apiKey) { alert("API Key is required"); return; }
     try {
         const res = await fetch("/connectors/webfonts/save_key", {
             method: "POST",
@@ -435,16 +502,31 @@ async function saveCredentials(){
             body: JSON.stringify({ api_key: apiKey })
         });
         if(res.ok) { checkFontsStatus(); }
-        else { alert("Failed to save API key"); }
-    } catch(e) { alert("Connection failed"); }
+    } catch(e) { alert("Save failed"); }
 }
 
 async function disconnectFonts(){
-    if(!confirm("Are you sure you want to disconnect Google Web Fonts?")) return;
-    try {
+    if(!confirm("Disconnecting will stop all future Google Fonts syncs.\n\nContinue?")) return;
+
+    const btn = document.getElementById("disconnectBtn");
+    btn.disabled = true;
+    btn.innerText = "Disconnecting...";
+
+    try{
         const res = await fetch("/connectors/webfonts/disconnect");
-        if(res.ok) { location.reload(); }
-    } catch(e) { alert("Disconnect failed"); }
+        if(res.ok){
+            alert("Connector disconnected.");
+            location.reload();
+        }
+        else{
+            alert("Failed to disconnect.");
+        }
+    }catch(e){
+        alert("Disconnect error.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Disconnect this connector";
+    }
 }
 
 async function loadDestinations(){
@@ -470,34 +552,43 @@ async function loadDestinations(){
     } catch(e) {}
 }
 
-function toggleDest(){
-    const type = document.getElementById("destType").value;
-    const fields = document.getElementById("dbFields");
+function toggleDropdown() {
+    const menu = document.getElementById('dropdownMenu');
+    menu.classList.toggle('hidden');
+}
 
+function selectDestination(value, label, logoUrl) {
+    document.getElementById('destType').value = value;
+
+    const selectedDiv = document.getElementById('selectedOption');
+    const clickedElement = event.currentTarget;
+    const imgClone = clickedElement.querySelector('img')?.cloneNode(true);
+
+    selectedDiv.innerHTML = '';
+    if (imgClone) selectedDiv.appendChild(imgClone);
+    
+    const textSpan = document.createElement('span');
+    textSpan.className = "text-white font-bold";
+    textSpan.innerText = label;
+    selectedDiv.appendChild(textSpan);
+
+    document.getElementById('dropdownMenu').classList.add('hidden');
+
+    toggleDestFields(value);
+}
+
+function toggleDestFields(type) {
+    const fields = document.getElementById("dbFields");
     if(!type){
         fields.classList.add("hidden");
         return;
     }
-
     fields.classList.remove("hidden");
 
-    document.getElementById("sqlFields")
-        .classList.toggle("hidden",
-            type === "bigquery" || type === "s3");
-
-    document.getElementById("bigqueryFields")
-        .classList.toggle("hidden",
-            type !== "bigquery");
-
-    document.getElementById("s3Fields")
-        .classList.toggle("hidden",
-            type !== "s3");
-
-    document.getElementById("formatField")
-        .classList.toggle(
-            "hidden",
-            !(type === "bigquery" || type === "s3")
-        );
+    document.getElementById("sqlFields").classList.toggle("hidden", type === "bigquery" || type === "s3");
+    document.getElementById("bigqueryFields").classList.toggle("hidden", type !== "bigquery");
+    document.getElementById("s3Fields").classList.toggle("hidden", type !== "s3");
+    document.getElementById("formatField").classList.toggle("hidden", !(type === "bigquery" || type === "s3"));
 }
 
 async function saveDestination(){
@@ -586,57 +677,11 @@ async function activateDest(id){
     loadDestinations();
 }
 
-function toggleDropdown() {
-    const menu = document.getElementById('dropdownMenu');
-    menu.classList.toggle('hidden');
-}
-
-function selectDestination(value, label, logoUrl) {
-    // 1. Update the hidden input for your existing save logic
-    document.getElementById('destType').value = value;
-
-    // 2. Update the Trigger UI
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain">` : ''; // Fallback logic if needed
-    
-    // Using the icons from the options list
-    const selectedDiv = document.getElementById('selectedOption');
-    const clickedElement = event.currentTarget;
-    const imgClone = clickedElement.querySelector('img').cloneNode(true);
-    
-    selectedDiv.innerHTML = '';
-    selectedDiv.appendChild(imgClone);
-    const textSpan = document.createElement('span');
-    textSpan.className = "text-white font-bold";
-    textSpan.innerText = label;
-    selectedDiv.appendChild(textSpan);
-
-    // 3. Hide menu
-    document.getElementById('dropdownMenu').classList.add('hidden');
-
-    // 4. Trigger your existing form field visibility logic
-    toggleDestFields(value);
-}
-
-// Close dropdown if user clicks outside
+// Close dropdown on outside click
 window.onclick = function(event) {
     if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
         document.getElementById('dropdownMenu').classList.add('hidden');
     }
-}
-
-// Modified version of original toggleDest function
-function toggleDestFields(type) {
-    const fields = document.getElementById("dbFields");
-    if(!type){
-        fields.classList.add("hidden");
-        return;
-    }
-    fields.classList.remove("hidden");
-
-    document.getElementById("sqlFields").classList.toggle("hidden", type === "bigquery" || type === "s3");
-    document.getElementById("bigqueryFields").classList.toggle("hidden", type !== "bigquery");
-    document.getElementById("s3Fields").classList.toggle("hidden", type !== "s3");
-    document.getElementById("formatField").classList.toggle("hidden", !(type === "bigquery" || type === "s3"));
 }
 </script>
 

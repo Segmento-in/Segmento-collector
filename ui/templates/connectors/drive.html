@@ -16,7 +16,7 @@
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
-          Google <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400">Drive</span> <span class="text-white">Connector</span>
+            Google <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400">Drive</span> <span class="text-white">Connector</span>
         </h1>
         
         <p class="text-slate-300 text-lg mb-6 leading-relaxed font-medium max-w-xl">
@@ -32,12 +32,6 @@
             <svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
             <span>OAuth 2.0 protocol ensures only restricted read scopes are requested for file indexing.</span>
           </div>
-        </div>
-
-        <div class="flex flex-wrap gap-4 items-center">
-          <button onclick="disconnectDrive()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
-            Disconnect
-          </button>
         </div>
       </div>
 
@@ -97,17 +91,61 @@
             </div>
           </div>
 
-          <div id="successState" class="hidden text-center space-y-6 transition-opacity duration-500 opacity-0">
-            <svg class="w-16 h-16 mx-auto text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <h3 class="text-white text-2xl font-bold">Connection Established</h3>
-            <p class="text-slate-400 text-sm">Your Google Drive connector is now active and ready for synchronization.</p>
+          <!-- ──────────────────────────────────────────────── -->
+          <!--                   SUCCESS STATE                   -->
+          <!-- ──────────────────────────────────────────────── -->
+          <div id="successState"
+               class="hidden text-center space-y-8 transition-opacity duration-500 opacity-0 relative pt-4 pb-20">
+
+            <div class="space-y-4">
+              <svg class="w-20 h-20 mx-auto text-emerald-500 animate-pulse-once"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <h3 class="text-white text-3xl font-bold tracking-tight">
+                  Successfully Connected
+              </h3>
+              <p class="text-slate-300 text-base max-w-md mx-auto">
+                  Your Google Drive is now linked and ready for synchronization.
+              </p>
+              <p id="connectedAs"
+                 class="text-emerald-400 text-sm font-medium"></p>
+            </div>
+
+            <!-- Disconnect button – moved here like in Gmail -->
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-xs px-6">
+              <button onclick="disconnectDrive()" id="disconnectBtn"
+                      class="group relative w-full py-4 px-6 bg-transparent
+                            border-2 border-red-600/70 text-red-400
+                            font-semibold rounded-2xl
+                            hover:bg-red-700/20 hover:border-red-500
+                            hover:text-white transition-all duration-300">
+                <span class="flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5"
+                       fill="none"
+                       stroke="currentColor"
+                       viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7"/>
+                  </svg>
+                  Disconnect this account
+                </span>
+              </button>
+              <p class="text-center text-[11px] text-slate-500 mt-2">
+                Revokes access and stops future syncs
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Sync + Destination section (same structure as Gmail) -->
     <div id="syncDestinationSection" class="relative transition-all duration-500">
       <div id="accessOverlay" class="absolute inset-0 bg-slate-900/90 flex items-center justify-center z-20 rounded-[2.5rem]">
         <div class="text-center space-y-4 p-8 bg-slate-800/50 rounded-3xl border border-white/10 shadow-2xl">
@@ -122,6 +160,7 @@
       </div>
 
       <div id="syncContent" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start opacity-65 blur-sm pointer-events-none">
+        <!-- Sync Engine column -->
         <div class="lg:col-span-1">
           <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
             <div class="flex items-center gap-3 mb-8">
@@ -166,6 +205,7 @@
           </div>
         </div>
 
+        <!-- Warehouse Destination column -->
         <div class="lg:col-span-2">
           <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
             <div class="flex items-center justify-between mb-8">
@@ -184,45 +224,44 @@
               <div class="md:col-span-2 relative">
                 <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Target Platform</label>
                 
-                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-rose-500 transition-all">
-                    <div id="selectedOption" class="flex items-center gap-3">
-                        <span class="text-slate-500">Select Connector...</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-blue-500 transition-all">
+                  <div id="selectedOption" class="flex items-center gap-3">
+                    <span class="text-slate-500">Select Connector...</span>
+                  </div>
+                  <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
                 <input type="hidden" id="destType" value="">
 
                 <div id="dropdownMenu" class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
-                    <div class="p-2 space-y-1">
-                        <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
-                        </div>
-                        <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
-                        </div>
-                        <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
-                        </div>
-                        <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
-                          <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
-                        </div>
-                        <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
-                        </div>
-                        <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
-                          <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
-                        </div>
+                  <div class="p-2 space-y-1">
+                    <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-blue-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
                     </div>
+                    <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-blue-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+                    </div>
+                    <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-blue-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+                    </div>
+                    <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-blue-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
+                      <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+                    </div>
+                    <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-blue-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+                    </div>
+                    <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-blue-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+                    </div>
+                  </div>
                 </div>
-            </div>
-
+              </div>
 
               <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                 <div id="sqlFields" class="contents">
@@ -238,8 +277,8 @@
                   <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <div class="md:col-span-2">
                     <textarea id="bqKey" placeholder="Service Account JSON Key"
-                        rows="3"
-                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
+                              rows="3"
+                              class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
                   </div>
                 </div>
 
@@ -288,6 +327,7 @@
       </div>
     </div>
 
+    <!-- Schema & Data Extracted sections remain unchanged -->
     <div class="pt-12">
       <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">Drive <span class="text-blue-500">Schema</span></h2>
       <div class="grid lg:grid-cols-2 gap-12 items-start">
@@ -351,13 +391,25 @@
   .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
   select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
 
-  /* Format Option Styling */
+  /* Format Option Styling – using blue theme */
   .format-option.selected { border-color: #3b82f6; color: white; background-color: rgba(59,130,246,0.05); }
   .format-option.selected .radio-indicator { border-color: #3b82f6; }
   .format-option.selected .dot { transform: scale(1); }
+
+  @keyframes pulse-once {
+    0%,100% { opacity:1; }
+    50% { opacity:.6; }
+  }
+  .animate-pulse-once {
+    animation: pulse-once 2s ease-in-out;
+  }
 </style>
 
 <script>
+// ────────────────────────────────────────────────
+//                   JAVASCRIPT
+// ────────────────────────────────────────────────
+
 document.addEventListener("DOMContentLoaded", () => {
     checkDriveStatus();
     loadDestinations();
@@ -375,34 +427,39 @@ async function checkDriveStatus(){
     try {
         const res = await fetch("/api/status/drive");
         const data = await res.json();
+
         const badge = document.getElementById("statusBadge");
-        const disconnectBtn = document.getElementById("disconnectBtn");
+        const connectedAs = document.getElementById("connectedAs");
         const syncContent = document.getElementById("syncContent");
         const accessOverlay = document.getElementById("accessOverlay");
 
-        if(data.connected){
+        if (data.connected) {
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
             badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.remove("hidden");
+
+            if(data.email){
+                connectedAs.innerHTML = `Connected as <strong>${data.email}</strong>`;
+            }
+
             updateFlowUI(3);
-            syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.remove("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.add("hidden");
         }
         else if(data.has_credentials){
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
             badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.add("hidden");
             updateFlowUI(1);
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.add("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.remove("hidden");
         }
         else{
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
-            disconnectBtn.classList.add("hidden");
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.add("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.remove("hidden");
         }
-    } catch(e){ console.error(e); }
+    } catch(e){
+        console.error(e);
+    }
 }
 
 function updateFlowUI(step) {
@@ -450,12 +507,33 @@ async function saveCredentials(){
 }
 
 async function disconnectDrive(){
-    if(!confirm("Are you sure you want to terminate this Google Drive connection?")) return;
-    try {
+    if(!confirm("Disconnecting will stop all future Drive syncs.\n\nContinue?")) return;
+
+    const btn = document.getElementById("disconnectBtn");
+    btn.disabled = true;
+    btn.innerText = "Disconnecting...";
+
+    try{
         const res = await fetch("/connectors/drive/disconnect");
-        if(res.ok) { location.reload(); }
-    } catch(e) { alert("Disconnect failed"); }
+        if(res.ok){
+            alert("Connection revoked.");
+            location.reload();
+        }
+        else{
+            alert("Failed to disconnect.");
+        }
+    }catch(e){
+        alert("Disconnect error.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Disconnect this account";
+    }
 }
+
+// ────────────────────────────────────────────────
+//  The rest of the script (loadDestinations, saveDestination, etc.)
+//  remains unchanged from your original version
+// ────────────────────────────────────────────────
 
 async function loadDestinations(){
     try {
@@ -492,22 +570,16 @@ function toggleDest(){
     fields.classList.remove("hidden");
 
     document.getElementById("sqlFields")
-        .classList.toggle("hidden",
-            type === "bigquery" || type === "s3");
+        .classList.toggle("hidden", type === "bigquery" || type === "s3");
 
     document.getElementById("bigqueryFields")
-        .classList.toggle("hidden",
-            type !== "bigquery");
+        .classList.toggle("hidden", type !== "bigquery");
 
     document.getElementById("s3Fields")
-        .classList.toggle("hidden",
-            type !== "s3");
+        .classList.toggle("hidden", type !== "s3");
 
     document.getElementById("formatField")
-        .classList.toggle(
-            "hidden",
-            !(type === "bigquery" || type === "s3")
-        );
+        .classList.toggle("hidden", !(type === "bigquery" || type === "s3"));
 }
 
 async function saveDestination(){
@@ -602,13 +674,8 @@ function toggleDropdown() {
 }
 
 function selectDestination(value, label, logoUrl) {
-    // 1. Update the hidden input for your existing save logic
     document.getElementById('destType').value = value;
 
-    // 2. Update the Trigger UI
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain">` : ''; // Fallback logic if needed
-    
-    // Using the icons from the options list
     const selectedDiv = document.getElementById('selectedOption');
     const clickedElement = event.currentTarget;
     const imgClone = clickedElement.querySelector('img').cloneNode(true);
@@ -620,21 +687,16 @@ function selectDestination(value, label, logoUrl) {
     textSpan.innerText = label;
     selectedDiv.appendChild(textSpan);
 
-    // 3. Hide menu
     document.getElementById('dropdownMenu').classList.add('hidden');
-
-    // 4. Trigger your existing form field visibility logic
     toggleDestFields(value);
 }
 
-// Close dropdown if user clicks outside
 window.onclick = function(event) {
     if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
         document.getElementById('dropdownMenu').classList.add('hidden');
     }
 }
 
-// Modified version of original toggleDest function
 function toggleDestFields(type) {
     const fields = document.getElementById("dbFields");
     if(!type){

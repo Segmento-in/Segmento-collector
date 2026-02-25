@@ -33,12 +33,6 @@
             <span>OAuth 2.0 protocol ensures restricted read-only access to your YouTube data.</span>
           </div>
         </div>
-
-        <div class="flex flex-wrap gap-4 items-center">
-          <button onclick="disconnectYouTube()" id="disconnectBtn" class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
-            Disconnect
-          </button>
-        </div>
       </div>
 
       <div class="relative" data-aos="zoom-in">
@@ -83,7 +77,7 @@
                 </li>
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
-                  <span>Enable the <b>YouTube Analytics API</b> and <b>YouTube Data API v3</b> from the Library</span>
+                  <span>Enable the <b>YouTube Data API v3</b> and <b>YouTube Analytics API</b> from the Library</span>
                 </li>
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
@@ -97,12 +91,51 @@
             </div>
           </div>
 
-          <div id="successState" class="hidden text-center space-y-6 transition-opacity duration-500 opacity-0">
-            <svg class="w-16 h-16 mx-auto text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <h3 class="text-white text-2xl font-bold">Connection Established</h3>
-            <p class="text-slate-400 text-sm">Your YouTube connector is now active and ready for synchronization.</p>
+          <div id="successState"
+               class="hidden text-center space-y-8 transition-opacity duration-500 opacity-0 relative pt-4 pb-20">
+
+            <div class="space-y-4">
+              <svg class="w-20 h-20 mx-auto text-emerald-500 animate-pulse-once"
+                   fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <h3 class="text-white text-3xl font-bold tracking-tight">
+                  Successfully Connected
+              </h3>
+              <p class="text-slate-300 text-base max-w-md mx-auto">
+                  Your YouTube account is now linked and ready for synchronization.
+              </p>
+              <p id="connectedAs"
+                 class="text-emerald-400 text-sm font-medium"></p>
+            </div>
+
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-xs px-6">
+              <button onclick="disconnectYouTube()" id="disconnectBtn"
+                      class="group relative w-full py-4 px-6 bg-transparent
+                            border-2 border-red-600/70 text-red-400
+                            font-semibold rounded-2xl
+                            hover:bg-red-700/20 hover:border-red-500
+                            hover:text-white transition-all duration-300">
+                <span class="flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5"
+                       fill="none"
+                       stroke="currentColor"
+                       viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M17 16l4-4m0 0l-4-4m4 4H7"/>
+                  </svg>
+                  Disconnect this account
+                </span>
+              </button>
+              <p class="text-center text-[11px] text-slate-500 mt-2">
+                Revokes access and stops future syncs
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -184,44 +217,44 @@
               <div class="md:col-span-2 relative">
                 <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Target Platform</label>
                 
-                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-rose-500 transition-all">
-                    <div id="selectedOption" class="flex items-center gap-3">
-                        <span class="text-slate-500">Select Connector...</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-red-500 transition-all">
+                  <div id="selectedOption" class="flex items-center gap-3">
+                    <span class="text-slate-500">Select Connector...</span>
+                  </div>
+                  <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
                 <input type="hidden" id="destType" value="">
 
                 <div id="dropdownMenu" class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
-                    <div class="p-2 space-y-1">
-                        <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
-                        </div>
-                        <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
-                        </div>
-                        <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
-                        </div>
-                        <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
-                          <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
-                        </div>
-                        <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
-                        </div>
-                        <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
-                          <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
-                        </div>
+                  <div class="p-2 space-y-1">
+                    <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
                     </div>
+                    <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+                    </div>
+                    <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+                    </div>
+                    <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
+                      <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+                    </div>
+                    <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+                    </div>
+                    <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+                    </div>
+                  </div>
                 </div>
-            </div>
+              </div>
 
               <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                 <div id="sqlFields" class="contents">
@@ -236,19 +269,23 @@
                   <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <div class="md:col-span-2">
-                    <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
+                    <textarea id="bqKey" placeholder="Service Account JSON Key"
+                              rows="3"
+                              class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
                   </div>
                 </div>
 
                 <div id="s3Fields" class="hidden contents">
-                  <input id="s3Bucket" placeholder="Bucket Name (my-youtube-backup)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="s3Region" placeholder="Region (us-east-1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3Bucket" placeholder="Bucket Name (my-yt-backup)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3Region" placeholder="Region (ap-south-1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="s3AccessKey" placeholder="Access Key ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="s3SecretKey" type="password" placeholder="Secret Access Key" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                 </div>
 
                 <div id="formatField" class="hidden md:col-span-2">
-                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Data Format</label>
+                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block">
+                    Data Format
+                  </label>
                   <div class="flex gap-4">
                     <button onclick="selectFormat('parquet')" id="format-parquet" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
                       <span class="font-bold">Parquet</span>
@@ -267,9 +304,7 @@
                 </div>
 
                 <div class="md:col-span-2 pt-2">
-                  <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-red-600/30 text-xs uppercase tracking-widest">
-                    Authenticate & Save
-                  </button>
+                  <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-black"> Authenticate & Save </button>
                 </div>
               </div>
             </div>
@@ -290,10 +325,10 @@
       <div class="grid lg:grid-cols-2 gap-12 items-start">
         <div class="grid grid-cols-1 gap-4">
           {% for table, columns in [
-            ('youtube_channels', ['channel_id', 'title', 'description', 'published_at', 'subscriber_count', 'video_count', 'view_count', 'country']),
-            ('youtube_videos', ['video_id', 'channel_id', 'title', 'description', 'published_at', 'duration', 'view_count', 'like_count', 'comment_count', 'favorite_count']),
-            ('youtube_comments', ['comment_id', 'video_id', 'author', 'text', 'published_at', 'like_count']),
-            ('youtube_playlists', ['playlist_id', 'channel_id', 'title', 'description', 'published_at', 'item_count'])
+            ('youtube_channels', ['channel_id', 'title', 'description', 'custom_url', 'published_at', 'view_count', 'subscriber_count', 'video_count', 'country', 'topic_categories', 'keywords', 'banner_image_url']),
+            ('youtube_videos', ['video_id', 'channel_id', 'title', 'description', 'published_at', 'duration', 'view_count', 'like_count', 'comment_count', 'favorite_count', 'tags', 'caption_status', 'privacy_status', 'license', 'category_id', 'thumbnail_url', 'live_broadcast_content']),
+            ('youtube_playlists', ['playlist_id', 'channel_id', 'title', 'description', 'published_at', 'item_count', 'privacy_status']),
+            ('youtube_comments', ['comment_id', 'video_id', 'text_original', 'author_display_name', 'author_channel_id', 'like_count', 'published_at', 'updated_at', 'parent_id'])
           ] %}
           <div class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-red-500/30 transition-all group">
             <div class="flex items-center gap-3 mb-4">
@@ -331,10 +366,10 @@
     <div class="mb-32">
       <h2 class="text-4xl font-black mb-12 text-center text-white">Data <span class="text-red-500">Extracted</span></h2>
       <div class="grid md:grid-cols-3 gap-6">
-        {% for table in ['youtube_channels', 'youtube_videos', 'youtube_comments', 'youtube_playlists'] %}
+        {% for table in ['youtube_channels', 'youtube_videos', 'youtube_playlists', 'youtube_comments'] %}
         <div class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-red-600/5 hover:border-red-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
           <div class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-red-600 transition-all duration-500 shadow-xl">
-            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
           </div>
           <span class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">{{table}}</span>
         </div>
@@ -349,10 +384,17 @@
   .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
   select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
 
-  /* Format Option Styling */
   .format-option.selected { border-color: #ef4444; color: white; background-color: rgba(239,68,68,0.05); }
   .format-option.selected .radio-indicator { border-color: #ef4444; }
   .format-option.selected .dot { transform: scale(1); }
+
+  @keyframes pulse-once {
+    0%,100% { opacity:1; }
+    50% { opacity:.6; }
+  }
+  .animate-pulse-once {
+    animation: pulse-once 2s ease-in-out;
+  }
 </style>
 
 <script>
@@ -360,7 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
     checkYouTubeStatus();
     loadDestinations();
     loadJob();
-    selectFormat('parquet'); // Default selection
+    selectFormat('parquet');
 });
 
 function selectFormat(val) {
@@ -373,34 +415,39 @@ async function checkYouTubeStatus(){
     try {
         const res = await fetch("/api/status/youtube");
         const data = await res.json();
+
         const badge = document.getElementById("statusBadge");
-        const disconnectBtn = document.getElementById("disconnectBtn");
+        const connectedAs = document.getElementById("connectedAs");
         const syncContent = document.getElementById("syncContent");
         const accessOverlay = document.getElementById("accessOverlay");
 
-        if(data.connected){
+        if (data.connected) {
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
             badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.remove("hidden");
+
+            if(data.email){
+                connectedAs.innerHTML = `Connected as <strong>${data.email}</strong>`;
+            }
+
             updateFlowUI(3);
-            syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.remove("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.add("hidden");
         }
         else if(data.has_credentials){
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
             badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-            disconnectBtn.classList.add("hidden");
             updateFlowUI(1);
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.add("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.remove("hidden");
         }
         else{
             badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
-            disconnectBtn.classList.add("hidden");
-            syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+            syncContent.classList.add("opacity-65","blur-sm","pointer-events-none");
             accessOverlay.classList.remove("hidden");
         }
-    } catch(e){ console.error(e); }
+    } catch(e){
+        console.error(e);
+    }
 }
 
 function updateFlowUI(step) {
@@ -448,11 +495,27 @@ async function saveCredentials(){
 }
 
 async function disconnectYouTube(){
-    if(!confirm("Are you sure you want to terminate this YouTube connection?")) return;
-    try {
+    if(!confirm("Disconnecting will stop all future YouTube syncs.\n\nContinue?")) return;
+
+    const btn = document.getElementById("disconnectBtn");
+    btn.disabled = true;
+    btn.innerText = "Disconnecting...";
+
+    try{
         const res = await fetch("/connectors/youtube/disconnect");
-        if(res.ok) { location.reload(); }
-    } catch(e) { alert("Disconnect failed"); }
+        if(res.ok){
+            alert("Connection revoked.");
+            location.reload();
+        }
+        else{
+            alert("Failed to disconnect.");
+        }
+    }catch(e){
+        alert("Disconnect error.");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Disconnect this account";
+    }
 }
 
 async function loadDestinations(){
@@ -490,22 +553,16 @@ function toggleDest(){
     fields.classList.remove("hidden");
 
     document.getElementById("sqlFields")
-        .classList.toggle("hidden",
-            type === "bigquery" || type === "s3");
+        .classList.toggle("hidden", type === "bigquery" || type === "s3");
 
     document.getElementById("bigqueryFields")
-        .classList.toggle("hidden",
-            type !== "bigquery");
+        .classList.toggle("hidden", type !== "bigquery");
 
     document.getElementById("s3Fields")
-        .classList.toggle("hidden",
-            type !== "s3");
+        .classList.toggle("hidden", type !== "s3");
 
     document.getElementById("formatField")
-        .classList.toggle(
-            "hidden",
-            !(type === "bigquery" || type === "s3")
-        );
+        .classList.toggle("hidden", !(type === "bigquery" || type === "s3"));
 }
 
 async function saveDestination(){
@@ -600,13 +657,8 @@ function toggleDropdown() {
 }
 
 function selectDestination(value, label, logoUrl) {
-    // 1. Update the hidden input for your existing save logic
     document.getElementById('destType').value = value;
 
-    // 2. Update the Trigger UI
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain">` : ''; // Fallback logic if needed
-    
-    // Using the icons from the options list
     const selectedDiv = document.getElementById('selectedOption');
     const clickedElement = event.currentTarget;
     const imgClone = clickedElement.querySelector('img').cloneNode(true);
@@ -618,21 +670,16 @@ function selectDestination(value, label, logoUrl) {
     textSpan.innerText = label;
     selectedDiv.appendChild(textSpan);
 
-    // 3. Hide menu
     document.getElementById('dropdownMenu').classList.add('hidden');
-
-    // 4. Trigger your existing form field visibility logic
     toggleDestFields(value);
 }
 
-// Close dropdown if user clicks outside
 window.onclick = function(event) {
     if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
         document.getElementById('dropdownMenu').classList.add('hidden');
     }
 }
 
-// Modified version of original toggleDest function
 function toggleDestFields(type) {
     const fields = document.getElementById("dbFields");
     if(!type){
