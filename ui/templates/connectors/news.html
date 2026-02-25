@@ -602,6 +602,21 @@ async function activateDest(id){
     });
     loadDestinations();
 }
+
+// Modified version of original toggleDest function
+function toggleDestFields(type) {
+    const fields = document.getElementById("dbFields");
+    if(!type){
+        fields.classList.add("hidden");
+        return;
+    }
+    fields.classList.remove("hidden");
+
+    document.getElementById("sqlFields").classList.toggle("hidden", type === "bigquery" || type === "s3");
+    document.getElementById("bigqueryFields").classList.toggle("hidden", type !== "bigquery");
+    document.getElementById("s3Fields").classList.toggle("hidden", type !== "s3");
+    document.getElementById("formatField").classList.toggle("hidden", !(type === "bigquery" || type === "s3"));
+}
 </script>
 
 {% endblock %}
