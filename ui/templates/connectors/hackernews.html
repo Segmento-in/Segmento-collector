@@ -6,21 +6,21 @@
   <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-orange-500/10 blur-[120px] rounded-full"></div>
   <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-amber-500/5 blur-[120px] rounded-full"></div>
 
-  <div class="max-w-7xl mx-auto relative z-10 space-y-32">
+  <div class="max-w-7xl mx-auto relative z-10 space-y-24">
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
       <div data-aos="fade-right" class="pt-8">
         <div id="statusBadge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
-          <span id="statusDot" class="h-2 w-2 rounded-full bg-slate-600"></span>
-          <span id="statusText">NOT CONNECTED</span>
+          <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+          NOT CONNECTED
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
-          Hacker <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">News</span>
+          Hacker <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300">News</span> Connector
         </h1>
+
         <p class="text-slate-300 text-lg mb-6 leading-relaxed font-medium max-w-xl">
-          Segmento Hacker News Connector pulls real-time top stories, comments, 
-          job postings and user karma changes from the official Firebase API.
+          Pull real-time top stories, comments, job postings, and user karma changes from the official Firebase API into your warehouse — no credentials needed.
         </p>
 
         <div class="space-y-4 text-slate-400 text-sm max-w-lg mb-10">
@@ -28,222 +28,258 @@
             <svg class="w-5 h-5 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span>Uses official public Firebase API — no API keys or authentication tokens required.</span>
+            <span>Official public Firebase API — zero authentication or API keys required.</span>
           </div>
           <div class="flex gap-3">
             <svg class="w-5 h-5 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span>Real-time listener + periodic full scan for historical catch-up.</span>
+            <span>Real-time listener + periodic full scan for complete coverage.</span>
           </div>
-        </div>
-
-        <div class="flex flex-wrap gap-4 items-center">
-          <a href="/dashboard/hackernews" id="dashboardBtn" 
-             class="px-10 py-4 bg-white/5 border border-white/10 text-white rounded-2xl font-bold hover:bg-white hover:text-orange-900 transition-all shadow-xl">
-            Dashboard
-          </a>
-          <button onclick="disconnectHackerNews()" id="disconnectBtn" 
-                  class="hidden px-10 py-4 bg-red-900/20 border border-red-500/50 text-red-400 rounded-2xl font-bold hover:bg-red-600 hover:text-white transition-all">
-            Disconnect
-          </button>
         </div>
       </div>
 
       <div class="relative" data-aos="zoom-in">
-        <div id="connectSection" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl">
-          
+        <div id="connectSection" class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl transition-all duration-500">
           <div class="flex justify-between mb-10 px-2">
             <div class="flex flex-col items-center gap-2">
-              <div id="step1-circle" class="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-bold transition-all">1</div>
-              <span id="step1-label" class="text-[9px] font-mono text-orange-400 uppercase tracking-tighter font-bold">Authorize</span>
+              <div id="step1-circle" class="w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-bold transition-all duration-300">1</div>
+              <span class="text-[9px] font-mono text-orange-400 uppercase tracking-tighter font-bold">Authorize</span>
             </div>
-            <div id="line1" class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+            <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
             <div class="flex flex-col items-center gap-2">
-              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all">2</div>
-              <span id="step2-label" class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Connected</span>
+              <div id="step2-circle" class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300">2</div>
+              <span class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Connected</span>
             </div>
           </div>
 
-          <div id="credentialsForm" class="space-y-4">
-            <div id="inputGroup" class="py-8 text-center">
-              <p class="text-slate-400 text-sm mb-6">Click below to start listening to Hacker News real-time stream.</p>
-              <button id="authBtn" onclick="connectHackerNews()" 
-                      class="w-full py-5 bg-orange-600 text-white rounded-2xl font-black hover:bg-white hover:text-orange-600 transition-all shadow-lg shadow-orange-600/20 text-xs uppercase tracking-widest mt-2">
+          <div id="credentialsForm" class="space-y-8 transition-opacity duration-500 opacity-100 py-6">
+            <div class="text-center space-y-6">
+              <p class="text-slate-300 text-base">Start listening to Hacker News real-time public stream — no credentials needed.</p>
+              <button onclick="connectHackerNews()" class="w-full max-w-sm mx-auto py-5 bg-orange-600 text-white rounded-2xl font-black hover:bg-white hover:text-orange-600 transition-all shadow-lg shadow-orange-600/30 text-sm uppercase tracking-widest">
                 Connect Hacker News
               </button>
             </div>
 
-            <div class="mt-8 pt-8 border-t border-white/5">
-              <h4 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">Setup Notes</h4>
-              <ul class="space-y-3">
-                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+            <div class="mt-10 pt-8 border-t border-white/5">
+              <h4 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">How It Works</h4>
+              <ul class="space-y-3 text-[11px] text-slate-400">
+                <li class="flex items-start gap-3">
                   <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 shrink-0"></span>
-                  <span>Public Firebase endpoint — no credentials needed.</span>
+                  <span>Uses official public Firebase endpoint — no auth required</span>
                 </li>
-                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                <li class="flex items-start gap-3">
                   <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mt-1.5 shrink-0"></span>
-                  <span>Initial sync may take several minutes depending on selected depth.</span>
+                  <span>Initial sync may take a few minutes for top stories + recent items</span>
                 </li>
               </ul>
+            </div>
+          </div>
+
+          <div id="successState" class="hidden text-center space-y-8 transition-opacity duration-500 opacity-0 relative pt-8 pb-48">
+            <div class="space-y-5 px-4">
+              <svg class="w-20 h-20 mx-auto text-emerald-500 animate-pulse-once" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <h3 class="text-white text-3xl font-bold tracking-tight">Successfully Connected</h3>
+              <p class="text-slate-300 text-base max-w-md mx-auto">
+                Hacker News real-time stream is now active. Stories, comments & jobs will sync continuously.
+              </p>
+            </div>
+
+            <div class="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-xs px-6">
+              <button onclick="disconnectHackerNews()" id="disconnectBtn"
+                  class="group relative w-full py-4 px-8 bg-transparent border-2 border-orange-600/70 text-orange-400 font-semibold rounded-2xl hover:bg-orange-700/20 hover:border-orange-500 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 shadow-sm hover:shadow-orange-500/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"/>
+                </svg>
+                Disconnect this connection
+              </button>
+              <p class="text-center text-[11px] text-slate-500 mt-4">
+                Stops real-time listening and future syncs
+              </p>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        
+    <div id="syncDestinationSection" class="relative transition-all duration-500">
+      <div id="accessOverlay" class="absolute inset-0 bg-slate-900/90 flex items-center justify-center z-20 rounded-[2.5rem]">
+        <div class="text-center space-y-4 p-8 bg-slate-800/50 rounded-3xl border border-white/10 shadow-2xl">
+          <div class="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <svg class="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="text-white text-2xl font-black tracking-tight">Connect to Unlock</h3>
+          <p class="text-slate-300 text-sm max-w-xs leading-relaxed">Connect to Hacker News to configure sync and warehouse destination.</p>
+        </div>
+      </div>
+
+      <div id="syncContent" class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start opacity-65 blur-sm pointer-events-none">
         <div class="lg:col-span-1">
-            <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center border border-orange-500/20">
-                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-white font-black text-xl">Sync Engine</h3>
-                </div>
-                
-                <div class="space-y-6">
-                    <div>
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh Strategy</label>
-                        <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-orange-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
-                            <option value="incremental">Incremental</option>
-                            <option value="historical">Historical (Full)</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Daily Schedule</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="relative">
-                                <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-orange-500 outline-none">
-                                    {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}" class="bg-slate-800">{{ '%02d' % h }}</option>{% endfor %}
-                                </select>
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 pointer-events-none">H</span>
-                            </div>
-                            <div class="relative">
-                                <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-orange-500 outline-none">
-                                    {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}" class="bg-slate-800">{{ '%02d' % m }}</option>{% endfor %}
-                                </select>
-                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 pointer-events-none">M</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-6 space-y-3">
-                        <button onclick="saveJob()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update Schedule</button>
-                        <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-orange-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
-                    </div>
-                </div>
+          <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
+            <div class="flex items-center gap-3 mb-8">
+              <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+              </div>
+              <h3 class="text-white font-black text-xl">Sync Engine</h3>
             </div>
+
+            <div class="space-y-6">
+              <div>
+                <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh Strategy</label>
+                <select id="syncType" class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-orange-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
+                  <option value="incremental">Incremental</option>
+                  <option value="historical">Historical (Full)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Daily Schedule</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <select id="hourSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-orange-500 outline-none">
+                    {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}">{{ '%02d' % h }}</option>{% endfor %}
+                  </select>
+                  <select id="minSelect" class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-orange-500 outline-none">
+                    {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}">{{ '%02d' % m }}</option>{% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <div class="pt-6 space-y-3">
+                <button onclick="saveJob()" class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update Schedule</button>
+                <button onclick="runSync()" id="syncBtn" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-emerald-600/30 text-xs uppercase tracking-widest">Run Manual Sync</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="lg:col-span-2">
-            <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center border border-orange-500/20">
-                            <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
-                    </div>
-                    <div id="destStatus" class="text-[10px] font-mono text-orange-400 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20 uppercase font-bold tracking-tighter">System Ready</div>
+          <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center border border-orange-500/20">
+                  <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
                 </div>
+                <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
+              </div>
+              <div id="destStatus" class="text-[10px] font-mono text-orange-400 bg-orange-500/10 px-4 py-1.5 rounded-full border border-orange-500/20 uppercase font-bold tracking-tighter">System Ready</div>
+            </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="md:col-span-2 relative">
                 <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Target Platform</label>
-                
-                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-rose-500 transition-all">
-                    <div id="selectedOption" class="flex items-center gap-3">
-                        <span class="text-slate-500">Select Connector...</span>
-                    </div>
-                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+
+                <div id="customSelectTrigger" onclick="toggleDropdown()" class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-orange-500 transition-all">
+                  <div id="selectedOption" class="flex items-center gap-3">
+                    <span class="text-slate-500">Select Connector...</span>
+                  </div>
+                  <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
 
                 <input type="hidden" id="destType" value="">
 
                 <div id="dropdownMenu" class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
-                    <div class="p-2 space-y-1">
-                        <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
-                        </div>
-                        <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
-                        </div>
-                        <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
-                        </div>
-                        <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">  
-                          <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
-                        </div>
-                        <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
-                            <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
-                        </div>
-                        <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
-                          <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
-                          <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
-                        </div>
+                  <div class="p-2 space-y-1">
+                    <div onclick="selectDestination('mysql', 'MySQL', 'https://www.mysql.com/common/logos/logo-mysql-170x115.png')" class="flex items-center gap-3 px-4 py-3 hover:bg-orange-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
                     </div>
+                    <div onclick="selectDestination('postgres', 'PostgreSQL', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-orange-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+                    </div>
+                    <div onclick="selectDestination('bigquery', 'Google BigQuery', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-orange-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+                    </div>
+                    <div onclick="selectDestination('snowflake', 'Snowflake', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-orange-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+                    </div>
+                    <div onclick="selectDestination('clickhouse', 'ClickHouse', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-orange-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+                    </div>
+                    <div onclick="selectDestination('s3', 'AWS S3', '')" class="flex items-center gap-3 px-4 py-3 hover:bg-orange-500/10 rounded-xl cursor-pointer transition-colors group">
+                      <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
+                      <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+                    </div>
+                  </div>
                 </div>
+              </div>
+
+              <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
+                <div id="sqlFields" class="contents">
+                  <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                </div>
+                <div id="bigqueryFields" class="hidden contents">
+                  <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <div class="md:col-span-2">
+                    <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
+                  </div>
+                </div>
+                <div id="s3Fields" class="hidden contents">
+                  <input id="s3Bucket" placeholder="Bucket Name (e.g. segmento-data)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3Region" placeholder="Region (e.g. us-east-1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3AccessKey" placeholder="Access Key ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="s3SecretKey" type="password" placeholder="Secret Access Key" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                </div>
+                <div id="formatField" class="hidden md:col-span-2">
+                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Data Format</label>
+                  <div class="flex gap-4">
+                    <button onclick="selectFormat('parquet')" id="format-parquet" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                      <span class="font-bold">Parquet</span>
+                      <div class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                        <div class="dot w-2 h-2 rounded-full bg-orange-500 scale-0 transition-transform"></div>
+                      </div>
+                    </button>
+                    <button onclick="selectFormat('json')" id="format-json" class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                      <span class="font-bold">JSON</span>
+                      <div class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                        <div class="dot w-2 h-2 rounded-full bg-orange-500 scale-0 transition-transform"></div>
+                      </div>
+                    </button>
+                  </div>
+                  <input type="hidden" id="dataFormat" value="parquet">
+                </div>
+                <div class="md:col-span-2 pt-2">
+                  <button onclick="saveDestination()" id="saveDestBtn" class="w-full py-5 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-orange-600/30 text-xs uppercase tracking-widest">
+                    Authenticate & Save
+                  </button>
+                </div>
+              </div>
             </div>
 
-
-                    <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
-                        <div id="sqlFields" class="contents">
-                            <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
-                            <input id="dbPort" placeholder="Port" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
-                            <input id="dbUser" placeholder="Username" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
-                            <input id="dbPass" type="password" placeholder="Password" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
-                            <input id="dbName" placeholder="Database Name" class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
-                        </div>
-
-                        <div id="bigqueryFields" class="hidden contents">
-                            <input id="bqProject" placeholder="Project ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
-                            <input id="bqDataset" placeholder="Dataset ID" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all">
-                            <div class="md:col-span-2">
-                                <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 focus:border-orange-500 outline-none text-sm transition-all resize-y"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="md:col-span-2 pt-2">
-                            <button onclick="saveDestination()" id="saveDestBtn" 
-                                    class="w-full py-5 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-orange-600/30 text-xs uppercase tracking-widest">
-                              Authenticate & Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-8 border-t border-white/5">
-                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection Switcher</label>
-                    <div class="relative">
-                        <select id="destDropdown" onchange="activateDest(this.value)" 
-                                class="w-full p-4 rounded-xl bg-black/40 text-orange-300 border border-orange-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
-                            <option value="">Loading connections...</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="mt-8 pt-8 border-t border-white/5">
+              <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active Connection Switcher</label>
+              <select id="destDropdown" onchange="activateDest(this.value)" class="w-full p-4 rounded-xl bg-black/40 text-orange-300 border border-orange-500/20 outline-none text-sm font-bold cursor-pointer hover:bg-black/60 transition-all">
+                <option value="">Loading connections...</option>
+              </select>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <div>
       <h2 class="text-4xl font-black mb-16 text-center text-white tracking-tight">How HN <span class="text-orange-500">Sync Works</span></h2>
       <div class="grid md:grid-cols-3 gap-8">
         {% for step, title, desc in [
-          ('01', 'Stream Hook', 'Connects to the official Firebase API to receive real-time updates of the top 500 items.'),
-          ('02', 'Recursive Crawl', 'Segmento recursively fetches parent stories for every comment to maintain context.'),
-          ('03', 'Sentiment Map', 'Normalizes item text and scores for rapid keyword and trend analysis.')
+          ('01', 'Stream Hook', 'Connects to official Firebase API for real-time top 500 item updates.'),
+          ('02', 'Recursive Crawl', 'Fetches full parent story context for every comment.'),
+          ('03', 'Sentiment & Trends', 'Normalizes text/scores for fast keyword & trend analysis.')
         ] %}
         <div class="group p-10 bg-slate-800/40 border border-white/5 rounded-[2.5rem] hover:bg-slate-800/80 transition-all hover:-translate-y-2">
           <div class="text-5xl font-black text-slate-700/30 mb-6 group-hover:text-orange-500 transition-colors">{{step}}</div>
@@ -266,33 +302,45 @@
           ] %}
           <div class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-orange-500/30 transition-all group">
             <div class="flex items-center gap-3 mb-4">
-                <div class="w-3 h-3 rounded-full bg-orange-600 group-hover:animate-pulse"></div>
-                <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">{{table}}</h4>
+              <div class="w-3 h-3 rounded-full bg-orange-600 group-hover:animate-pulse shadow-[0_0_10px_rgba(249,115,22,0.8)]"></div>
+              <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">{{table}}</h4>
             </div>
             <div class="flex flex-wrap gap-2">
-                {% for col in columns %}
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400">{{col}}</span>
-                {% endfor %}
+              {% for col in columns %}
+              <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-orange-300 transition-colors">{{col}}</span>
+              {% endfor %}
             </div>
           </div>
           {% endfor %}
         </div>
         
-        <div class="relative bg-slate-800 border border-white/10 rounded-[3rem] p-10 shadow-3xl sticky top-10">
-          <div class="absolute inset-0 bg-orange-600/5 rounded-[3rem] blur-xl"></div>
-          <img src="/static/images/erd/hackernews_erd.png" class="relative z-10 mx-auto max-w-full rounded-2xl opacity-90 grayscale hover:grayscale-0 transition-all duration-700"/>
+        <div class="sticky top-10 group">
+          <div class="absolute -inset-4 bg-orange-500/10 rounded-[4rem] blur-2xl opacity-30 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div class="relative bg-slate-800/80 border border-white/10 rounded-[3.5rem] p-4 shadow-3xl overflow-hidden backdrop-blur-md">
+            <div class="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/5 to-transparent flex items-center px-8 justify-between">
+              <div class="flex gap-2">
+                <div class="w-2 h-2 rounded-full bg-red-500/40"></div>
+                <div class="w-2 h-2 rounded-full bg-yellow-500/40"></div>
+                <div class="w-2 h-2 rounded-full bg-green-500/40"></div>
+              </div>
+              <span class="text-[9px] font-mono text-slate-500 tracking-widest uppercase">HackerNews_Entity_Diagram.vuerd</span>
+            </div>
+            <div class="mt-12 p-6 rounded-[2.5rem] bg-slate-900/50 border border-white/5">
+              <img src="/static/images/erd/hackernews_erd.png" class="mx-auto max-w-full rounded-2xl opacity-80 group-hover:opacity-100 transition-all duration-700 transform group-hover:scale-[1.02]"/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="mb-32">
-      <h2 class="text-4xl font-black mb-12 text-center text-white">Extraction Points</h2>
+      <h2 class="text-4xl font-black mb-12 text-center text-white">Data <span class="text-orange-500">Extracted</span></h2>
       <div class="grid md:grid-cols-3 gap-6">
         {% for table in ['hn_stories', 'hn_comments', 'hn_profiles'] %}
         <div class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-orange-600/5 hover:border-orange-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
           <div class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-orange-600 transition-all duration-500 shadow-xl">
             <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
           </div>
           <span class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">{{table}}</span>
@@ -305,9 +353,13 @@
 </section>
 
 <style>
-  @keyframes flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
   .bg-slate-900 { background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0); background-size: 40px 40px; }
   select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+  .format-option.selected { border-color: #f97316; color: white; background-color: rgba(249,115,22,0.05); }
+  .format-option.selected .radio-indicator { border-color: #f97316; }
+  .format-option.selected .dot { transform: scale(1); }
+  @keyframes pulse-once { 0%,100% { opacity:1; } 50% { opacity:.6; } }
+  .animate-pulse-once { animation: pulse-once 2s ease-in-out; }
 </style>
 
 <script>
@@ -315,67 +367,56 @@ document.addEventListener("DOMContentLoaded", () => {
     checkHackerNewsStatus();
     loadDestinations();
     loadJob();
+    selectFormat('parquet');
 });
+
+function selectFormat(val) {
+    document.getElementById('dataFormat').value = val;
+    document.querySelectorAll('.format-option').forEach(el => el.classList.remove('selected'));
+    document.getElementById('format-' + val).classList.add('selected');
+}
 
 async function checkHackerNewsStatus(){
     try {
-        const res = await fetch("/api/status/hackernews").then(r => r.json());
-        const isConnected = res.connected || false;
+        const res = await fetch("/api/status/hackernews");
+        const data = await res.json();
+        const badge = document.getElementById("statusBadge");
+        const syncContent = document.getElementById("syncContent");
+        const accessOverlay = document.getElementById("accessOverlay");
 
-        const authBtn = document.getElementById("authBtn");
-        const inputGroup = document.getElementById("inputGroup");
-        const disconnectBtn = document.getElementById("disconnectBtn");
-
-        if(isConnected){
-            updateStatusBadge("CONNECTED", "emerald");
-            inputGroup.classList.add('hidden');
-            disconnectBtn.classList.remove('hidden');
-            updateSteps(2);
+        if (data.connected) {
+            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
+            badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+            updateFlowUI(2);
+            syncContent.classList.remove("opacity-65","blur-sm","pointer-events-none");
+            accessOverlay.classList.add("hidden");
         } else {
-            updateStatusBadge("NOT CONNECTED", "slate");
-            inputGroup.classList.remove('hidden');
-            disconnectBtn.classList.add('hidden');
-            updateSteps(1);
+            badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
+            updateFlowUI(1);
+            syncContent.classList.add("opacity-65","blur-sm","pointer-events-none");
+            accessOverlay.classList.remove("hidden");
         }
-    } catch(e) {}
-}
-
-function updateStatusBadge(text, color) {
-    const badge = document.getElementById("statusBadge");
-    const dot = document.getElementById("statusDot");
-    const textEl = document.getElementById("statusText");
-
-    textEl.innerText = text;
-
-    if(color === "emerald") {
-        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
-        dot.className = "h-2 w-2 rounded-full bg-emerald-500 animate-pulse";
-    } else {
-        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
-        dot.className = "h-2 w-2 rounded-full bg-slate-600";
+    } catch(e) {
+        console.error(e);
     }
 }
 
-function updateSteps(step){
-    const circles = [document.getElementById("step1-circle"), document.getElementById("step2-circle")];
-    const labels = [document.getElementById("step1-label"), document.getElementById("step2-label")];
-    const line1 = document.getElementById("line1");
+function updateFlowUI(step) {
+    const s1 = document.getElementById("step1-circle");
+    const s2 = document.getElementById("step2-circle");
+    const form = document.getElementById("credentialsForm");
+    const success = document.getElementById("successState");
 
-    circles.forEach((c, i) => {
-        c.innerHTML = i + 1;
-        c.className = "w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all";
-    });
-    labels.forEach(l => l.className = "text-[9px] font-mono text-slate-500 uppercase tracking-tighter");
-    line1.className = "flex-1 h-[1px] bg-slate-700 mt-4 mx-2";
-
-    for(let i=0; i<step; i++) {
-        circles[i].className = "w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-bold transition-all";
-        labels[i].className = "text-[9px] font-mono text-orange-400 uppercase tracking-tighter font-bold";
-        if(i > 0) line1.className = "flex-1 h-[1px] bg-orange-600 mt-4 mx-2";
-        if(i < step - 1 || (step === 2)) {
-            circles[i].innerHTML = "✓";
-            circles[i].className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all";
-        }
+    if (step >= 1) {
+        s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+        s1.innerHTML = "✓";
+    }
+    if (step >= 2) {
+        s2.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+        s2.innerHTML = "✓";
+        form.classList.add("opacity-0", "hidden");
+        success.classList.remove("hidden");
+        success.classList.add("opacity-100");
     }
 }
 
@@ -383,9 +424,21 @@ function connectHackerNews(){
     window.location.href = "/connectors/hackernews/connect";
 }
 
-function disconnectHackerNews() {
-    if(!confirm("Disconnect Hacker News stream?")) return;
-    fetch("/connectors/hackernews/disconnect").then(() => location.reload());
+async function disconnectHackerNews(){
+    if(!confirm("Disconnecting will stop Hacker News real-time sync.\n\nContinue?")) return;
+    const btn = document.getElementById("disconnectBtn");
+    btn.disabled = true;
+    btn.innerText = "Disconnecting...";
+    try {
+        const res = await fetch("/connectors/hackernews/disconnect");
+        if(res.ok){
+            location.reload();
+        } else {
+            alert("Failed to disconnect.");
+        }
+    } catch(e) {
+        alert("Disconnect error.");
+    }
 }
 
 async function loadDestinations(){
@@ -394,14 +447,12 @@ async function loadDestinations(){
         const data = await res.json();
         const dropdown = document.getElementById("destDropdown");
         const statusEl = document.getElementById("destStatus");
-        
-        dropdown.innerHTML = '<option value="">Loading connections...</option>';
-        
+        dropdown.innerHTML = '<option value="">Select Connection...</option>';
         if(data.destinations?.length){
             data.destinations.forEach(d => {
                 const opt = document.createElement("option");
                 opt.value = d.id;
-                opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database} (@${d.host || '—'})`;
+                opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database}`;
                 if(d.active) {
                     opt.selected = true;
                     statusEl.innerText = "Connection Active";
@@ -409,58 +460,66 @@ async function loadDestinations(){
                 }
                 dropdown.appendChild(opt);
             });
-        } else {
-            statusEl.innerText = "No destination configured";
         }
-    } catch(e) { console.error(e); }
+    } catch(e) {}
 }
 
-async function activateDest(id){
-    if(!id) return;
-    const res = await fetch("/destination/activate", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ source: "hackernews", dest_id: id })
-    });
-    if(res.ok) loadDestinations();
+function toggleDropdown() {
+    document.getElementById('dropdownMenu').classList.toggle('hidden');
 }
 
-function toggleDest() {
-    const type = document.getElementById("destType").value;
-    const wrapper = document.getElementById("dbFields");
-    const sql = document.getElementById("sqlFields");
-    const bq = document.getElementById("bigqueryFields");
+function selectDestination(value, label, logoUrl) {
+    document.getElementById('destType').value = value;
+    const selectedDiv = document.getElementById('selectedOption');
+    const clicked = event.currentTarget;
+    const imgClone = clicked.querySelector('img')?.cloneNode(true);
 
+    selectedDiv.innerHTML = '';
+    if (imgClone) selectedDiv.appendChild(imgClone);
+    const textSpan = document.createElement('span');
+    textSpan.className = "text-white font-bold";
+    textSpan.innerText = label;
+    selectedDiv.appendChild(textSpan);
+
+    document.getElementById('dropdownMenu').classList.add('hidden');
+    toggleDestFields(value);
+}
+
+function toggleDestFields(type) {
+    const fields = document.getElementById("dbFields");
     if(!type){
-        wrapper.classList.add("hidden");
+        fields.classList.add("hidden");
         return;
     }
+    fields.classList.remove("hidden");
 
-    wrapper.classList.remove("hidden");
-
-    if(type === "bigquery"){
-        sql.classList.add("hidden");
-        bq.classList.remove("hidden");
-    } else {
-        sql.classList.remove("hidden");
-        bq.classList.add("hidden");
-    }
+    document.getElementById("sqlFields").classList.toggle("hidden", type === "bigquery" || type === "s3");
+    document.getElementById("bigqueryFields").classList.toggle("hidden", type !== "bigquery");
+    document.getElementById("s3Fields").classList.toggle("hidden", type !== "s3");
+    document.getElementById("formatField").classList.toggle("hidden", !(type === "bigquery" || type === "s3"));
 }
 
 async function saveDestination(){
     const btn = document.getElementById("saveDestBtn");
-    btn.innerText = "AUTHENTICATING..."; btn.disabled = true;
-
+    btn.innerText = "CONNECTING...";
     const type = document.getElementById("destType").value;
     let payload = { source: "hackernews", type };
 
     if(type === "bigquery"){
-        payload.host = document.getElementById("bqProject")?.value || "";
-        payload.database = document.getElementById("bqDataset")?.value || "";
-        payload.password = document.getElementById("bqKey")?.value || "";
-        payload.port = "";
-        payload.username = "";
-    } else if(type) {
+        payload.host = document.getElementById("bqProject").value;
+        payload.database = document.getElementById("bqDataset").value;
+        payload.password = document.getElementById("bqKey").value;
+        payload.format = document.getElementById("dataFormat").value;
+    }
+    else if(type === "s3"){
+        payload.host = document.getElementById("s3Bucket").value;
+        payload.port = document.getElementById("s3Region").value;
+        payload.username = document.getElementById("s3AccessKey").value;
+        payload.password = document.getElementById("s3SecretKey").value;
+        payload.database = "s3";
+        payload.format = document.getElementById("dataFormat").value;
+    }
+    else {
         payload.host = document.getElementById("dbHost").value;
         payload.port = document.getElementById("dbPort").value;
         payload.username = document.getElementById("dbUser").value;
@@ -468,25 +527,18 @@ async function saveDestination(){
         payload.database = document.getElementById("dbName").value;
     }
 
-    try {
-        const res = await fetch("/destination/save", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
-        });
-        if(res.ok) {
-            btn.innerText = "SAVED ✓";
-            btn.classList.replace("bg-orange-600", "bg-emerald-600");
-            loadDestinations();
-            setTimeout(() => {
-                btn.innerText = "Authenticate & Save";
-                btn.classList.replace("bg-emerald-600", "bg-orange-600");
-                btn.disabled = false;
-            }, 2000);
-        }
-    } catch(e) {
-        alert("Connection failed");
-        btn.disabled = false;
+    const res = await fetch("/destination/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+    if(res.ok) { 
+        btn.innerText = "SUCCESS ✓"; 
+        loadDestinations(); 
+        setTimeout(() => btn.innerText = "Authenticate & Save", 2000); 
+    } else {
+        btn.innerText = "Failed";
+        setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
     }
 }
 
@@ -504,90 +556,39 @@ async function loadJob(){
 
 async function saveJob(){
     const time = `${document.getElementById("hourSelect").value}:${document.getElementById("minSelect").value}`;
-    const res = await fetch("/connectors/hackernews/job/save", {
+    await fetch("/connectors/hackernews/job/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-            sync_type: document.getElementById("syncType").value, 
-            schedule_time: time 
-        })
+        body: JSON.stringify({ sync_type: document.getElementById("syncType").value, schedule_time: time })
     });
-    if(res.ok) alert("Job Schedule Updated");
+    alert("Sync Job Updated");
 }
 
 async function runSync(){
     const btn = document.getElementById("syncBtn");
-    btn.innerText = "SYNCING..."; 
-    btn.disabled = true;
-
+    btn.innerText = "SYNCING..."; btn.disabled = true;
     try {
         const res = await fetch("/connectors/hackernews/sync");
         const d = await res.json();
-
-        if(d.status === "ok" || d.stories !== undefined){
-            btn.innerText = `SYNCED (${d.stories || 0} STORIES)`;
-        } else {
-            btn.innerText = "FAILED";
-        }
-    } catch(e) {
-        btn.innerText = "FAILED";
-    } finally {
-        setTimeout(() => btn.innerText = "Run Manual Sync", 3000);
-        btn.disabled = false;
-    }
+        btn.innerText = `SYNCED (${d.stories || 0} stories)`;
+    } catch(e) { btn.innerText = "FAILED"; }
+    finally { setTimeout(() => { btn.innerText = "Run Manual Sync"; btn.disabled = false; }, 3000); }
 }
 
-function toggleDropdown() {
-    const menu = document.getElementById('dropdownMenu');
-    menu.classList.toggle('hidden');
+async function activateDest(id){
+    if(!id) return;
+    await fetch("/destination/activate", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ source: "hackernews", dest_id: id })
+    });
+    loadDestinations();
 }
 
-function selectDestination(value, label, logoUrl) {
-    // 1. Update the hidden input for your existing save logic
-    document.getElementById('destType').value = value;
-
-    // 2. Update the Trigger UI
-    const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain">` : ''; // Fallback logic if needed
-    
-    // Using the icons from the options list
-    const selectedDiv = document.getElementById('selectedOption');
-    const clickedElement = event.currentTarget;
-    const imgClone = clickedElement.querySelector('img').cloneNode(true);
-    
-    selectedDiv.innerHTML = '';
-    selectedDiv.appendChild(imgClone);
-    const textSpan = document.createElement('span');
-    textSpan.className = "text-white font-bold";
-    textSpan.innerText = label;
-    selectedDiv.appendChild(textSpan);
-
-    // 3. Hide menu
-    document.getElementById('dropdownMenu').classList.add('hidden');
-
-    // 4. Trigger your existing form field visibility logic
-    toggleDestFields(value);
-}
-
-// Close dropdown if user clicks outside
 window.onclick = function(event) {
     if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
         document.getElementById('dropdownMenu').classList.add('hidden');
     }
-}
-
-// Modified version of original toggleDest function
-function toggleDestFields(type) {
-    const fields = document.getElementById("dbFields");
-    if(!type){
-        fields.classList.add("hidden");
-        return;
-    }
-    fields.classList.remove("hidden");
-
-    document.getElementById("sqlFields").classList.toggle("hidden", type === "bigquery" || type === "s3");
-    document.getElementById("bigqueryFields").classList.toggle("hidden", type !== "bigquery");
-    document.getElementById("s3Fields").classList.toggle("hidden", type !== "s3");
-    document.getElementById("formatField").classList.toggle("hidden", !(type === "bigquery" || type === "s3"));
 }
 </script>
 
