@@ -49,6 +49,9 @@ def get_google_status(source):
 def home():
     return render_template("index.html")
 
+@app.route("/signup")
+def signup_page():
+    return render_template("signup.html")
 
 @app.route("/tracking")
 def tracking():

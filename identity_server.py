@@ -27,6 +27,7 @@ from security.secure_fetch import (
     fetchone_secure,
     fetchall_secure
 )
+from security.auth_routes import auth
 
 # Connectors
 from connectors.pinterest import (
@@ -67,6 +68,8 @@ IST = zoneinfo.ZoneInfo("Asia/Kolkata")
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
+
+app.register_blueprint(auth)
 
 @app.route("/__ping")
 def ping():
@@ -205,6 +208,37 @@ def init_db():
     uid TEXT,form_name TEXT,data TEXT,ts TEXT)
     """)
 
+    # ---------------- PLATFORM USERS ----------------
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users(
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT,
+        first_name TEXT,
+        last_name TEXT,
+
+        company_name TEXT,
+        company_size TEXT,
+        country TEXT,
+        phone TEXT,
+
+        company_logo TEXT,
+
+        is_individual INTEGER DEFAULT 0,
+
+        created_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS user_sessions(
+        session_id TEXT PRIMARY KEY,
+        user_id TEXT,
+        created_at TEXT,
+        expires_at TEXT
+    )
+    """)
 
     # Google Accounts
     cur.execute("""

@@ -1,0 +1,110 @@
+from flask import Blueprint, request, jsonify, redirect, make_response
+import sqlite3, uuid, datetime, os
+from werkzeug.security import generate_password_hash
+from security.secure_db import encrypt_payload
+
+auth = Blueprint("auth", __name__)
+
+DB = "identity.db"
+UPLOAD_DIR = "uploads/company_logos"
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+def get_db():
+    return sqlite3.connect(DB)
+
+# SIGNUP
+@auth.route("/auth/signup", methods=["POST"])
+def signup():
+
+    data = request.form
+
+    user_id = str(uuid.uuid4())
+
+    email = data.get("email")
+    password = data.get("password")
+
+    first = data.get("first_name")
+    last = data.get("last_name")
+
+    company = data.get("company_name")
+    company_size = data.get("company_size")
+    country = data.get("country")
+    phone = data.get("phone")
+
+    is_individual = 1 if data.get("is_individual") == "true" else 0
+
+    # ---------- PASSWORD HASH ----------
+    password_hash = generate_password_hash(password)
+
+    secured = encrypt_payload({
+        "password": password_hash
+    })
+
+    # ---------- LOGO ----------
+    logo_path = None
+    if "company_logo" in request.files:
+        logo = request.files["company_logo"]
+
+        if logo.filename:
+            filename = f"{user_id}_{logo.filename}"
+            path = os.path.join(UPLOAD_DIR, filename)
+            logo.save(path)
+            logo_path = path
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT INTO users(
+            id,email,password,
+            first_name,last_name,
+            company_name,company_size,
+            country,phone,
+            company_logo,
+            is_individual,
+            created_at
+        )
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
+    """, (
+        user_id,
+        email,
+        secured["password"],
+        first,
+        last,
+        company,
+        company_size,
+        country,
+        phone,
+        logo_path,
+        is_individual,
+        datetime.datetime.utcnow().isoformat()
+    ))
+
+    # ---------- CREATE SESSION ----------
+    session_id = str(uuid.uuid4())
+
+    cur.execute("""
+        INSERT INTO user_sessions
+        VALUES(?,?,?,?)
+    """, (
+        session_id,
+        user_id,
+        datetime.datetime.utcnow().isoformat(),
+        None
+    ))
+
+    con.commit()
+    con.close()
+
+    resp = make_response(redirect("/connectors"))
+
+    resp.set_cookie(
+        "segmento_session",
+        session_id,
+        httponly=True,
+        samesite="Lax"
+    )
+
+    return resp
