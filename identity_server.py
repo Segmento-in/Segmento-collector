@@ -28,6 +28,7 @@ from security.secure_fetch import (
     fetchall_secure
 )
 from security.auth_routes import auth
+from security.auth_middleware import load_logged_user
 
 # Connectors
 from connectors.pinterest import (
@@ -67,9 +68,17 @@ load_dotenv()
 IST = zoneinfo.ZoneInfo("Asia/Kolkata")
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(
+    app,
+    supports_credentials=True,
+    origins=["http://localhost:3000"]
+)
 
 app.register_blueprint(auth)
+
+@app.before_request
+def resolve_user():
+    load_logged_user()
 
 @app.route("/__ping")
 def ping():
@@ -153,8 +162,30 @@ def get_db():
 
     return con
 
+from flask import request, g
 def get_uid():
-    return request.cookies.get("uid") or "demo_user"
+
+    # Priority 1 → Logged platform user
+    if getattr(g, "user_id", None):
+        return g.user_id
+
+    # Fallback → legacy uid cookie
+    return request.cookies.get("uid")
+
+# CONNECTOR INITIALIZATION
+def ensure_connector_initialized(uid, source):
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR IGNORE INTO google_connections
+        (uid, source, enabled)
+        VALUES (?, ?, 0)
+    """, (uid, source))
+
+    con.commit()
+    con.close()
 
 # ---------------- DB INIT ----------------
 
@@ -2504,9 +2535,12 @@ def connector_status(source):
 
     uid = get_uid()
 
-    con = get_db()
-    cur = con.cursor()
+    conn = sqlite3.connect("identity.db")
+    cur = conn.cursor()
 
+    # ---------------------------
+    # CHECK OAUTH CONNECTION
+    # ---------------------------
     cur.execute("""
         SELECT enabled
         FROM google_connections
@@ -2514,11 +2548,38 @@ def connector_status(source):
         LIMIT 1
     """, (uid, source))
 
-    row = fetchone_secure(cur)
-    con.close()
+    row = cur.fetchone()
+
+    if row and row[0] == 1:
+        conn.close()
+        return jsonify({
+            "stage": "connected",
+            "connected": True
+        })
+
+    # ---------------------------
+    # CHECK CREDENTIALS SAVED
+    # ---------------------------
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector=?
+        LIMIT 1
+    """, (uid, source))
+
+    creds = cur.fetchone()
+
+    conn.close()
+
+    if creds:
+        return jsonify({
+            "stage": "authorized_pending",
+            "connected": False
+        })
 
     return jsonify({
-        "connected": True if row and row[0] == 1 else False
+        "stage": "not_connected",
+        "connected": False
     })
 
 # ---------------- GOOGLE OAUTH ----------------
@@ -2796,6 +2857,7 @@ def drive_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "drive")
     return jsonify({"status": "saved"})
 
 # ---------------- SHEETS ----------------
@@ -2835,6 +2897,7 @@ def sheets_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "sheets")
     return jsonify({"status": "saved"})
 
 # ---------------- SHEETS DISCONNECT ----------------
@@ -2972,6 +3035,7 @@ def ga4_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "ga4")
     return jsonify({"status": "saved"})
 
 # ---------------- GA4 JOB GET ----------------
@@ -3073,6 +3137,7 @@ def search_console_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "search-console")
     return jsonify({"status": "saved"})
 
 # ---------------- SEARCH CONSOLE JOB GET ----------------
@@ -3405,6 +3470,7 @@ def forms_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "forms")
     return jsonify({"status": "saved"})
 
 # ---------------- FORMS DISCONNECT ----------------
@@ -3541,6 +3607,7 @@ def calendar_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "calendar")
     return jsonify({"status": "saved"})
 
 @app.route("/google/disconnect/gmail")
@@ -3629,6 +3696,7 @@ def gmail_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "gmail")
     return jsonify({"status": "saved"})
 
 @app.route("/google/disconnect/drive")
@@ -3786,6 +3854,7 @@ def classroom_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "classroom")
     return jsonify({"status": "saved"})
 
 @app.route("/google/disconnect/classroom")
@@ -3913,6 +3982,7 @@ def tasks_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "tasks")
     return jsonify({"status": "saved"})
 
 # ---------------- TASKS JOB GET ----------------
@@ -4005,6 +4075,7 @@ def contacts_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "contacts")
     return jsonify({"status": "saved"})
 
 # ---------------- CONTACTS DISCONNECT ----------------
@@ -4212,6 +4283,7 @@ def gcs_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "gcs")
     return jsonify({"status":"saved"})
 
 @app.route("/google/sync/webfonts", methods=["GET", "POST"])
@@ -4456,6 +4528,7 @@ def youtube_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "youtube")
     return jsonify({"status": "saved"})
 
 @app.route("/google/disconnect/youtube")
@@ -6870,6 +6943,7 @@ def github_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "github")
     return jsonify({"status": "saved"})
 
 @app.route("/api/status/github")
@@ -6996,6 +7070,7 @@ def gitlab_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "gitlab")
     return jsonify({"status": "saved"})
 
 @app.route("/connectors/gitlab/disconnect")
@@ -9539,6 +9614,7 @@ def facebook_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "facebook")
     return jsonify({"status": "saved"})
 
 #-------------- Temporary route to test saving Facebook credentials without going through the UI --------------
@@ -10204,6 +10280,7 @@ def facebook_ads_save_app():
     con.commit()
     con.close()
 
+    ensure_connector_initialized(uid, "facebook_ads")
     return jsonify({"status": "saved"})
 
 @app.route("/connectors/<source>/connect")

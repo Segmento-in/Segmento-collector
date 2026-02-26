@@ -96,8 +96,7 @@
             </header>
 
             <div class="w-full max-w-[580px] px-8 pb-24">
-                <form action="http://localhost:4000/auth/signup" method="POST" enctype="multipart/form-data" class="space-y-8">
-                    
+                <form id="signupForm" enctype="multipart/form-data" class="space-y-8">    
                     <input type="hidden" name="is_individual" id="isIndividualHidden" value="false">
 
                     <div class="space-y-5">
@@ -117,6 +116,7 @@
                             <div class="space-y-1.5">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Work Email</label>
                                 <input name="email" type="email" required class="input-premium" placeholder="name@company.com">
+                                <p id="emailError" class="text-xs text-red-500 font-semibold mt-1 hidden"></p>
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
@@ -231,6 +231,74 @@
             lenReq.className = val.length >= 8 ? 'text-[10px] font-bold uppercase flex items-center gap-1 valid' : 'text-[10px] font-bold uppercase flex items-center gap-1 invalid';
             numReq.className = /\d/.test(val) ? 'text-[10px] font-bold uppercase flex items-center gap-1 valid' : 'text-[10px] font-bold uppercase flex items-center gap-1 invalid';
         });
+    </script>
+    <script>
+
+    const signupForm = document.getElementById("signupForm");
+    const emailError = document.getElementById("emailError");
+
+    signupForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        emailError.classList.add("hidden");
+
+        const submitBtn =
+            signupForm.querySelector("button[type='submit']");
+
+        const originalText = submitBtn.innerText;
+
+        // Loading state
+        submitBtn.innerText = "Creating account...";
+        submitBtn.disabled = true;
+
+        const formData = new FormData(signupForm);
+
+        try {
+
+            const response = await fetch(
+                "http://localhost:4000/auth/signup",
+                {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include"
+                }
+            );
+
+            const data = await response.json();
+
+            // ---------------- ERROR CASE
+            if (!response.ok) {
+
+                if (data.error &&
+                    data.error.includes("exists")) {
+
+                    emailError.innerText =
+                        "An account with this email already exists.";
+                    emailError.classList.remove("hidden");
+                }
+
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+                return;
+            }
+
+            // ---------------- SUCCESS
+            window.location.href = data.redirect;
+
+        }
+        catch (err) {
+
+            emailError.innerText =
+                "Unexpected error. Please try again.";
+
+            emailError.classList.remove("hidden");
+
+            submitBtn.innerText = originalText;
+            submitBtn.disabled = false;
+        }
+
+    });
     </script>
 </body>
 </html>

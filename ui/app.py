@@ -28,23 +28,17 @@ DB_PATH = os.path.join(BASE_DIR, "..", "identity.db")
 # ================= BASIC =================
 def get_google_status(source):
 
-    uid = request.cookies.get("uid") or "demo_user"
+    r = requests.get(
+        f"http://localhost:4000/api/status/{source}",
+        cookies=request.cookies
+    )
 
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT enabled
-        FROM google_connections
-        WHERE uid=? AND source=?
-        LIMIT 1
-    """, (uid, source))
-
-    row = cur.fetchone()
-    conn.close()
-
-    return bool(row and row[0] == 1)
-
+    try:
+        data = r.json()
+        return data.get("connected", False)
+    except:
+        return False
+    
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -65,24 +59,12 @@ def connectors():
 @app.route("/api/status/<source>")
 def generic_google_status(source):
 
-    uid = request.cookies.get("uid") or "demo_user"
+    r = requests.get(
+        f"http://localhost:4000/api/status/{source}",
+        cookies=request.cookies
+    )
 
-    conn = sqlite3.connect(DB_PATH)
-    cur = conn.cursor()
-
-    cur.execute("""
-        SELECT enabled
-        FROM google_connections
-        WHERE uid=? AND source=?
-        LIMIT 1
-    """, (uid, source))
-
-    row = cur.fetchone()
-    conn.close()
-
-    return jsonify({
-        "connected": bool(row and row[0] == 1)
-    })
+    return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/<source>/job/save", methods=["POST"])
 def ui_save_job(source):
