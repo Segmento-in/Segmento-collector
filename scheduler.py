@@ -65,9 +65,19 @@ def run_job(job):
     try:
 
         # Universal dynamic call
-        url = f"{BASE_URL}/connectors/{source}/sync"
+        url = (
+            f"{BASE_URL}/connectors/{source}/sync"
+            "?mode=scheduled&strategy=incremental"
+        )
 
-        r = requests.get(url, timeout=600)
+        r = requests.get(
+            url,
+            headers={
+                "X-Internal-UID": uid,
+                "X-Sync-Mode": "scheduled"
+            },
+            timeout=600
+        )
 
         if r.status_code == 200:
             print(f"[SCHEDULER] {source} sync OK →", r.json())

@@ -5,40 +5,12 @@ from destinations.snowflake_writer import push_snowflake
 from destinations.clickhouse_writer import push_clickhouse
 from destinations.s3_writer import push_s3
 from security.secure_db import decrypt_payload
+from flask import g
 
 import sqlite3
 import datetime
 
 DB = "identity.db"
-
-# ---------------- USAGE DESTINATION LOGGER ----------------
-
-def log_destination_push(uid, source, dest_type,
-                         rows, status, error=None):
-
-    con = sqlite3.connect(DB)
-    cur = con.cursor()
-
-    cur.execute("""
-        INSERT INTO destination_push_logs
-        (uid, source, destination_type,
-         rows_pushed, pushed_at,
-         status, error)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (
-        uid,
-        source,
-        dest_type,
-        rows,
-        datetime.datetime.now(
-            datetime.UTC
-        ).isoformat(),
-        status,
-        error
-    ))
-
-    con.commit()
-    con.close()
 
 def resolve_destination_format(dest_cfg, source):
 
@@ -88,7 +60,7 @@ def push_to_destination(dest_cfg, source, rows):
     dest_type = dest_cfg["type"]
 
     # Extract uid for logging
-    uid = dest_cfg.get("uid")
+    uid = getattr(g, "user_id", None)
 
     # ---------------- FORMAT ISOLATION ----------------
     if dest_type in ["bigquery", "s3"]:
@@ -147,3 +119,32 @@ def push_to_destination(dest_cfg, source, rows):
         )
 
         raise e
+
+# ---------------- USAGE DESTINATION LOGGER ----------------
+
+def log_destination_push(uid, source, dest_type,
+                         rows, status, error=None):
+
+    con = sqlite3.connect(DB)
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT INTO destination_push_logs
+        (uid, source, destination_type,
+         rows_pushed, pushed_at,
+         status, error)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        uid,
+        source,
+        dest_type,
+        rows,
+        datetime.datetime.now(
+            datetime.UTC
+        ).isoformat(),
+        status,
+        error
+    ))
+
+    con.commit()
+    con.close()

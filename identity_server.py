@@ -107,25 +107,28 @@ def usage_sync_start():
 
     path = request.path
 
-    # detect sync endpoints automatically
     if "/sync/" not in path:
         return
 
-    uid = getattr(g, "user_id", None)
-
+    uid = get_uid()
     if not uid:
         return
 
     try:
         source = path.split("/sync/")[-1]
 
+        mode = request.args.get("mode", "manual")
+
+        if mode not in ["manual", "scheduled"]:
+            mode = "manual"
+
         g.sync_run_id = log_sync_start(
             uid,
             source,
-            "auto"
+            mode
         )
 
-        print(f"[USAGE] Sync START → {source}")
+        print(f"[USAGE] Sync START → {source} ({mode})")
 
     except Exception as e:
         print("[USAGE START ERROR]", e)
@@ -294,14 +297,25 @@ def get_db():
     return con
 
 from flask import request, g
+
+
 def get_uid():
 
-    # Priority 1 → Logged platform user
+    # Priority 1 — Logged web user
     if getattr(g, "user_id", None):
         return g.user_id
 
-    # Fallback → legacy uid cookie
-    return request.cookies.get("uid")
+    # Priority 2 — Scheduler / internal calls
+    internal_uid = request.headers.get("X-Internal-UID")
+    if internal_uid:
+        return internal_uid
+
+    # Priority 3 — legacy cookie fallback
+    uid_cookie = request.cookies.get("uid")
+    if uid_cookie:
+        return uid_cookie
+
+    return None
 
 # CONNECTOR INITIALIZATION
 def ensure_connector_initialized(uid, source):
@@ -3735,6 +3749,7 @@ def forms_save_app():
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
+
     data = encrypt_payload(request.get_json())
 
     client_id = data.get("client_id")
@@ -3749,11 +3764,12 @@ def forms_save_app():
     cur.execute("""
         INSERT OR REPLACE INTO connector_configs
         (uid, connector, client_id, client_secret, config_json, created_at)
-        VALUES (?, 'forms', ?, ?, ?)
+        VALUES (?, 'forms', ?, ?, ?, ?)
     """, (
         uid,
         client_id,
         client_secret,
+        "{}",
         datetime.datetime.now(datetime.UTC).isoformat()
     ))
 
@@ -3761,6 +3777,7 @@ def forms_save_app():
     con.close()
 
     ensure_connector_initialized(uid, "forms")
+
     return jsonify({"status": "saved"})
 
 # ---------------- FORMS DISCONNECT ----------------
@@ -11760,38 +11777,42 @@ def universal_sync(source):
             "status": "failed",
             "error": str(e)
         }), 500
-    
-# UNIVERSAL SYNC AUTO LOGGER (ZERO CONNECTOR MODIFICATION)
+
+# UNIVERSAL SYNC LOGGER (SAFE VERSION)
+# NOTE:
+# Logging is handled centrally via Flask middleware.
+# This prevents scheduler argument conflicts.
 
 def wrap_sync_function(func_name, func):
 
     def wrapper(*args, **kwargs):
 
-        uid = None
-
-        try:
-            uid = get_uid()
-        except:
-            pass
-
+        uid = get_uid()
         source = func_name.replace("sync_", "")
 
         run_id = None
 
-        if uid:
-            run_id = log_sync_start(uid, source, "auto")
-
         try:
+            if uid:
+                mode = request.args.get(
+                    "mode",
+                    request.headers.get(
+                        "X-Sync-Mode",
+                        "manual"
+                    )
+                )
+
+                run_id = log_sync_start(uid, source, mode)
+
             print(f"[USAGE] Sync started → {source}")
 
-            result = func(*args, **kwargs)
+            # SAFE CALL
+            result = func()
 
             rows = result if isinstance(result, int) else 0
 
             if run_id:
                 log_sync_finish(run_id, rows, "success")
-
-            print(f"[USAGE] Sync success → {source}")
 
             return result
 
@@ -11800,28 +11821,22 @@ def wrap_sync_function(func_name, func):
             if run_id:
                 log_sync_finish(run_id, 0, "failed", str(e))
 
-            print(f"[USAGE] Sync failed → {source}", str(e))
-
             raise e
 
     return wrapper
 
-
 def auto_wrap_all_syncs():
+    """
+    Disabled auto wrapping.
+    Middleware logging replaces this safely.
+    """
+    print("[USAGE] Sync auto-wrapper disabled (middleware active)")
 
-    for name, obj in list(globals().items()):
-
-        if callable(obj) and name.startswith("sync_"):
-
-            print("[USAGE WRAP]", name)
-
-            globals()[name] = wrap_sync_function(name, obj)
-
-
-# RUN AUTO WRAP ON STARTUP
+# DO NOT WRAP FUNCTIONS ANYMORE
 auto_wrap_all_syncs()
 
-# USAGE ANALYTICS API
+# USAGE ANALYTICS API (FIXED & PRODUCTION READY)
+
 @app.route("/api/usage")
 def usage_analytics():
 
@@ -11836,16 +11851,14 @@ def usage_analytics():
     # ---------------- ACCOUNT OVERVIEW ----------------
 
     cur.execute("""
-        SELECT created_at,
-               company_name,
-               is_individual
+        SELECT created_at, company_name, is_individual
         FROM users
         WHERE id=?
     """, (uid,))
     user_row = cur.fetchone()
 
     account_created = user_row[0] if user_row else None
-    company_name = user_row[1] if user_row else None
+    company_name = user_row[1] if user_row else ""
     is_individual = bool(user_row[2]) if user_row else True
 
     cur.execute("""
@@ -11873,9 +11886,7 @@ def usage_analytics():
     """, (uid,))
     connected_connectors = cur.fetchone()[0]
 
-    disconnected_connectors = (
-        TOTAL_CONNECTORS - connected_connectors
-    )
+    disconnected_connectors = TOTAL_CONNECTORS - connected_connectors
 
     cur.execute("""
         SELECT MIN(started_at)
@@ -11905,7 +11916,6 @@ def usage_analytics():
     """, (uid,))
     failed_sync_runs = cur.fetchone()[0]
 
-    # Full vs incremental
     cur.execute("""
         SELECT sync_type, COUNT(*)
         FROM sync_runs
@@ -11914,35 +11924,35 @@ def usage_analytics():
     """, (uid,))
     sync_type_breakdown = dict(cur.fetchall())
 
-    # ---------------- DATA VOLUME METRICS ----------------
+    # ---------------- DATA VOLUME (REAL SOURCE) ----------------
+    # IMPORTANT: Now reading from destination_push_logs
 
     cur.execute("""
-        SELECT COALESCE(SUM(rows_synced),0)
-        FROM sync_runs
+        SELECT COALESCE(SUM(rows_pushed),0)
+        FROM destination_push_logs
         WHERE uid=?
     """, (uid,))
     total_records_synced = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT COALESCE(SUM(rows_synced),0)
-        FROM sync_runs
+        SELECT COALESCE(SUM(rows_pushed),0)
+        FROM destination_push_logs
         WHERE uid=?
-        AND date(started_at)=date('now')
+        AND date(pushed_at)=date('now')
     """, (uid,))
     records_today = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT COALESCE(SUM(rows_synced),0)
-        FROM sync_runs
+        SELECT COALESCE(SUM(rows_pushed),0)
+        FROM destination_push_logs
         WHERE uid=?
-        AND strftime('%Y-%m', started_at)=strftime('%Y-%m','now')
+        AND strftime('%Y-%m', pushed_at)=strftime('%Y-%m','now')
     """, (uid,))
     records_this_month = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT source,
-               SUM(rows_synced)
-        FROM sync_runs
+        SELECT source, SUM(rows_pushed)
+        FROM destination_push_logs
         WHERE uid=?
         GROUP BY source
     """, (uid,))
@@ -11972,8 +11982,7 @@ def usage_analytics():
     active_destinations = cur.fetchone()[0]
 
     cur.execute("""
-        SELECT destination_type,
-               SUM(rows_pushed)
+        SELECT destination_type, SUM(rows_pushed)
         FROM destination_push_logs
         WHERE uid=?
         GROUP BY destination_type
@@ -11994,7 +12003,7 @@ def usage_analytics():
     """, (uid,))
     push_failures = cur.fetchone()[0]
 
-    # ---------------- SCHEDULER INSIGHTS ----------------
+    # ---------------- SCHEDULER ----------------
 
     cur.execute("""
         SELECT COUNT(*)
@@ -12004,6 +12013,8 @@ def usage_analytics():
     scheduled_jobs = cur.fetchone()[0]
 
     con.close()
+
+    # ---------------- HEALTH CALCULATION ----------------
 
     success_rate = 0
     if total_sync_runs > 0:

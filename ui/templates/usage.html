@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    :root {
+        --primary-gold: #e2e8f0;
+        --accent-cyan: #22d3ee;
+        --accent-purple: #a78bfa;
+        --accent-emerald: #34d399;
+        --accent-red: #f87171;
+        --deep-slate: #0f172a;
+        --bg-dark: #0a0f1a;
+        --glass-white: rgba(255, 255, 255, 0.07);
+        --neu-upper: rgba(255, 255, 255, 0.06);
+        --neu-lower: rgba(0, 0, 0, 0.55);
+    }
+
+    body {
+        background: radial-gradient(ellipse at 25% 35%, #1e293b 0%, #0a0f1a 70%);
+        color: #e2e8f0;
+        overflow-x: hidden;
+        position: relative;
+        min-height: 100vh;
+    }
+
+    .bg-layer {
+        position: fixed;
+        inset: 0;
+        z-index: -3;
+        background: linear-gradient(to bottom right, #0f172a 0%, #020617 100%);
+        pointer-events: none;
+    }
+
+    .bg-orb {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(90px);
+        z-index: -2;
+        opacity: 0.18;
+        pointer-events: none;
+        animation: floatOrb 45s infinite alternate ease-in-out;
+    }
+
+    .bg-orb-1 { width: 680px; height: 680px; background: #22d3ee; top: -18%; left: -22%; animation-duration: 55s; }
+    .bg-orb-2 { width: 520px; height: 520px; background: #a78bfa; bottom: -12%; right: -18%; animation-duration: 70s; animation-delay: -18s; }
+    .bg-orb-3 { width: 400px; height: 400px; background: #06b6d4; top: 45%; left: 55%; animation-duration: 90s; animation-delay: -35s; }
+
+    @keyframes floatOrb {
+        0%   { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(140px, 90px) scale(1.18); }
+    }
+
+    .noise-overlay {
+        position: fixed;
+        inset: 0;
+        background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" /><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.4"/></svg>') repeat;
+        pointer-events: none;
+        z-index: -1;
+        opacity: 0.35;
+    }
+
+    .premium-card {
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.82), rgba(15, 23, 42, 0.88));
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 28px;
+        box-shadow: 12px 12px 24px var(--neu-lower), -6px -6px 16px var(--neu-upper);
+        transition: all 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .premium-card:hover {
+        transform: translateY(-10px) scale(1.015);
+        border-color: var(--accent-cyan);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.55), 0 0 50px rgba(34,211,238,0.22);
+    }
+
+    .stat-label {
+        font-size: 0.81rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: #a1b0c9;
+    }
+
+    .stat-value {
+        font-size: 3.1rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #ffffff 20%, #a5f3fc 80%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    }
+
+    .insight-item {
+        background: rgba(15, 23, 42, 0.5);
+        border-left: 4px solid var(--accent-cyan);
+        box-shadow: inset 2px 2px 5px rgba(0,0,0,0.2);
+        padding: 1.25rem;
+        border-radius: 1rem;
+    }
+
+    .insight-item:hover {
+        background: rgba(15, 23, 42, 0.65);
+    }
+</style>
+
+<div class="bg-layer"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+<div class="noise-overlay"></div>
+
+<section class="min-h-screen px-5 sm:px-8 py-12 md:py-16 relative">
+    <div class="max-w-[1480px] mx-auto space-y-12">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6" data-aos="fade-down">
+            <div>
+                <span class="text-cyan-400 font-bold text-xs uppercase tracking-[0.45em] mb-3 block">Platform Pulse</span>
+                <h1 class="text-5xl md:text-6xl font-black text-white tracking-tight">
+                    Usage <span class="relative inline-block">
+                        Dashboard
+                        <svg class="absolute -bottom-3 left-0 w-full h-3" viewBox="0 0 120 8" preserveAspectRatio="none">
+                            <path d="M0 4 Q30 0 60 4 T120 4" stroke="#22d3ee" stroke-width="2.5" fill="none"/>
+                        </svg>
+                    </span>
+                </h1>
+                <p class="text-slate-300 mt-5 max-w-2xl text-lg">
+                    Real-time overview of your data flows, sync health & platform activity.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="premium-card px-7 py-5 flex items-center gap-5">
+                    <div class="relative">
+                        <div class="w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+                        <div class="absolute inset-0 bg-green-400 blur-md rounded-full opacity-40 animate-ping"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Status</p>
+                        <p class="text-sm font-bold text-green-400">HEALTHY</p>
+                    </div>
+                </div>
+
+                <div class="premium-card px-7 py-5 flex items-center gap-5">
+                    <div class="relative">
+                        <div class="w-4 h-4 bg-cyan-400 rounded-full animate-pulse"></div>
+                        <div class="absolute inset-0 bg-cyan-400 blur-md rounded-full opacity-40 animate-ping"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase">Data Freshness</p>
+                        <p id="dataFreshness" class="text-xs font-bold text-cyan-400">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8" data-aos="fade-up" data-aos-delay="100">
+            <div class="premium-card p-8 group">
+                <div class="stat-label mb-2 group-hover:text-cyan-300 transition-colors">Connectors</div>
+                <div id="connectedConnectors" class="stat-value">--</div>
+                <p class="text-slate-500 text-xs mt-3">Active data sources</p>
+            </div>
+            <div class="premium-card p-8 group">
+                <div class="stat-label mb-2 group-hover:text-cyan-300 transition-colors">Records Processed</div>
+                <div id="totalRecords" class="stat-value">--</div>
+                <p class="text-slate-500 text-xs mt-3">Across all pipelines</p>
+            </div>
+            <div class="premium-card p-8 group">
+                <div class="stat-label mb-2 group-hover:text-cyan-300 transition-colors">Destinations</div>
+                <div id="activeDestinations" class="stat-value">--</div>
+                <p class="text-slate-500 text-xs mt-3">Active outputs</p>
+            </div>
+            <div class="premium-card p-8 border-r-4 border-r-cyan-500 bg-gradient-to-br from-cyan-600/8 to-transparent group">
+                <div class="stat-label mb-2 text-cyan-300">Sync Success</div>
+                <div id="successRate" class="stat-value text-cyan-300">--</div>
+                <p class="text-cyan-800/60 text-xs mt-3 font-semibold">Efficiency score</p>
+            </div>
+
+            <div class="premium-card p-8 group relative overflow-hidden">
+                <div class="stat-label mb-3 group-hover:text-cyan-400 transition-colors">Automation Score</div>
+                <div class="relative w-28 h-28 mx-auto mt-3">
+                    <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="#1e293b" stroke-width="13"/>
+                        <circle id="automationProgress" cx="60" cy="60" r="54" fill="none" stroke="#22d3ee" 
+                                stroke-width="13" stroke-dasharray="339" stroke-dashoffset="339" stroke-linecap="round"/>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <div id="automationScore" class="text-4xl font-black text-cyan-400">—%</div>
+                        <div class="text-xs text-slate-400 -mt-1">Scheduled</div>
+                    </div>
+                </div>
+                <p class="text-center text-slate-500 text-xs mt-5 italic">Maturity of your pipelines</p>
+            </div>
+        </div>
+
+        <!-- Intelligence Feed – reverted to original style -->
+        <div class="premium-card p-9 md:p-11 overflow-hidden relative" data-aos="zoom-in" data-aos-delay="200">
+            <div class="absolute top-0 right-0 p-10 opacity-10 rotate-12">
+                <svg width="120" height="120" fill="white" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div class="flex items-center gap-4 mb-8">
+                <div class="h-8 w-1 bg-cyan-500 shadow-[0_0_15px_#22d3ee]"></div>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Intelligence Feed</h2>
+            </div>
+            <div id="usageInsights" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Original placeholder kept – will be replaced by JS -->
+                <div class="flex items-center gap-3 text-slate-400 animate-pulse">
+                    <div class="w-2 h-2 bg-slate-500 rounded-full"></div>
+                    Parsing performance logs...
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 premium-card p-9 md:p-11" data-aos="fade-right">
+                <div class="flex justify-between items-center mb-10">
+                    <h2 class="text-2xl font-bold text-white">Data Throughput</h2>
+                    <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Records by Source</span>
+                </div>
+                <div class="h-[380px]">
+                    <canvas id="connectorBar"></canvas>
+                </div>
+            </div>
+
+            <div class="premium-card p-9 md:p-11" data-aos="fade-left">
+                <h2 class="text-2xl font-bold text-white mb-10">Pipeline Automation</h2>
+                <div class="h-[340px]">
+                    <canvas id="syncPie"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Delivery + Pipeline Activity + rest remains the same as previous version -->
+
+        <div class="grid lg:grid-cols-2 gap-8">
+            <div class="premium-card p-8 h-fit">
+                <h2 class="text-xl font-bold text-white mb-8 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-cyan-500 rounded-full"></span>
+                    Data Delivery
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm premium-table">
+                        <thead>
+                            <tr class="text-slate-400 text-[11px] font-black uppercase tracking-widest border-b border-white/10">
+                                <th class="text-left py-5 px-4">Node</th>
+                                <th class="text-center py-5 px-4">Payload (Rows)</th>
+                                <th class="text-right py-5 px-4">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="destinationTable" class="text-slate-200"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="space-y-8">
+                <div class="premium-card p-10">
+                    <h2 class="text-xl font-bold text-white mb-8">Pipeline Activity</h2>
+                    <div class="grid grid-cols-2 gap-10">
+                        <div class="relative">
+                            <div class="stat-label">Initial Contact</div>
+                            <div id="firstConnected" class="text-lg text-white font-medium mt-2">--</div>
+                        </div>
+                        <div class="relative">
+                            <div class="stat-label">Last Successful Push</div>
+                            <div id="lastSync" class="text-lg text-cyan-400 font-medium mt-2">--</div>
+                        </div>
+                        <div class="pt-6 border-t border-white/5">
+                            <div class="stat-label">Total Executions</div>
+                            <div id="totalRuns" class="text-3xl font-black text-white mt-2">--</div>
+                        </div>
+                        <div class="pt-6 border-t border-white/5">
+                            <div class="stat-label text-red-400/80">Logged Failures</div>
+                            <div id="failedRuns" class="text-3xl font-black text-red-400 mt-2">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="premium-card p-8 bg-opacity-40">
+                        <div class="stat-label">Engine Scheduler</div>
+                        <div id="scheduledJobs" class="text-3xl font-black text-white mt-2">--</div>
+                        <div class="text-[10px] text-slate-500 font-bold uppercase mt-2 tracking-tighter">Active Background Tasks</div>
+                    </div>
+                    <div class="premium-card p-8 bg-opacity-40">
+                        <div class="stat-label">API Gateway</div>
+                        <div id="apiCalls" class="text-3xl font-black text-white mt-2">--</div>
+                        <div class="text-[10px] text-slate-500 font-bold uppercase mt-2 tracking-tighter">Request Consumption</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-card p-12 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-none shadow-2xl" data-aos="fade-up">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="text-center md:text-left">
+                    <h2 class="text-2xl font-black text-white mb-2">Organization Profile</h2>
+                    <p class="text-slate-400 text-sm">Managing your enterprise identity and session security.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-x-12 gap-y-6">
+                    <div>
+                        <span class="stat-label">Registered Entity</span>
+                        <p id="companyName" class="text-white font-bold text-lg mt-1">--</p>
+                    </div>
+                    <div>
+                        <span class="stat-label">Access Level</span>
+                        <p id="accountType" class="text-cyan-400 font-bold text-lg mt-1 uppercase tracking-widest">--</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-10 pt-10 border-t border-white/5 flex flex-wrap justify-between text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+                <div>Account Age: <span id="accountAge" class="text-white ml-2">-- Days</span></div>
+                <div>Registry Date: <span id="accountCreated" class="text-white ml-2">--</span></div>
+                <div>Live Sessions: <span id="totalSessions" class="text-cyan-400 ml-2">--</span></div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<div id="companionOrb" class="fixed w-24 h-24 rounded-full bg-gradient-to-br from-cyan-400 via-cyan-300 to-blue-500 blur-3xl opacity-35 pointer-events-none z-30 transition-transform duration-200 mix-blend-screen shadow-2xl"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/js/usage.js"></script>
+
+<script>
+// Companion orb
+const orb = document.getElementById('companionOrb');
+let targetX = 0, targetY = 0;
+let currentX = window.innerWidth / 2, currentY = window.innerHeight / 2;
+
+window.addEventListener('mousemove', e => {
+    targetX = e.clientX;
+    targetY = e.clientY;
+});
+
+function updateOrb() {
+    currentX += (targetX - currentX) * 0.085;
+    currentY += (targetY - currentY) * 0.085;
+    orb.style.transform = `translate(${currentX - 48}px, ${currentY - 48}px)`;
+    requestAnimationFrame(updateOrb);
+}
+updateOrb();
+
+setInterval(() => {
+    orb.style.transform += ' scale(1.18)';
+    setTimeout(() => orb.style.transform = orb.style.transform.replace(' scale(1.18)', ''), 1400);
+}, 4200);
+</script>
+
+{% endblock %}
