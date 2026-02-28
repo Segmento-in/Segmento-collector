@@ -275,8 +275,12 @@
 
                     emailError.innerText =
                         "An account with this email already exists.";
-                    emailError.classList.remove("hidden");
+                } else if (data.error) {
+                    emailError.innerText = data.error;
+                } else {
+                    emailError.innerText = "An error occurred during sign up.";
                 }
+                emailError.classList.remove("hidden");
 
                 submitBtn.innerText = originalText;
                 submitBtn.disabled = false;
