@@ -11439,6 +11439,16 @@ def save_destination():
                 "msg": "Missing Azure Data Lake credentials"
             }), 400
 
+    # ---------- Databricks Validation ----------
+
+    if dest_type == "databricks":
+
+        if not host or not port or not password:
+            return jsonify({
+                "status": "error",
+                "msg": "Missing Databricks credentials"
+            }), 400
+
 
     con = get_db()
     cur = con.cursor()

@@ -8,12 +8,19 @@ def push_databricks(dest, source, rows):
         return 0
 
     try:
+        db_name = (dest.get("database_name") or "hive_metastore.default").strip()
+
+        if "." in db_name:
+            catalog, schema = db_name.split(".", 1)
+        else:
+            catalog, schema = "hive_metastore", db_name or "default"
+
         connection = databricks.sql.connect(
             server_hostname=dest["host"],
             http_path=dest.get("port"),
             access_token=dest["password"],
-            catalog=dest.get("database_name", "hive_metastore").split(".")[0],
-            schema=dest.get("database_name", "hive_metastore.default").split(".")[-1] if "." in dest.get("database_name", "") else "default"
+            catalog=catalog,
+            schema=schema
         )
 
         cursor = connection.cursor()

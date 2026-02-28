@@ -244,6 +244,10 @@
                           <img src="/static/images/logos/adls.png" class="w-6 h-6 object-contain">
                           <span class="text-slate-200 group-hover:text-white font-medium">Azure Data Lake</span>
                         </div>
+                        <div onclick="selectDestination('databricks', 'Databricks', 'https://cdn.simpleicons.org/databricks/EF3A2C')" class="flex items-center gap-3 px-4 py-3 hover:bg-blue-500/10 rounded-xl cursor-pointer transition-colors group">
+                          <img src="https://cdn.simpleicons.org/databricks/EF3A2C" class="w-6 h-6 object-contain">
+                          <span class="text-slate-200 group-hover:text-white font-medium">Databricks</span>
+                        </div>
                     </div>
                 </div>
               </div>
@@ -279,6 +283,13 @@
                   <input id="adlsFilesystem" placeholder="File System / Container (segmento-data)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="adlsPath" placeholder="Base Path (optional, e.g. raw/events)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                   <input id="adlsKey" type="password" placeholder="Account Key" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                </div>
+
+                <div id="databricksFields" class="hidden contents">
+                  <input id="dbxHost" placeholder="Workspace Hostname (adb-xxx.azuredatabricks.net)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbxHttpPath" placeholder="HTTP Path (/sql/1.0/warehouses/...)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbxCatalogSchema" placeholder="Catalog.Schema (optional, e.g. hive_metastore.default)" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
+                  <input id="dbxToken" type="password" placeholder="Personal Access Token" class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
                 </div>
 
                 <div id="formatField" class="hidden md:col-span-2">
@@ -572,10 +583,11 @@ function toggleDestFields(type) {
     }
     fields.classList.remove("hidden");
 
-    document.getElementById("sqlFields").classList.toggle("hidden", type === "bigquery" || type === "s3" || type === "azure_datalake");
+    document.getElementById("sqlFields").classList.toggle("hidden", type === "bigquery" || type === "s3" || type === "azure_datalake" || type === "databricks");
     document.getElementById("bigqueryFields").classList.toggle("hidden", type !== "bigquery");
     document.getElementById("s3Fields").classList.toggle("hidden", type !== "s3");
     document.getElementById("adlsFields").classList.toggle("hidden", type !== "azure_datalake");
+    document.getElementById("databricksFields").classList.toggle("hidden", type !== "databricks");
     document.getElementById("formatField").classList.toggle("hidden", !(type === "bigquery" || type === "s3" || type === "azure_datalake"));
 }
 
@@ -606,6 +618,13 @@ async function saveDestination(){
         payload.password = document.getElementById("adlsKey").value;
         payload.database = "adls";
         payload.format = document.getElementById("dataFormat").value;
+    }
+
+    else if(type === "databricks"){
+        payload.host = document.getElementById("dbxHost").value;
+        payload.port = document.getElementById("dbxHttpPath").value;
+        payload.password = document.getElementById("dbxToken").value;
+        payload.database = document.getElementById("dbxCatalogSchema").value || "hive_metastore.default";
     }
     else {
         payload.host = document.getElementById("dbHost").value;
