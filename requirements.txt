@@ -32,3 +32,4 @@ clickhouse-connect
 pyarrow
 cryptography
 azure-storage-file-datalake
+databricks-sql-connector
