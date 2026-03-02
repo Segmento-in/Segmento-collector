@@ -7,6 +7,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 import requests
 import sqlite3
+from functools import wraps
 
 from flask import (
     Flask,
@@ -85,6 +86,14 @@ def logged_in():
     except:
         return False
     
+def require_login(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not logged_in():
+            next_url = request.path
+            return redirect(f"/login?next={next_url}&auth_required=1")
+        return f(*args, **kwargs)
+    return decorated
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -99,7 +108,7 @@ def signup_page():
 def login_page():
     if logged_in():
         return redirect("/")
-    return render_template("login.html")
+    return render_template("login.html", next_url=request.args.get("next", ""), auth_required=request.args.get("auth_required", ""))
 
 @app.context_processor
 def inject_auth_status():
@@ -202,6 +211,7 @@ def ui_disconnect(source):
 # ================= GITHUB ========================
 
 @app.route("/connectors/github")
+@require_login
 def github_page():
     return render_template("connectors/github.html")
 
@@ -294,6 +304,7 @@ def github_save_app_proxy():
 # ================= REDDIT ========================
 
 @app.route("/connectors/reddit")
+@require_login
 def reddit_page():
     return render_template("connectors/reddit.html")
 
@@ -405,6 +416,7 @@ def reddit_data(table):
 # ================= MEDIUM =================
 
 @app.route("/connectors/medium")
+@require_login
 def medium_page():
     return render_template("connectors/medium.html")
 
@@ -479,6 +491,7 @@ def medium_data():
 # ================= GITLAB =================
 
 @app.route("/connectors/gitlab")
+@require_login
 def gitlab_page():
     return render_template("connectors/gitlab.html")
 
@@ -581,6 +594,7 @@ def gitlab_data(table):
 # ================= DEVTO =================
 
 @app.route("/connectors/devto")
+@require_login
 def devto_page():
     return render_template("connectors/devto.html")
 
@@ -656,6 +670,7 @@ def devto_job_save_proxy():
 # ================= STACKOVERFLOW =================
 
 @app.route("/connectors/stackoverflow")
+@require_login
 def stackoverflow_page():
     return render_template("connectors/stackoverflow.html")
 
@@ -788,6 +803,7 @@ def stack_users():
 # ================= HACKERNEWS =================
 
 @app.route("/connectors/hackernews")
+@require_login
 def hackernews_page():
     return render_template("connectors/hackernews.html")
 
@@ -847,6 +863,7 @@ def hackernews_stories():
 # ================= NVD =================
 
 @app.route("/connectors/nvd")
+@require_login
 def nvd_page():
     return render_template("connectors/nvd.html")
 
@@ -931,6 +948,7 @@ def nvd_cves():
 # ================= DISCORD =================
 
 @app.route("/connectors/discord")
+@require_login
 def discord_page():
     return render_template("connectors/discord.html")
 
@@ -990,6 +1008,7 @@ def discord_status_proxy():
 # ================= TELEGRAM =================
 
 @app.route("/connectors/telegram")
+@require_login
 def telegram_page():
     return render_template("connectors/telegram.html")
 
@@ -1100,6 +1119,7 @@ def telegram_save_config_proxy():
 # ================= TUMBLR =================
 
 @app.route("/connectors/tumblr")
+@require_login
 def tumblr_page():
     return render_template("connectors/tumblr.html")
 
@@ -1207,6 +1227,7 @@ def tumblr_posts(blog):
 
 # ================= MASTODON =================
 @app.route("/connectors/mastodon")
+@require_login
 def mastodon_page():
     return render_template("connectors/mastodon.html")
 
@@ -1314,6 +1335,7 @@ def mastodon_save_config_proxy():
 # ================= LEMMY =================
 
 @app.route("/connectors/lemmy")
+@require_login
 def lemmy_page():
     return render_template("connectors/lemmy.html")
 
@@ -1435,6 +1457,7 @@ def lemmy_save_config_proxy():
 # ================= PINTEREST =================
 
 @app.route("/connectors/pinterest")
+@require_login
 def pinterest_page():
     return render_template("connectors/pinterest.html")
 
@@ -1533,6 +1556,7 @@ def pinterest_save_config_proxy():
 # ================= TWITCH =================
 
 @app.route("/connectors/twitch")
+@require_login
 def twitch_page():
     return render_template("connectors/twitch.html")
 
@@ -1585,6 +1609,7 @@ def twitch_save_config_proxy():
 # ================= PEERTUBE =================
 
 @app.route("/connectors/peertube")
+@require_login
 def peertube_page():
     return render_template("connectors/peertube.html")
 
@@ -1689,6 +1714,7 @@ def peertube_save_proxy():
 # ================= OPENSTREETMAP =================
 
 @app.route("/connectors/openstreetmap")
+@require_login
 def osm_page():
     return render_template("connectors/openstreetmap.html")
 
@@ -1781,6 +1807,7 @@ def osm_notes():
 # ================= WIKIPEDIA =================
 
 @app.route("/connectors/wikipedia")
+@require_login
 def wikipedia_page():
     return render_template("connectors/wikipedia.html")
 
@@ -1900,6 +1927,7 @@ def wiki_viewed():
 # ================= PRODUCTHUNT =================
 
 @app.route("/connectors/producthunt")
+@require_login
 def producthunt_page():
     return render_template("connectors/producthunt.html")
 
@@ -1998,6 +2026,7 @@ def ui_producthunt_save():
 # ================= DISCOURSE =================
 
 @app.route("/connectors/discourse")
+@require_login
 def discourse_page():
     return render_template("connectors/discourse.html")
 
@@ -2080,6 +2109,7 @@ def ui_discourse_categories():
 # ================= GMAIL ========================
 
 @app.route("/connectors/gmail")
+@require_login
 def gmail_page():
     return render_template("connectors/gmail.html")
 
@@ -2215,6 +2245,7 @@ def gmail_dashboard():
 # ================= GOOGLE DRIVE ========================
 
 @app.route("/connectors/drive")
+@require_login
 def drive_page():
     return render_template("connectors/drive.html")
 
@@ -2347,6 +2378,7 @@ def drive_job_save_proxy():
 # ================= GOOGLE CALENDAR ========================
 
 @app.route("/connectors/calendar")
+@require_login
 def calendar_page():
     return render_template("connectors/calendar.html")
 
@@ -2485,6 +2517,7 @@ def calendar_data(table):
 # ================= GOOGLE SHEETS ========================
 
 @app.route("/connectors/sheets")
+@require_login
 def sheets_page():
     return render_template("connectors/sheets.html")
 
@@ -2617,6 +2650,7 @@ def sheets_data():
 # ================= GOOGLE FORMS ========================
 
 @app.route("/connectors/forms")
+@require_login
 def forms_page():
     return render_template("connectors/forms.html")
 
@@ -2752,6 +2786,7 @@ def forms_data(table):
 # ================= GOOGLE CONTACTS ========================
 
 @app.route("/connectors/contacts")
+@require_login
 def contacts_page():
     return render_template("connectors/contacts.html")
 
@@ -2871,6 +2906,7 @@ def contacts_job_save_proxy():
 # ================= GOOGLE TASKS ========================
 
 @app.route("/connectors/tasks")
+@require_login
 def tasks_page():
     return render_template("connectors/tasks.html")
 
@@ -3015,6 +3051,7 @@ def tasks_data(table):
 # ================= GOOGLE GA4 ========================
 
 @app.route("/connectors/ga4")
+@require_login
 def ga4_page():
     return render_template("connectors/ga4.html")
 
@@ -3154,6 +3191,7 @@ def ga4_data(table):
 # ================= GOOGLE SEARCH CONSOLE ========================
 
 @app.route("/connectors/search-console")
+@require_login
 def gsc_page():
     return render_template("connectors/search_console.html")
 
@@ -3257,6 +3295,7 @@ def gsc_data():
 # ================= GOOGLE YOUTUBE ========================
 
 @app.route("/connectors/youtube")
+@require_login
 def youtube_page():
     return render_template("connectors/youtube.html")
 
@@ -3398,6 +3437,7 @@ def youtube_data(table):
 # ================= GOOGLE TRENDS ========================
 
 @app.route("/connectors/trends")
+@require_login
 def trends_page():
     return render_template("connectors/trends.html")
 
@@ -3496,6 +3536,7 @@ def trends_job_save_proxy():
 # ================= GOOGLE NEWS ========================
 
 @app.route("/connectors/news")
+@require_login
 def news_page():
     return render_template("connectors/news.html")
 
@@ -3566,6 +3607,7 @@ def news_status_proxy():
 # ================= GOOGLE BOOKS ========================
 
 @app.route("/connectors/books")
+@require_login
 def books_page():
     return render_template("connectors/books.html")
 
@@ -3647,6 +3689,7 @@ def books_data():
 # ================= GOOGLE WEBFONTS ========================
 
 @app.route("/connectors/webfonts")
+@require_login
 def webfonts_page():
     return render_template("connectors/webfonts.html")
 
@@ -3740,6 +3783,7 @@ def webfonts_save_config_proxy():
 # ================= GOOGLE PAGESPEED ========================
 
 @app.route("/connectors/pagespeed")
+@require_login
 def pagespeed_page():
     return render_template("connectors/pagespeed.html")
 
@@ -3886,6 +3930,7 @@ def pagespeed_job_save_proxy():
 # ================= GOOGLE CLOUD STORAGE =================
 
 @app.route("/connectors/gcs")
+@require_login
 def gcs_page():
     return render_template("connectors/gcs.html")
 
@@ -4026,6 +4071,7 @@ def gcs_save_app_proxy():
 # ================= GOOGLE CLASSROOM =================
 
 @app.route("/connectors/classroom")
+@require_login
 def classroom_page():
     return render_template("connectors/classroom.html")
 
@@ -4222,6 +4268,7 @@ def classroom_submissions():
 # ================= GOOGLE FACT CHECK =================
 
 @app.route("/connectors/factcheck")
+@require_login
 def factcheck_page():
     return render_template("connectors/factcheck.html")
 
@@ -4361,6 +4408,7 @@ def factcheck_save_config_proxy():
 # ================= FACEBOOK PAGES=================
 
 @app.route("/connectors/facebook")
+@require_login
 def facebook_page():
     return render_template("connectors/facebookpages.html")
 
@@ -4432,6 +4480,7 @@ def facebook_job_save_proxy():
 # ================= FACEBOOK ADS =================
 
 @app.route("/connectors/facebook_ads")
+@require_login
 def facebook_ads_page():
     return render_template("connectors/facebook_ads.html")
 
