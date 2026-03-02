@@ -102,7 +102,11 @@ def home():
 def signup_page():
     if logged_in():
         return redirect("/")
-    return render_template("signup.html")
+    return render_template(
+        "signup.html",
+        next_url=request.args.get("next", ""),
+        auth_required=request.args.get("auth_required", "")
+    )
 
 @app.route("/login")
 def login_page():
