@@ -3,6 +3,7 @@ import sqlite3
 import uuid
 import datetime
 import os
+from urllib.parse import quote_plus
 
 from werkzeug.security import generate_password_hash
 from security.secure_db import encrypt_payload
@@ -14,16 +15,39 @@ DB = "identity.db"
 UPLOAD_DIR = "uploads/company_logos"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+UI_BASE_URL = os.getenv("UI_BASE_URL", "http://localhost:3000")
 
 # DB CONNECTION
 def get_db():
     return sqlite3.connect(DB)
+
+
+def sanitize_next_path(next_path):
+    if not next_path:
+        return "/"
+    if not next_path.startswith("/") or next_path.startswith("//"):
+        return "/"
+    return next_path
+
+
+def build_login_redirect(error_code, next_path="", auth_required=""):
+    params = [f"error={error_code}"]
+
+    safe_next = sanitize_next_path(next_path)
+    if safe_next != "/":
+        params.append(f"next={quote_plus(safe_next)}")
+
+    if auth_required == "1":
+        params.append("auth_required=1")
+
+    return f"{UI_BASE_URL}/login?{'&'.join(params)}"
 
 # ================= Signup =================
 @auth.route("/auth/signup", methods=["POST"])
 def signup():
 
     data = request.form
+    next_url = sanitize_next_path(data.get("next"))
 
     # BASIC VALIDATION
     email = data.get("email")
@@ -128,7 +152,7 @@ def signup():
 
     resp = make_response(jsonify({
         "success": True,
-        "redirect": "http://localhost:3000/"
+        "redirect": f"{UI_BASE_URL}{next_url}"
     }))
 
     resp.set_cookie(
@@ -161,11 +185,15 @@ def login():
 
     email = data.get("email")
     password = data.get("password")
+    next_url = data.get("next", "")
+    auth_required = data.get("auth_required", "")
 
     if not email or not password:
-        return redirect(
-            "http://localhost:3000/login?error=missing"
-        )
+        return redirect(build_login_redirect(
+            "missing",
+            next_url=next_url,
+            auth_required=auth_required
+        ))
 
     con = get_db()
     cur = con.cursor()
@@ -180,9 +208,11 @@ def login():
 
     if not row:
         con.close()
-        return redirect(
-            "http://localhost:3000/login?error=invalid"
-        )
+        return redirect(build_login_redirect(
+            "invalid",
+            next_url=next_url,
+            auth_required=auth_required
+        ))
 
     user_id = row[0]
     encrypted_hash = row[1]
@@ -193,9 +223,11 @@ def login():
     # VERIFY PASSWORD
     if not check_password_hash(stored_hash, password):
         con.close()
-        return redirect(
-            "http://localhost:3000/login?error=invalid"
-        )
+        return redirect(build_login_redirect(
+            "invalid",
+            next_url=next_url,
+            auth_required=auth_required
+        ))
 
     # ---------- CREATE SESSION ----------
     session_id = str(uuid.uuid4())
@@ -213,9 +245,8 @@ def login():
     con.commit()
     con.close()
 
-    resp = make_response(
-        redirect("http://localhost:3000/")
-    )
+    safe_next = sanitize_next_path(next_url)
+    resp = make_response(redirect(f"{UI_BASE_URL}{safe_next}"))
 
     resp.set_cookie(
         "segmento_session",

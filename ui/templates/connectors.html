@@ -84,6 +84,31 @@
     <div id="connectorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
     </div>
 
+    <div id="authGateModal" class="fixed inset-0 z-50 hidden items-center justify-center px-6">
+      <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onclick="closeAuthGate()"></div>
+      <div class="relative w-full max-w-md rounded-3xl border border-cyan-400/20 bg-slate-900/90 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
+        <button onclick="closeAuthGate()" class="absolute right-4 top-4 text-slate-400 hover:text-white" aria-label="Close">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+
+        <div class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/20 bg-cyan-400/10 text-cyan-300">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.343 3-3V7a3 3 0 10-6 0v1c0 1.657 1.343 3 3 3zm-7 9a7 7 0 1114 0H5z"></path>
+          </svg>
+        </div>
+
+        <h3 class="text-2xl font-black text-white">Create a free account to access this connector</h3>
+        <p class="mt-3 text-sm text-slate-300">Connector setup and sync controls are available after you sign up or log in.</p>
+
+        <div class="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <a id="authGateSignup" href="/signup" class="rounded-xl bg-cyan-400 px-4 py-3 text-center text-sm font-extrabold text-slate-900 hover:bg-cyan-300 transition-colors">Sign Up - It's Free</a>
+          <a id="authGateLogin" href="/login" class="rounded-xl border border-slate-600 px-4 py-3 text-center text-sm font-bold text-white hover:border-cyan-300 hover:text-cyan-300 transition-colors">Log In</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -113,10 +138,27 @@
 
 <script>
   if (typeof CONNECTORS === "undefined") {
-    console.error("❌ connectors_data.js not loaded!");
+    console.error("connectors_data.js not loaded");
   }
 
   const grid = document.getElementById("connectorsGrid");
+  const authGateModal = document.getElementById("authGateModal");
+  const authGateLogin = document.getElementById("authGateLogin");
+  const authGateSignup = document.getElementById("authGateSignup");
+  const IS_LOGGED_IN = {{ is_logged_in | tojson }};
+
+  function closeAuthGate() {
+    authGateModal.classList.add("hidden");
+    authGateModal.classList.remove("flex");
+  }
+
+  function openAuthGate(connectorId) {
+    const nextPath = "/connectors/" + connectorId;
+    authGateSignup.href = `/signup?next=${encodeURIComponent(nextPath)}&auth_required=1`;
+    authGateLogin.href = `/login?next=${encodeURIComponent(nextPath)}&auth_required=1`;
+    authGateModal.classList.remove("hidden");
+    authGateModal.classList.add("flex");
+  }
 
   function render(list) {
     grid.innerHTML = "";
@@ -138,7 +180,12 @@
     `;
 
       card.onclick = () => {
-        location.href = "/connectors/" + c.id;
+        if (IS_LOGGED_IN) {
+          location.href = "/connectors/" + c.id;
+          return;
+        }
+
+        openAuthGate(c.id);
       };
 
       const dataPreview = c.data
@@ -186,6 +233,8 @@
       grid.appendChild(card);
     });
   }
+
+  window.closeAuthGate = closeAuthGate;
 
   render(CONNECTORS);
 

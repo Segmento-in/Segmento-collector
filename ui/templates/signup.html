@@ -131,7 +131,7 @@
 
                 <div class="text-sm font-medium">
                     <span class="text-slate-400 mr-2">Already have an account?</span>
-                    <a href="/login"
+                    <a href="/login?next={{ next_url }}&auth_required={{ auth_required }}"
                         class="text-cyan-600 hover:text-cyan-500 font-bold border-b-2 border-cyan-100 pb-0.5">Login</a>
                 </div>
             </header>
@@ -152,6 +152,7 @@
 
                 <form id="signupForm" enctype="multipart/form-data" class="space-y-8 mt-2">
                     <input type="hidden" name="is_individual" id="isIndividualHidden" value="false">
+                    <input type="hidden" name="next" value="{{ next_url }}">
 
                     <div class="space-y-5">
                         <h3

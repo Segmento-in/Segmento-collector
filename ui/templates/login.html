@@ -136,6 +136,13 @@
                     <p class="text-slate-500 font-medium">Enter your credentials to access your dashboard</p>
                 </div>
 
+                <div id="authRequiredBanner" class="mb-6 hidden p-4 bg-cyan-50 border border-cyan-100 rounded-xl flex items-center gap-3">
+                    <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.343 3-3V7a3 3 0 10-6 0v1c0 1.657 1.343 3 3 3zm-7 9a7 7 0 1114 0H5z"></path>
+                    </svg>
+                    <span class="text-sm font-bold text-cyan-700">Please log in to access connector pages.</span>
+                </div>
+
                 {% if request.args.get("error") %}
                 <div class="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 animate-shake">
                     <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
@@ -148,6 +155,8 @@
                 {% endif %}
 
                 <form action="http://localhost:4000/auth/login" method="POST" class="space-y-6">
+                    <input type="hidden" name="next" value="{{ next_url }}">
+                    <input type="hidden" name="auth_required" value="{{ auth_required }}">
                     <div class="space-y-1.5">
                         <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Work
                             Email</label>
@@ -196,7 +205,7 @@
                 <footer class="mt-12 text-center">
                     <p class="text-sm font-medium text-slate-500">
                         Don't have an account?
-                        <a href="/signup" class="text-cyan-600 font-bold border-b-2 border-cyan-100 pb-0.5 ml-1">Create
+                        <a href="/signup?next={{ next_url }}&auth_required={{ auth_required }}" class="text-cyan-600 font-bold border-b-2 border-cyan-100 pb-0.5 ml-1">Create
                             Account</a>
                     </p>
                 </footer>
@@ -204,6 +213,14 @@
         </div>
     </main>
 
+    <script>
+        const authRequiredBanner = document.getElementById("authRequiredBanner");
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("auth_required") === "1") {
+            authRequiredBanner.classList.remove("hidden");
+        }
+    </script>
 </body>
 
 </html>
+
