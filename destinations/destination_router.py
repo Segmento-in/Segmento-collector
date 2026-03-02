@@ -6,6 +6,7 @@ from destinations.clickhouse_writer import push_clickhouse
 from destinations.s3_writer import push_s3
 from destinations.azure_datalake_writer import push_azure_datalake
 from destinations.databricks_writer import push_databricks
+from destinations.redshift_writer import push_redshift
 from security.secure_db import decrypt_payload
 from flask import g, has_request_context
 
@@ -100,6 +101,9 @@ def push_to_destination(dest_cfg, source, rows):
 
         elif dest_type == "databricks":
             count = push_databricks(dest_cfg, source, rows)
+
+        elif dest_type == "redshift":
+            count = push_redshift(dest_cfg, source, rows)
 
         else:
             raise Exception(

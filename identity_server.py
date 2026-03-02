@@ -11418,6 +11418,16 @@ def save_destination():
                 "msg": "Missing database credentials"
             }), 400
 
+    # ---------- Redshift Validation ----------
+
+    if dest_type == "redshift":
+
+        if not host or not username or not password or not database:
+            return jsonify({
+                "status": "error",
+                "msg": "Missing Redshift credentials"
+            }), 400
+
 
     # ---------- BigQuery Validation ----------
 
