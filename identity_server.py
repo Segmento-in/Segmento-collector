@@ -22,6 +22,7 @@ from google_auth_oauthlib.flow import Flow
 #credentials security
 from security.secure_db import encrypt_payload
 from security.secure_db import decrypt_payload
+from security.crypto import encrypt_value
 from security.secure_fetch import auto_decrypt_row
 from security.secure_fetch import (
     fetchone_secure,
@@ -2257,7 +2258,7 @@ def init_db():
     )
     """)
 
-    # ---------------- FACEBOOK PAGES ----------------
+    # ---------------- Meta ----------------
 
     cur.execute("""
     CREATE TABLE IF NOT EXISTS facebook_connections (
@@ -2266,6 +2267,16 @@ def init_db():
         page_id TEXT,
         page_name TEXT,
         page_access_token TEXT,
+        connected_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS instagram_connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT UNIQUE,
+        ig_account_id TEXT,
+        access_token TEXT,
         connected_at TEXT
     )
     """)
@@ -7645,6 +7656,213 @@ def github_job_save():
         INSERT OR REPLACE INTO connector_jobs
         (uid, source, sync_type, schedule_time)
         VALUES (?, 'github', ?, ?)
+    """, (uid, sync_type, schedule_time))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
+# ---------------- INSTAGRAM ----------------
+
+from connectors.instagram import (
+    get_instagram_auth_url,
+    handle_oauth_callback,
+    sync_instagram,
+    disconnect_instagram
+)
+
+@app.route("/connectors/instagram/save_app", methods=["POST"])
+def instagram_save_app():
+
+    uid = getattr(g, "user_id", None)
+
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+
+    app_id = data.get("app_id")
+    app_secret = data.get("app_secret")
+    redirect_uri = data.get("redirect_uri") or (request.host_url.rstrip("/") + "/instagram/callback")
+
+    if not app_id or not app_secret:
+        return jsonify({"error": "App ID & App Secret required"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+
+    # Store encrypted values in connector_configs (while preserving existing schema).
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, client_id, client_secret, scopes, created_at)
+        VALUES (?, 'instagram', ?, ?, ?, datetime('now'))
+    """, (
+        uid,
+        encrypt_value(app_id),
+        encrypt_value(app_secret),
+        encrypt_value(redirect_uri)
+    ))
+
+    con.commit()
+    con.close()
+
+    ensure_connector_initialized(uid, "instagram")
+    return jsonify({"status": "saved"})
+
+@app.route("/instagram/connect")
+def instagram_connect():
+    uid = getattr(g, "user_id", None)
+
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    try:
+        return redirect(get_instagram_auth_url(uid))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@app.route("/instagram/callback")
+def instagram_callback():
+    uid = getattr(g, "user_id", None)
+    code = request.args.get("code")
+
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not code:
+        return "Authorization failed", 400
+
+    result = handle_oauth_callback(uid, code)
+
+    if result.get("status") != "success":
+        return jsonify(result), 400
+
+    return redirect("http://localhost:3000/connectors/instagram")
+
+@app.route("/connectors/instagram/disconnect")
+def instagram_disconnect():
+    uid = getattr(g, "user_id", None)
+
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    disconnect_instagram(uid)
+    return jsonify({"status": "disconnected"})
+
+@app.route("/connectors/instagram/sync")
+def instagram_sync_route():
+    uid = getattr(g, "user_id", None)
+
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='instagram'
+        LIMIT 1
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_instagram(uid, sync_type=sync_type))
+
+@app.route("/api/status/instagram")
+def instagram_status():
+    uid = getattr(g, "user_id", None)
+
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='instagram'
+        LIMIT 1
+    """, (uid,))
+    creds = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='instagram'
+        LIMIT 1
+    """, (uid,))
+    conn = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT ig_account_id
+        FROM instagram_connections
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    ig_row = fetchone_secure(cur)
+
+    con.close()
+
+    return jsonify({
+        "has_credentials": bool(creds),
+        "connected": bool(conn and conn["enabled"] == 1),
+        "ig_account_id": ig_row["ig_account_id"] if ig_row else None
+    })
+
+@app.route("/connectors/instagram/job/get")
+def instagram_job_get():
+
+    uid = getattr(g, "user_id", None)
+
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    try:
+        cur.execute("""
+            SELECT sync_type, schedule_time
+            FROM connector_jobs
+            WHERE uid=? AND source='instagram'
+        """, (uid,))
+
+        row = fetchone_secure(cur)
+    finally:
+        con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"]
+    })
+
+@app.route("/connectors/instagram/job/save", methods=["POST"])
+def instagram_job_save():
+
+    uid = getattr(g, "user_id", None)
+
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json()
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'instagram', ?, ?)
     """, (uid, sync_type, schedule_time))
 
     con.commit()

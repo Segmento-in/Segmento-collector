@@ -796,6 +796,48 @@ All page data is securely synchronized using OAuth authorization.
   ]
 },
 
+{
+  id:"instagram",
+  name:"Instagram",
+  category:"social",
+  logo:"/static/images/logos/instagram.png",
+
+  auth_type:"oauth",
+
+  connect_url:"http://localhost:4000/instagram/connect",
+  sync_url:"http://localhost:4000/connectors/instagram/sync",
+  dashboard:"/dashboard/instagram",
+
+  long_description:`
+Connect your Instagram Business account through Meta Graph API to sync
+media, captions, engagement counters, and publishing timestamps.
+OAuth access is scoped and securely stored.
+  `,
+
+  steps:[
+    {title:"Provide App Credentials",desc:"Enter Meta App ID and App Secret."},
+    {title:"Authorize Access",desc:"Grant Instagram and page scopes via OAuth."},
+    {title:"Initial Sync",desc:"Instagram media and engagement fields are fetched."}
+  ],
+
+  tables:[
+    "instagram_media",
+    "instagram_media_metrics"
+  ],
+
+  erd:"/static/images/erd/facebook_pages_erd.png",
+
+  description:"Collects Instagram business media and engagement metrics.",
+
+  data:[
+    "Media posts",
+    "Captions",
+    "Permalinks",
+    "Like counts",
+    "Comment counts"
+  ]
+},
+
 /* ================= META ADS ================= */
 {
   id:"facebook_ads",

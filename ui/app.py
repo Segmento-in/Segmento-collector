@@ -305,6 +305,77 @@ def github_save_app_proxy():
 
     return jsonify(r.json()), r.status_code
 
+# ================= INSTAGRAM ========================
+
+@app.route("/connectors/instagram")
+@require_login
+def instagram_page():
+    return render_template("connectors/instagram.html")
+
+@app.route("/connectors/instagram/connect")
+def instagram_connect():
+    return redirect("http://localhost:4000/instagram/connect")
+
+@app.route("/connectors/instagram/sync")
+def instagram_sync():
+
+    res = requests.get(
+        "http://localhost:4000/connectors/instagram/sync",
+        cookies=request.cookies
+    )
+
+    return jsonify(res.json())
+
+@app.route("/api/status/instagram")
+def instagram_status_proxy():
+
+    r = requests.get(
+        "http://localhost:4000/api/status/instagram",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
+
+@app.route("/connectors/instagram/job/get")
+def instagram_job_get_proxy():
+
+    r = requests.get(
+        "http://localhost:4000/connectors/instagram/job/get",
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
+
+@app.route("/connectors/instagram/job/save", methods=["POST"])
+def instagram_job_save_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/instagram/job/save",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json())
+
+@app.route("/connectors/instagram/save_app", methods=["POST"])
+def instagram_save_app_proxy():
+
+    r = requests.post(
+        "http://localhost:4000/connectors/instagram/save_app",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/instagram/disconnect")
+def instagram_disconnect():
+    requests.get(
+        "http://localhost:4000/connectors/instagram/disconnect",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return redirect("/connectors/instagram")
+
 # ================= REDDIT ========================
 
 @app.route("/connectors/reddit")
