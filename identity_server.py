@@ -69,6 +69,16 @@ from connectors.tiktok import (
     sync_tiktok,
     disconnect_tiktok
 )
+from connectors.taboola import (
+    connect_taboola,
+    sync_taboola,
+    disconnect_taboola,
+)
+from connectors.outbrain import (
+    connect_outbrain,
+    sync_outbrain,
+    disconnect_outbrain,
+)
 from connectors.x import (
     get_x_auth_url,
     handle_x_oauth_callback,
@@ -2563,6 +2573,152 @@ def init_db():
         raw_json TEXT,
         fetched_at TEXT,
         UNIQUE(uid, ad_id, stat_time_day)
+    )
+    """)
+
+    # ---------------- TABOOLA BACKSTAGE ----------------
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS taboola_connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT UNIQUE,
+        account_id TEXT,
+        access_token TEXT,
+        expires_at TEXT,
+        connected_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS taboola_campaign_reports (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        account_id TEXT,
+        dimension TEXT,
+        dimension_value TEXT,
+        campaign_id TEXT,
+        campaign_name TEXT,
+        impressions TEXT,
+        clicks TEXT,
+        ctr TEXT,
+        spent TEXT,
+        cpc TEXT,
+        cpm TEXT,
+        conversions TEXT,
+        conversion_rate TEXT,
+        roas TEXT,
+        date TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, account_id, dimension, dimension_value, campaign_id, date)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS taboola_ads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        account_id TEXT,
+        campaign_id TEXT,
+        campaign_name TEXT,
+        item_id TEXT,
+        item_name TEXT,
+        thumbnail_url TEXT,
+        url TEXT,
+        impressions TEXT,
+        clicks TEXT,
+        ctr TEXT,
+        cpc TEXT,
+        spent TEXT,
+        conversions TEXT,
+        date TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, account_id, campaign_id, item_id, date)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS taboola_publisher_revenue (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        account_id TEXT,
+        dimension TEXT,
+        dimension_value TEXT,
+        page_views TEXT,
+        page_views_with_ads_pct TEXT,
+        ad_revenue TEXT,
+        ad_rpm TEXT,
+        ad_cpc TEXT,
+        date TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, account_id, dimension, dimension_value, date)
+    )
+    """)
+
+    # ---------------- OUTBRAIN AMPLIFY ----------------
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS outbrain_connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT UNIQUE,
+        marketer_id TEXT,
+        access_token TEXT,
+        expires_at TEXT,
+        connected_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS outbrain_marketers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        marketer_id TEXT,
+        name TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, marketer_id)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS outbrain_campaign_reports (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        marketer_id TEXT,
+        campaign_id TEXT,
+        campaign_name TEXT,
+        breakdown TEXT,
+        impressions TEXT,
+        clicks TEXT,
+        ctr TEXT,
+        spend TEXT,
+        conversions TEXT,
+        date TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, marketer_id, campaign_id, breakdown, date)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS outbrain_ads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        marketer_id TEXT,
+        campaign_id TEXT,
+        promoted_link_id TEXT,
+        promoted_link_text TEXT,
+        impressions TEXT,
+        clicks TEXT,
+        ctr TEXT,
+        spend TEXT,
+        conversions TEXT,
+        date TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, marketer_id, campaign_id, promoted_link_id, date)
     )
     """)
 
@@ -8281,6 +8437,348 @@ def tiktok_job_save():
         INSERT OR REPLACE INTO connector_jobs
         (uid, source, sync_type, schedule_time)
         VALUES (?, 'tiktok', ?, ?)
+    """, (uid, sync_type, schedule_time))
+
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+# ---------------- TABOOLA BACKSTAGE ----------------
+
+@app.route("/connectors/taboola/save_app", methods=["POST"])
+def taboola_save_app():
+
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    client_id = data.get("client_id")
+    client_secret = data.get("client_secret")
+    account_id = data.get("account_id")
+
+    if not client_id or not client_secret or not account_id:
+        return jsonify({"error": "client_id, client_secret and account_id are required"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, client_id, client_secret, api_key, status, created_at)
+        VALUES (?, 'taboola', ?, ?, ?, 'configured', datetime('now'))
+    """, (
+        uid,
+        encrypt_value(client_id),
+        encrypt_value(client_secret),
+        encrypt_value(account_id)
+    ))
+    con.commit()
+    con.close()
+
+    ensure_connector_initialized(uid, "taboola")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/taboola/connect")
+def taboola_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+    result = connect_taboola(uid)
+    if result.get("status") != "success":
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@app.route("/connectors/taboola/disconnect")
+def taboola_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    disconnect_taboola(uid)
+    return jsonify({"status": "disconnected"})
+
+
+@app.route("/connectors/taboola/sync")
+def taboola_sync_route():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='taboola'
+        LIMIT 1
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_taboola(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/taboola")
+def taboola_status():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='taboola'
+        LIMIT 1
+    """, (uid,))
+    creds = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='taboola'
+        LIMIT 1
+    """, (uid,))
+    conn = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT account_id, expires_at
+        FROM taboola_connections
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    tb = fetchone_secure(cur)
+    con.close()
+
+    return jsonify({
+        "has_credentials": bool(creds),
+        "connected": bool(conn and conn["enabled"] == 1),
+        "account_id": tb["account_id"] if tb else None,
+        "expires_at": tb["expires_at"] if tb else None
+    })
+
+
+@app.route("/connectors/taboola/job/get")
+def taboola_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("""
+            SELECT sync_type, schedule_time
+            FROM connector_jobs
+            WHERE uid=? AND source='taboola'
+        """, (uid,))
+        row = fetchone_secure(cur)
+    finally:
+        con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"]
+    })
+
+
+@app.route("/connectors/taboola/job/save", methods=["POST"])
+def taboola_job_save():
+
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'taboola', ?, ?)
+    """, (uid, sync_type, schedule_time))
+
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+# ---------------- OUTBRAIN AMPLIFY ----------------
+
+@app.route("/connectors/outbrain/save_app", methods=["POST"])
+def outbrain_save_app():
+
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    username = data.get("username")
+    password = data.get("password")
+    marketer_id = data.get("marketer_id")
+
+    if not username or not password or not marketer_id:
+        return jsonify({"error": "username, password and marketer_id are required"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, client_id, client_secret, api_key, status, created_at)
+        VALUES (?, 'outbrain', ?, ?, ?, 'configured', datetime('now'))
+    """, (
+        uid,
+        encrypt_value(username),
+        encrypt_value(password),
+        encrypt_value(marketer_id)
+    ))
+    con.commit()
+    con.close()
+
+    ensure_connector_initialized(uid, "outbrain")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/outbrain/connect")
+def outbrain_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+    result = connect_outbrain(uid)
+    if result.get("status") != "success":
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@app.route("/connectors/outbrain/disconnect")
+def outbrain_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    disconnect_outbrain(uid)
+    return jsonify({"status": "disconnected"})
+
+
+@app.route("/connectors/outbrain/sync")
+def outbrain_sync_route():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='outbrain'
+        LIMIT 1
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_outbrain(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/outbrain")
+def outbrain_status():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='outbrain'
+        LIMIT 1
+    """, (uid,))
+    creds = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='outbrain'
+        LIMIT 1
+    """, (uid,))
+    conn = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT marketer_id, expires_at
+        FROM outbrain_connections
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    ob = fetchone_secure(cur)
+    con.close()
+
+    return jsonify({
+        "has_credentials": bool(creds),
+        "connected": bool(conn and conn["enabled"] == 1),
+        "marketer_id": ob["marketer_id"] if ob else None,
+        "expires_at": ob["expires_at"] if ob else None
+    })
+
+
+@app.route("/connectors/outbrain/job/get")
+def outbrain_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("""
+            SELECT sync_type, schedule_time
+            FROM connector_jobs
+            WHERE uid=? AND source='outbrain'
+        """, (uid,))
+        row = fetchone_secure(cur)
+    finally:
+        con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"]
+    })
+
+
+@app.route("/connectors/outbrain/job/save", methods=["POST"])
+def outbrain_job_save():
+
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'outbrain', ?, ?)
     """, (uid, sync_type, schedule_time))
 
     con.commit()

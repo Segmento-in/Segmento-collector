@@ -928,6 +928,90 @@ and integrated ad reports with secure OAuth token management.
 },
 
 {
+  id:"taboola",
+  name:"Taboola Backstage",
+  category:"ads",
+  logo:"/static/images/logos/taboola.png",
+
+  auth_type:"oauth",
+
+  connect_url:"http://localhost:4000/connectors/taboola/connect",
+  sync_url:"http://localhost:4000/connectors/taboola/sync",
+  dashboard:"/dashboard/taboola",
+
+  long_description:`
+Connect your Taboola Backstage API credentials to ingest campaign performance,
+top campaign content, and publisher revenue reports with token caching.
+  `,
+
+  steps:[
+    {title:"Provide API Credentials",desc:"Enter Taboola client ID, client secret and account ID."},
+    {title:"Validate Connection",desc:"Client credentials token is generated and allowed accounts are verified."},
+    {title:"Run Sync",desc:"Campaign, ad-level content and publisher revenue reports are ingested."}
+  ],
+
+  tables:[
+    "taboola_campaign_reports",
+    "taboola_ads",
+    "taboola_publisher_revenue"
+  ],
+
+  erd:"/static/images/logos/taboola.png",
+
+  description:"Collects Taboola campaign, content, and publisher revenue metrics.",
+
+  data:[
+    "Impressions and clicks",
+    "Spend, CPC, CPM, CTR",
+    "Conversions and ROAS",
+    "Top campaign content",
+    "Publisher revenue KPIs"
+  ]
+},
+
+{
+  id:"outbrain",
+  name:"Outbrain Amplify",
+  category:"ads",
+  logo:"/static/images/logos/outbrain.png",
+
+  auth_type:"oauth",
+
+  connect_url:"http://localhost:4000/connectors/outbrain/connect",
+  sync_url:"http://localhost:4000/connectors/outbrain/sync",
+  dashboard:"/dashboard/outbrain",
+
+  long_description:`
+Connect your Outbrain Amplify credentials to ingest marketer accounts,
+campaign reports, promoted content performance, and periodic campaign metrics.
+  `,
+
+  steps:[
+    {title:"Provide Credentials",desc:"Enter Outbrain username, password and default marketer ID."},
+    {title:"Validate Token",desc:"OB-TOKEN-V1 is generated and marketer access is validated."},
+    {title:"Run Sync",desc:"Campaign and promoted content reports are ingested."}
+  ],
+
+  tables:[
+    "outbrain_marketers",
+    "outbrain_campaign_reports",
+    "outbrain_ads"
+  ],
+
+  erd:"/static/images/logos/outbrain.png",
+
+  description:"Collects Outbrain marketers, campaigns and promoted content performance.",
+
+  data:[
+    "Marketer accounts",
+    "Campaign metrics",
+    "Promoted content metrics",
+    "Periodic breakdown metrics",
+    "Clicks, spend and conversions"
+  ]
+},
+
+{
   id:"x",
   name:"X (Twitter)",
   category:"social",

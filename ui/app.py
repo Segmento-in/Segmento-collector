@@ -437,6 +437,136 @@ def tiktok_disconnect():
     )
     return redirect("/connectors/tiktok")
 
+# ================= TABOOLA ========================
+
+@app.route("/connectors/taboola")
+@require_login
+def taboola_page():
+    return render_template("connectors/taboola.html")
+
+@app.route("/connectors/taboola/connect")
+def taboola_connect():
+    r = requests.get(
+        "http://localhost:4000/connectors/taboola/connect",
+        cookies=request.cookies
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/taboola/sync")
+def taboola_sync():
+    res = requests.get(
+        "http://localhost:4000/connectors/taboola/sync",
+        cookies=request.cookies
+    )
+    return jsonify(res.json())
+
+@app.route("/api/status/taboola")
+def taboola_status_proxy():
+    r = requests.get(
+        "http://localhost:4000/api/status/taboola",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/taboola/job/get")
+def taboola_job_get_proxy():
+    r = requests.get(
+        "http://localhost:4000/connectors/taboola/job/get",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/taboola/job/save", methods=["POST"])
+def taboola_job_save_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/taboola/job/save",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/taboola/save_app", methods=["POST"])
+def taboola_save_app_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/taboola/save_app",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/taboola/disconnect")
+def taboola_disconnect():
+    requests.get(
+        "http://localhost:4000/connectors/taboola/disconnect",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return redirect("/connectors/taboola")
+
+# ================= OUTBRAIN ========================
+
+@app.route("/connectors/outbrain")
+@require_login
+def outbrain_page():
+    return render_template("connectors/outbrain.html")
+
+@app.route("/connectors/outbrain/connect")
+def outbrain_connect():
+    r = requests.get(
+        "http://localhost:4000/connectors/outbrain/connect",
+        cookies=request.cookies
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/outbrain/sync")
+def outbrain_sync():
+    res = requests.get(
+        "http://localhost:4000/connectors/outbrain/sync",
+        cookies=request.cookies
+    )
+    return jsonify(res.json())
+
+@app.route("/api/status/outbrain")
+def outbrain_status_proxy():
+    r = requests.get(
+        "http://localhost:4000/api/status/outbrain",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/outbrain/job/get")
+def outbrain_job_get_proxy():
+    r = requests.get(
+        "http://localhost:4000/connectors/outbrain/job/get",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/outbrain/job/save", methods=["POST"])
+def outbrain_job_save_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/outbrain/job/save",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/outbrain/save_app", methods=["POST"])
+def outbrain_save_app_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/outbrain/save_app",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/outbrain/disconnect")
+def outbrain_disconnect():
+    requests.get(
+        "http://localhost:4000/connectors/outbrain/disconnect",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return redirect("/connectors/outbrain")
+
 # ================= X ========================
 
 @app.route("/connectors/x")
