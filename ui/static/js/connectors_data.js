@@ -1012,6 +1012,49 @@ campaign reports, promoted content performance, and periodic campaign metrics.
 },
 
 {
+  id:"similarweb",
+  name:"SimilarWeb",
+  category:"analytics",
+  logo:"/static/images/logos/similarweb.png",
+
+  auth_type:"api_key",
+
+  connect_url:"http://localhost:4000/connectors/similarweb/connect",
+  sync_url:"http://localhost:4000/connectors/similarweb/sync",
+  dashboard:"/dashboard/similarweb",
+
+  long_description:`
+Connect SimilarWeb using your API key to ingest website traffic and engagement,
+marketing channel shares, social traffic sources, and search keyword analytics.
+  `,
+
+  steps:[
+    {title:"Provide API Key",desc:"Enter SimilarWeb API key and domain."},
+    {title:"Validate Access",desc:"API key is validated against SimilarWeb endpoint."},
+    {title:"Run Sync",desc:"Domain overview, channels, referrals and keywords are ingested."}
+  ],
+
+  tables:[
+    "similarweb_domain_overview",
+    "similarweb_traffic_sources",
+    "similarweb_referrals",
+    "similarweb_search_keywords"
+  ],
+
+  erd:"/static/images/logos/similarweb.png",
+
+  description:"Collects SimilarWeb domain analytics and traffic source metrics.",
+
+  data:[
+    "Visits and engagement",
+    "Channel traffic shares",
+    "Social source shares",
+    "Search keywords",
+    "CPC and traffic share"
+  ]
+},
+
+{
   id:"x",
   name:"X (Twitter)",
   category:"social",

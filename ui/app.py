@@ -567,6 +567,71 @@ def outbrain_disconnect():
     )
     return redirect("/connectors/outbrain")
 
+# ================= SIMILARWEB ========================
+
+@app.route("/connectors/similarweb")
+@require_login
+def similarweb_page():
+    return render_template("connectors/similarweb.html")
+
+@app.route("/connectors/similarweb/connect")
+def similarweb_connect():
+    r = requests.get(
+        "http://localhost:4000/connectors/similarweb/connect",
+        cookies=request.cookies
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/similarweb/sync")
+def similarweb_sync():
+    res = requests.get(
+        "http://localhost:4000/connectors/similarweb/sync",
+        cookies=request.cookies
+    )
+    return jsonify(res.json())
+
+@app.route("/api/status/similarweb")
+def similarweb_status_proxy():
+    r = requests.get(
+        "http://localhost:4000/api/status/similarweb",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/similarweb/job/get")
+def similarweb_job_get_proxy():
+    r = requests.get(
+        "http://localhost:4000/connectors/similarweb/job/get",
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/similarweb/job/save", methods=["POST"])
+def similarweb_job_save_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/similarweb/job/save",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+    return jsonify(r.json())
+
+@app.route("/connectors/similarweb/save_app", methods=["POST"])
+def similarweb_save_app_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/similarweb/save_app",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/similarweb/disconnect")
+def similarweb_disconnect():
+    requests.get(
+        "http://localhost:4000/connectors/similarweb/disconnect",
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
+    return redirect("/connectors/similarweb")
+
 # ================= X ========================
 
 @app.route("/connectors/x")

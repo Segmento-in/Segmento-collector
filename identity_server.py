@@ -79,6 +79,11 @@ from connectors.outbrain import (
     sync_outbrain,
     disconnect_outbrain,
 )
+from connectors.similarweb import (
+    connect_similarweb,
+    sync_similarweb,
+    disconnect_similarweb,
+)
 from connectors.x import (
     get_x_auth_url,
     handle_x_oauth_callback,
@@ -2719,6 +2724,85 @@ def init_db():
         raw_json TEXT,
         fetched_at TEXT,
         UNIQUE(uid, marketer_id, campaign_id, promoted_link_id, date)
+    )
+    """)
+
+    # ---------------- SIMILARWEB ----------------
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS similarweb_connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT UNIQUE,
+        domain TEXT,
+        connected_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS similarweb_domain_overview (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        domain TEXT,
+        date TEXT,
+        visits TEXT,
+        desktop_share TEXT,
+        mobile_share TEXT,
+        pages_per_visit TEXT,
+        visit_duration TEXT,
+        bounce_rate TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, domain, date)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS similarweb_traffic_sources (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        domain TEXT,
+        date TEXT,
+        direct_share TEXT,
+        referral_share TEXT,
+        organic_search_share TEXT,
+        paid_search_share TEXT,
+        social_share TEXT,
+        mail_share TEXT,
+        display_share TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, domain, date)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS similarweb_referrals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        domain TEXT,
+        date TEXT,
+        referring_domain TEXT,
+        referral_share TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, domain, date, referring_domain)
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS similarweb_search_keywords (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        domain TEXT,
+        date TEXT,
+        keyword TEXT,
+        search_volume TEXT,
+        traffic_share TEXT,
+        cpc TEXT,
+        organic_vs_paid TEXT,
+        raw_json TEXT,
+        fetched_at TEXT,
+        UNIQUE(uid, domain, date, keyword)
     )
     """)
 
@@ -8779,6 +8863,174 @@ def outbrain_job_save():
         INSERT OR REPLACE INTO connector_jobs
         (uid, source, sync_type, schedule_time)
         VALUES (?, 'outbrain', ?, ?)
+    """, (uid, sync_type, schedule_time))
+
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+# ---------------- SIMILARWEB ----------------
+
+@app.route("/connectors/similarweb/save_app", methods=["POST"])
+def similarweb_save_app():
+
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    api_key = data.get("api_key")
+    domain = data.get("domain")
+
+    if not api_key or not domain:
+        return jsonify({"error": "api_key and domain are required"}), 400
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_configs
+        (uid, connector, api_key, scopes, status, created_at)
+        VALUES (?, 'similarweb', ?, ?, 'configured', datetime('now'))
+    """, (
+        uid,
+        encrypt_value(api_key),
+        encrypt_value(domain)
+    ))
+    con.commit()
+    con.close()
+
+    ensure_connector_initialized(uid, "similarweb")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/similarweb/connect")
+def similarweb_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+    result = connect_similarweb(uid)
+    if result.get("status") != "success":
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@app.route("/connectors/similarweb/disconnect")
+def similarweb_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    disconnect_similarweb(uid)
+    return jsonify({"status": "disconnected"})
+
+
+@app.route("/connectors/similarweb/sync")
+def similarweb_sync_route():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='similarweb'
+        LIMIT 1
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_similarweb(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/similarweb")
+def similarweb_status():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='similarweb'
+        LIMIT 1
+    """, (uid,))
+    creds = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='similarweb'
+        LIMIT 1
+    """, (uid,))
+    conn = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT domain
+        FROM similarweb_connections
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    sw = fetchone_secure(cur)
+    con.close()
+
+    return jsonify({
+        "has_credentials": bool(creds),
+        "connected": bool(conn and conn["enabled"] == 1),
+        "domain": sw["domain"] if sw else None
+    })
+
+
+@app.route("/connectors/similarweb/job/get")
+def similarweb_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("""
+            SELECT sync_type, schedule_time
+            FROM connector_jobs
+            WHERE uid=? AND source='similarweb'
+        """, (uid,))
+        row = fetchone_secure(cur)
+    finally:
+        con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"]
+    })
+
+
+@app.route("/connectors/similarweb/job/save", methods=["POST"])
+def similarweb_job_save():
+
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'similarweb', ?, ?)
     """, (uid, sync_type, schedule_time))
 
     con.commit()
