@@ -172,6 +172,62 @@ def proxy_post(path, **kwargs):
         **kwargs
     )
     
+# ================= SOCIAL INSIDER ========================
+
+@app.route("/connectors/socialinsider")
+@require_login
+def socialinsider_page():
+    return render_template("connectors/socialinsider.html")
+
+
+@app.route("/connectors/socialinsider/connect")
+@require_login
+def socialinsider_connect():
+    r = proxy_get("/connectors/socialinsider/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/socialinsider/sync")
+@require_login
+def socialinsider_sync():
+    r = proxy_get("/connectors/socialinsider/sync")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/socialinsider/status")
+@require_login
+def socialinsider_status_proxy():
+    r = proxy_get("/api/status/socialinsider")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/socialinsider/job/get")
+@require_login
+def socialinsider_job_get_proxy():
+    r = proxy_get("/connectors/socialinsider/job/get")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/socialinsider/job/save", methods=["POST"])
+@require_login
+def socialinsider_job_save_proxy():
+    r = proxy_post("/connectors/socialinsider/job/save", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/socialinsider/save_app", methods=["POST"])
+@require_login
+def socialinsider_save_app_proxy():
+    r = proxy_post("/connectors/socialinsider/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/socialinsider/disconnect")
+@require_login
+def socialinsider_disconnect():
+    r = proxy_get("/connectors/socialinsider/disconnect")
+    return jsonify(r.json()), r.status_code
+
 @app.route("/api/status/<source>")
 def generic_google_status(source):
 

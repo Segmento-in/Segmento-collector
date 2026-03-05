@@ -2042,14 +2042,8 @@ from Discourse communities.
   },
 
   // ================================================================
-  // CHARTBEAT CONNECTOR — connectors_data.js entry
+  // CHARTBEAT CONNECTOR
   // ================================================================
-  //
-  // Add this object into the CONNECTORS array in
-  // ui/static/js/connectors_data.js
-  //
-  // ================================================================
-
   {
     id: "chartbeat",
     name: "Chartbeat",
@@ -2091,6 +2085,46 @@ video engagement metrics directly into your data warehouse.
       "Author, section & device breakdowns",
       "Referrer type analytics",
       "Video plays, loads & play rate"
+    ]
+  },
+
+  {
+    id: "socialinsider",
+    name: "Social Insider",
+    categories: ["social", "analytics"],
+    logo: "https://www.socialinsider.io/favicon.ico",
+
+    auth_type: "api_key",
+
+    route: "/connectors/socialinsider",
+    connect_url: "http://localhost:4000/connectors/socialinsider/connect",
+    sync_url: "http://localhost:4000/connectors/socialinsider/sync",
+
+    long_description: `
+Connect Social Insider using your API Key to ingest social media posts, 
+engagement metrics, and detailed profile insights across various platforms 
+directly into your data warehouse.
+    `,
+
+    steps: [
+      { title: "Provide API Key", desc: "Enter your Social Insider API Key, platform, and handle." },
+      { title: "Validate Access", desc: "Validate access to the specified profile via Social Insider API." },
+      { title: "Run Sync", desc: "Social media posts and profile insights are ingested into your warehouse." }
+    ],
+
+    tables: [
+      "socialinsider_posts",
+      "socialinsider_profile_insights"
+    ],
+
+    description: "Fetches social media posts and profile insights across multiple platforms using Social Insider.",
+
+    data: [
+      "Post engagement & reach",
+      "Content type analytics",
+      "Follower growth & demographics",
+      "Industry benchmarks",
+      "Historical social data"
     ]
   },
 

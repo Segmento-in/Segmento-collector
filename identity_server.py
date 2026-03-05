@@ -101,6 +101,11 @@ from connectors.chartbeat import (
        sync_chartbeat,
        disconnect_chartbeat,
 )
+from connectors.socialinsider import (
+    connect_socialinsider,
+    sync_socialinsider,
+    disconnect_socialinsider,
+)
 # ---------------- CONFIG ----------------
 load_dotenv()
 
@@ -791,6 +796,53 @@ def init_db():
     access_role TEXT,
     raw_json TEXT,
     fetched_at TEXT
+    )
+    """)
+
+    # socialinsider
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS socialinsider_connections (
+        uid TEXT PRIMARY KEY,
+        api_key TEXT,
+        platform TEXT,
+        handle TEXT,
+        created_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS socialinsider_posts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        platform TEXT,
+        handle TEXT,
+        post_id TEXT,
+        publish_date TEXT,
+        content_type TEXT,
+        engagement INTEGER,
+        reach INTEGER,
+        impressions INTEGER,
+        saves INTEGER,
+        video_views INTEGER,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS socialinsider_profile_insights (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        platform TEXT,
+        handle TEXT,
+        follower_count INTEGER,
+        follower_growth INTEGER,
+        gender_distribution TEXT,
+        age_distribution TEXT,
+        geo_distribution TEXT,
+        industry TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
     )
     """)
 
@@ -14561,6 +14613,166 @@ def chartbeat_job_save():
         INSERT OR REPLACE INTO connector_jobs
         (uid, source, sync_type, schedule_time)
         VALUES (?, 'chartbeat', ?, ?)
+    """, (uid, sync_type, schedule_time))
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
+
+# -------- SOCIAL INSIDER --------
+
+@app.route("/connectors/socialinsider/save_app", methods=["POST"])
+def socialinsider_save_app():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data     = request.get_json() or {}
+    api_key  = data.get("api_key", "").strip()
+    platform = data.get("platform", "").strip()
+    handle   = data.get("handle", "").strip()
+
+    if not api_key or not platform or not handle:
+        return jsonify({"error": "api_key, platform, and handle are required"}), 400
+
+    from connectors.socialinsider import save_credentials
+    save_credentials(uid, api_key, platform, handle)
+
+    ensure_connector_initialized(uid, "socialinsider")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/socialinsider/connect")
+def socialinsider_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    result = connect_socialinsider(uid)
+    if result.get("status") != "success":
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@app.route("/connectors/socialinsider/disconnect")
+def socialinsider_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    disconnect_socialinsider(uid)
+    return jsonify({"status": "disconnected"})
+
+
+@app.route("/connectors/socialinsider/sync")
+def socialinsider_sync_route():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='socialinsider'
+        LIMIT 1
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_socialinsider(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/socialinsider")
+def socialinsider_status():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='socialinsider'
+        LIMIT 1
+    """, (uid,))
+    creds = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='socialinsider'
+        LIMIT 1
+    """, (uid,))
+    conn = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT platform, handle
+        FROM socialinsider_connections
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    si = fetchone_secure(cur)
+
+    con.close()
+
+    return jsonify({
+        "has_credentials": bool(creds),
+        "connected":       bool(conn and conn["enabled"] == 1),
+        "platform":        si["platform"] if si else None,
+        "handle":          si["handle"] if si else None,
+    })
+
+
+@app.route("/connectors/socialinsider/job/get")
+def socialinsider_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("""
+            SELECT sync_type, schedule_time
+            FROM connector_jobs
+            WHERE uid=? AND source='socialinsider'
+        """, (uid,))
+        row = fetchone_secure(cur)
+    finally:
+        con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists":        True,
+        "sync_type":     row["sync_type"],
+        "schedule_time": row["schedule_time"],
+    })
+
+
+@app.route("/connectors/socialinsider/job/save", methods=["POST"])
+def socialinsider_job_save():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data          = request.get_json() or {}
+    sync_type     = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'socialinsider', ?, ?)
     """, (uid, sync_type, schedule_time))
     con.commit()
     con.close()
