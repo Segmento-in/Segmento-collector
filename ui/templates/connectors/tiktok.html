@@ -420,13 +420,24 @@
                       </div>
                     </button>
 
-<button onclick="selectFormat('iceberg')" id="format-iceberg"
-class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
-<span class="font-bold">Iceberg</span>
-<div class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
-<div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
-</div>
-</button>
+                    <button onclick="selectFormat('iceberg')" id="format-iceberg"
+                      class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                      <span class="font-bold">Iceberg</span>
+                      <div
+                        class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                        <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                      </div>
+                    </button>
+
+                    <button onclick="selectFormat('hudi')" id="format-hudi"
+                      class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                      <span class="font-bold">Hudi</span>
+                      <div
+                        class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                        <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                      </div>
+                    </button>
+
 
                   </div>
                   <input type="hidden" id="dataFormat" value="parquet">
@@ -762,9 +773,9 @@ class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg
 
   function toggleDestFields(type) {
     const fields = document.getElementById("dbFields");
-    if(!type){
-        fields.classList.add("hidden");
-        return;
+    if (!type) {
+      fields.classList.add("hidden");
+      return;
     }
     fields.classList.remove("hidden");
 
@@ -777,17 +788,18 @@ class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg
 
     // New logic: Hide Iceberg for BigQuery only
     const icebergBtn = document.getElementById("format-iceberg");
+    const hudiBtn = document.getElementById("format-hudi");
     const currentFormat = document.getElementById('dataFormat').value;
     if (type === "bigquery") {
-        icebergBtn.classList.add("hidden");
-        // Fallback to Parquet if Iceberg was selected (prevents invalid format on save)
-        if (currentFormat === 'iceberg') {
-            selectFormat('parquet');
-        }
+      icebergBtn.classList.add("hidden");
+      // Fallback to Parquet if Iceberg was selected (prevents invalid format on save)
+      if (currentFormat === 'iceberg') {
+        selectFormat('parquet');
+      }
     } else {
-        icebergBtn.classList.remove("hidden");
+      icebergBtn.classList.remove("hidden");
     }
-}
+  }
 
 
   async function saveDestination() {

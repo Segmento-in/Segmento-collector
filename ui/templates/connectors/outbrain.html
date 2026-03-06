@@ -52,7 +52,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
             </svg>
-            <span>Token-based Amplify authentication ensures only permitted Outbrain data is accessible for ingestion.</span>
+            <span>Token-based Amplify authentication ensures only permitted Outbrain data is accessible for
+              ingestion.</span>
           </div>
         </div>
       </div>
@@ -418,13 +419,24 @@
                       </div>
                     </button>
 
-<button onclick="selectFormat('iceberg')" id="format-iceberg"
-class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
-<span class="font-bold">Iceberg</span>
-<div class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
-<div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
-</div>
-</button>
+                    <button onclick="selectFormat('iceberg')" id="format-iceberg"
+                      class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                      <span class="font-bold">Iceberg</span>
+                      <div
+                        class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                        <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                      </div>
+                    </button>
+
+                    <button onclick="selectFormat('hudi')" id="format-hudi"
+                      class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                      <span class="font-bold">Hudi</span>
+                      <div
+                        class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                        <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                      </div>
+                    </button>
+
 
                   </div>
                   <input type="hidden" id="dataFormat" value="parquet">
@@ -458,8 +470,10 @@ class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg
         <div class="grid grid-cols-1 gap-4">
           {% for table, columns in [
           ('outbrain_marketers', ['marketer_id', 'name']),
-          ('outbrain_campaign_reports', ['marketer_id', 'campaign_id', 'campaign_name', 'impressions', 'clicks', 'spend', 'conversions', 'date']),
-          ('outbrain_ads', ['marketer_id', 'campaign_id', 'promoted_link_id', 'promoted_link_text', 'impressions', 'clicks', 'spend', 'date'])
+          ('outbrain_campaign_reports', ['marketer_id', 'campaign_id', 'campaign_name', 'impressions', 'clicks',
+          'spend', 'conversions', 'date']),
+          ('outbrain_ads', ['marketer_id', 'campaign_id', 'promoted_link_id', 'promoted_link_text', 'impressions',
+          'clicks', 'spend', 'date'])
           ] %}
           <div
             class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-orange-400/30 transition-all group">
@@ -779,9 +793,9 @@ class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg
 
   function toggleDestFields(type) {
     const fields = document.getElementById("dbFields");
-    if(!type){
-        fields.classList.add("hidden");
-        return;
+    if (!type) {
+      fields.classList.add("hidden");
+      return;
     }
     fields.classList.remove("hidden");
 
@@ -794,17 +808,18 @@ class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg
 
     // New logic: Hide Iceberg for BigQuery only
     const icebergBtn = document.getElementById("format-iceberg");
+    const hudiBtn = document.getElementById("format-hudi");
     const currentFormat = document.getElementById('dataFormat').value;
     if (type === "bigquery") {
-        icebergBtn.classList.add("hidden");
-        // Fallback to Parquet if Iceberg was selected (prevents invalid format on save)
-        if (currentFormat === 'iceberg') {
-            selectFormat('parquet');
-        }
+      icebergBtn.classList.add("hidden");
+      // Fallback to Parquet if Iceberg was selected (prevents invalid format on save)
+      if (currentFormat === 'iceberg') {
+        selectFormat('parquet');
+      }
     } else {
-        icebergBtn.classList.remove("hidden");
+      icebergBtn.classList.remove("hidden");
     }
-}
+  }
 
   async function saveDestination() {
     const btn = document.getElementById("saveDestBtn");
@@ -923,6 +938,3 @@ class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg
 </script>
 
 {% endblock %}
-
-
-
