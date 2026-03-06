@@ -5210,6 +5210,63 @@ def activate_destination_proxy():
     )
 
     return jsonify(r.json()), r.status_code
+
+# ================= BIGQUERY DESTINATION ========================
+
+@app.route("/connectors/bigquery")
+@require_login
+def bigquery_page():
+    return render_template("connectors/bigquery.html")
+
+
+@app.route("/connectors/bigquery/connect")
+@require_login
+def bigquery_connect_proxy():
+    r = proxy_get("/connectors/bigquery/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bigquery/disconnect")
+@require_login
+def bigquery_disconnect_proxy():
+    r = proxy_get("/connectors/bigquery/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bigquery/sync")
+@require_login
+def bigquery_sync_proxy():
+    r = proxy_get("/connectors/bigquery/sync")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bigquery/status")
+@require_login
+def bigquery_status_proxy():
+    r = proxy_get("/api/status/bigquery")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bigquery/job/get")
+@require_login
+def bigquery_job_get_proxy():
+    r = proxy_get("/connectors/bigquery/job/get")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bigquery/job/save", methods=["POST"])
+@require_login
+def bigquery_job_save_proxy():
+    r = proxy_post("/connectors/bigquery/job/save", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bigquery/save_app", methods=["POST"])
+@require_login
+def bigquery_save_app_proxy():
+    r = proxy_post("/connectors/bigquery/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
 # ================= MAIN ==========================
 
 if __name__ == "__main__":

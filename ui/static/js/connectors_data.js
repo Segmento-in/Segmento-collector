@@ -665,6 +665,50 @@ and object-level information.
   },
 
   {
+    id: "bigquery",
+    name: "Google BigQuery",
+    categories: ["data_warehouse", "google"],
+    logo: "https://cdn.simpleicons.org/googlebigquery/4285F4",
+
+    auth_type: "service_account",
+
+    route: "/connectors/bigquery",
+    connect_url: "/connectors/bigquery/connect",
+    sync_url: "/connectors/bigquery/sync",
+    dashboard: "/dashboard/bigquery",
+
+    long_description: `
+Google BigQuery is the central destination warehouse for Segmento. It receives unified rows
+from all source connectors via the sync engine and stores them in per-source tables inside
+your configured dataset.
+    `,
+
+    steps: [
+      { title: "Provide Service Account", desc: "Paste your BigQuery service account JSON key." },
+      { title: "Validate Dataset", desc: "Segmento checks dataset access and metadata permissions." },
+      { title: "Start Warehouse Sync", desc: "Source connectors stream unified rows into BigQuery tables." }
+    ],
+
+    tables: [
+      "facebook_ads",
+      "github_repos",
+      "socialinsider_posts"
+    ],
+
+    erd: "/static/images/erd/gcs_erd.png",
+
+    description: "Primary analytics warehouse destination powered by BigQuery streaming and load jobs.",
+
+    data: [
+      "Per-source fact tables",
+      "Unified uid and source identifiers",
+      "Raw JSON payloads",
+      "Normalized metrics and attributes",
+      "Incremental sync timestamps"
+    ]
+  },
+
+  {
     id: "classroom",
     name: "Google Classroom",
     categories: ["google"],
