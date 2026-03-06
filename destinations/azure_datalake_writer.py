@@ -29,7 +29,7 @@ def push_azure_datalake(dest, source, rows):
     try:
         fs_client.create_file_system()
     except Exception:
-        pass  # already exists — safe to ignore
+        pass  # container already exists — safe to ignore
 
     df = pd.DataFrame(rows)
     for col in df.columns:
@@ -38,10 +38,11 @@ def push_azure_datalake(dest, source, rows):
 
     # ------------------------------------------------------------------ #
     # FILE CREATION                                                        #
-    # "iceberg" writes the exact same Parquet file as "parquet".          #
-    # The Iceberg layer is purely metadata — no external catalog calls.   #
+    # "iceberg" and "hudi" both write identical Parquet files.            #
+    # Table-format semantics live entirely in the lakehouse registry —    #
+    # no external catalog calls, no JVM dependency.                       #
     # ------------------------------------------------------------------ #
-    if fmt in ("parquet", "iceberg"):
+    if fmt in ("parquet", "iceberg", "hudi"):
 
         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".parquet")
         file_path = tmp.name
@@ -89,22 +90,34 @@ def push_azure_datalake(dest, source, rows):
     print(f"[ADLS] Uploaded {len(rows)} rows → adls://{file_system}/{adls_path}")
 
     # ------------------------------------------------------------------ #
-    # ICEBERG REGISTRATION (metadata only — no data written here)         #
+    # LAKEHOUSE REGISTRATION (metadata only — no data written here)       #
+    # Canonical ABFSS URI is what Spark / Trino / Dremio expect when they #
+    # later read the registry to discover the table location.             #
     # ------------------------------------------------------------------ #
-    if fmt == "iceberg":
-        from destinations.lakehouse_writer import register_iceberg_table
+    if fmt in ("iceberg", "hudi"):
 
-        # Canonical ABFSS URI understood by Spark / Trino / Dremio
         table_location = (
             f"abfss://{file_system}@{account_name}.dfs.core.windows.net"
-            f"/{base_path}/{source}" if base_path
-            else f"abfss://{file_system}@{account_name}.dfs.core.windows.net/{source}"
+            f"/{base_path}/{source}"
+            if base_path
+            else
+            f"abfss://{file_system}@{account_name}.dfs.core.windows.net/{source}"
         )
 
-        register_iceberg_table(
-            source=source,
-            storage_type="adls",
-            table_location=table_location,
-        )
+        if fmt == "iceberg":
+            from destinations.lakehouse_writer import register_iceberg_table
+            register_iceberg_table(
+                source=source,
+                storage_type="adls",
+                table_location=table_location,
+            )
+
+        else:  # hudi
+            from destinations.lakehouse_writer import register_hudi_table
+            register_hudi_table(
+                source=source,
+                storage_type="adls",
+                table_location=table_location,
+            )
 
     return len(rows)
