@@ -10,8 +10,6 @@ from destinations.redshift_writer import push_redshift
 from security.secure_db import decrypt_payload
 from flask import g, has_request_context
 
-from destinations.lakehouse_writer import push_iceberg
-
 import sqlite3
 import datetime
 
