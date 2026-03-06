@@ -39,10 +39,11 @@ def push_s3(dest, source, rows):
 
     # ------------------------------------------------------------------ #
     # FILE CREATION                                                        #
-    # "iceberg" writes the exact same Parquet file as "parquet".          #
-    # The Iceberg layer is purely metadata — no PyArrow S3FileSystem.     #
+    # "iceberg" and "hudi" both write identical Parquet files.            #
+    # Table-format semantics live entirely in the lakehouse registry —    #
+    # no PyArrow S3FileSystem, no Spark, no JVM dependency.               #
     # ------------------------------------------------------------------ #
-    if fmt in ("parquet", "iceberg"):
+    if fmt in ("parquet", "iceberg", "hudi"):
 
         tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".parquet")
         file_path = tmp.name
@@ -94,18 +95,24 @@ def push_s3(dest, source, rows):
 
     print(f"[S3] Uploaded {len(rows)} rows → s3://{bucket_name}/{key}")
 
-    # ------------------------------------------------------------------ #
-    # ICEBERG REGISTRATION (metadata only — no data written here)         #
-    # ------------------------------------------------------------------ #
-    if fmt == "iceberg":
-        from destinations.lakehouse_writer import register_iceberg_table
+    if fmt in ("iceberg", "hudi"):
 
         table_location = f"s3://{bucket_name}/{source}"
 
-        register_iceberg_table(
-            source=source,
-            storage_type="s3",
-            table_location=table_location,
-        )
+        if fmt == "iceberg":
+            from destinations.lakehouse_writer import register_iceberg_table
+            register_iceberg_table(
+                source=source,
+                storage_type="s3",
+                table_location=table_location,
+            )
+
+        else:  # hudi
+            from destinations.lakehouse_writer import register_hudi_table
+            register_hudi_table(
+                source=source,
+                storage_type="s3",
+                table_location=table_location,
+            )
 
     return len(rows)
