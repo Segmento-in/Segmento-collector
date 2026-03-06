@@ -786,21 +786,28 @@
     document.getElementById("databricksFields").classList.toggle("hidden", type !== "databricks");
     document.getElementById("formatField").classList.toggle("hidden", !(type === "bigquery" || type === "s3" || type === "azure_datalake"));
 
-    // New logic: Hide Iceberg for BigQuery only
+    // Format buttons
     const icebergBtn = document.getElementById("format-iceberg");
     const hudiBtn = document.getElementById("format-hudi");
-    const currentFormat = document.getElementById('dataFormat').value;
+    const currentFormat = document.getElementById("dataFormat").value;
+
     if (type === "bigquery") {
-      icebergBtn.classList.add("hidden");
-      // Fallback to Parquet if Iceberg was selected (prevents invalid format on save)
-      if (currentFormat === 'iceberg') {
-        selectFormat('parquet');
+
+      if (icebergBtn) icebergBtn.classList.add("hidden");
+      if (hudiBtn) hudiBtn.classList.add("hidden");
+
+      // Prevent invalid formats for BigQuery
+      if (currentFormat === "iceberg" || currentFormat === "hudi") {
+        selectFormat("parquet");
       }
+
     } else {
-      icebergBtn.classList.remove("hidden");
+
+      if (icebergBtn) icebergBtn.classList.remove("hidden");
+      if (hudiBtn) hudiBtn.classList.remove("hidden");
+
     }
   }
-
 
   async function saveDestination() {
     const btn = document.getElementById("saveDestBtn");
