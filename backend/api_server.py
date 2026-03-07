@@ -14978,7 +14978,8 @@ def socialinsider_job_save():
 
     return jsonify({"status": "job_saved"})
 
+init_db()
+seed_test_user()
+
 if __name__=="__main__":
-    init_db() # Ensure DB is initialized
-    seed_test_user()
     app.run(port=4000,debug=True,host="0.0.0.0",use_reloader=False)
