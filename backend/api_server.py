@@ -1,5 +1,6 @@
 import os
 os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
+
 import time
 from flask import send_from_directory
 from flask import Flask,request,redirect,make_response,jsonify,render_template_string
@@ -19,6 +20,21 @@ from backend.destinations.destination_router import push_to_destination
 # Google OAuth
 from dotenv import load_dotenv
 from google_auth_oauthlib.flow import Flow
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REAL_DB = os.path.join(PROJECT_ROOT, "identity.db")
+
+_original_sqlite_connect = sqlite3.connect
+
+def fixed_connect(db_path, *args, **kwargs):
+
+    if isinstance(db_path, str) and db_path.endswith("identity.db"):
+        db_path = REAL_DB
+
+    return _original_sqlite_connect(db_path, *args, **kwargs)
+
+sqlite3.connect = fixed_connect
+
 
 #credentials security
 from backend.security.secure_db import encrypt_payload
@@ -276,7 +292,8 @@ app.register_blueprint(auth)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-DB = "identity.db"
+# ✓ CHANGED: Use absolute path to root database, not relative "identity.db"
+DB = REAL_DB
 
 
 # ---------------- GOOGLE CONFIG ----------------
