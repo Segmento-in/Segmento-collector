@@ -2172,4 +2172,45 @@ directly into your data warehouse.
     ]
   },
 
+  {
+    id: "aws_rds",
+    name: "AWS RDS",
+    categories: ["cloud", "database"],
+    logo: "/static/images/logos/aws_rds.png",
+
+    auth_type: "credentials",
+
+    route: "/connectors/aws_rds",
+    connect_url: "/connectors/aws_rds/connect",
+    sync_url: "/connectors/aws_rds/sync",
+    dashboard: "/dashboard/aws_rds",
+
+    long_description: `
+Connect directly to your Amazon RDS or Aurora database instance.
+Segmento automatically discovers all tables, extracts rows in
+configurable batches, and streams the data into your destination
+warehouse. Supports MySQL, MariaDB, Aurora MySQL, PostgreSQL,
+and Aurora PostgreSQL engines.
+    `,
+
+    steps: [
+      { title: "Enter Credentials", desc: "Provide your RDS endpoint, engine, port, database name, username, and password." },
+      { title: "Validate Connection", desc: "Segmento opens a live connection and runs a lightweight ping against your instance." },
+      { title: "Account Linked",     desc: "All tables are discovered automatically and rows are synced to your warehouse." }
+    ],
+
+    tables: [
+      "aws_rds_sync (mirrors source tables dynamically)"
+    ],
+
+    description: "Extracts all tables from an Amazon RDS or Aurora instance and loads them into your warehouse.",
+
+    data: [
+      "All user tables (auto-discovered)",
+      "Full row extraction with batch pagination",
+      "MySQL, MariaDB, Aurora MySQL support",
+      "PostgreSQL, Aurora PostgreSQL support",
+      "Incremental and historical sync modes"
+    ]
+  },
 ];

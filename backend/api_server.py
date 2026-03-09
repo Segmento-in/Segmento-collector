@@ -127,6 +127,14 @@ from backend.connectors.socialinsider import (
     sync_socialinsider,
     disconnect_socialinsider,
 )
+
+from backend.connectors.aws_rds import (
+    connect_rds,
+    sync_rds,
+    disconnect_rds,
+    save_config as save_rds_config,
+)
+
 # ---------------- CONFIG ----------------
 load_dotenv()
 
@@ -14990,6 +14998,189 @@ def socialinsider_job_save():
         (uid, source, sync_type, schedule_time)
         VALUES (?, 'socialinsider', ?, ?)
     """, (uid, sync_type, schedule_time))
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
+# -------- AWS RDS --------
+
+@app.route("/connectors/aws_rds/save_app", methods=["POST"])
+def aws_rds_save_app():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+
+    engine   = data.get("engine", "").strip()
+    host     = data.get("host", "").strip()
+    port     = data.get("port")
+    database = data.get("database", "").strip()
+    username = data.get("username", "").strip()
+    password = data.get("password", "")
+
+    if not engine or not host or not port or not database or not username or not password:
+        return jsonify({"error": "All fields are required: engine, host, port, database, username, password"}), 400
+
+    try:
+        port = int(port)
+    except (TypeError, ValueError):
+        return jsonify({"error": "Port must be a valid integer"}), 400
+
+    save_rds_config(uid, engine, host, port, database, username, password)
+    ensure_connector_initialized(uid, "aws_rds")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/aws_rds/connect")
+def aws_rds_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    result = connect_rds(uid)
+    if result.get("status") != "success":
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@app.route("/connectors/aws_rds/disconnect")
+def aws_rds_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    disconnect_rds(uid)
+    return jsonify({"status": "disconnected"})
+
+
+@app.route("/connectors/aws_rds/sync")
+def aws_rds_sync_route():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='aws_rds'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_rds(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/aws_rds")
+def aws_rds_status():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute(
+        """
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='aws_rds'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+
+    cur.execute(
+        """
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='aws_rds'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+
+    # Decode config to surface engine/host in status response
+    engine = None
+    host   = None
+    if cfg_row and cfg_row.get("config_json"):
+        try:
+            cfg    = json.loads(cfg_row["config_json"])
+            engine = cfg.get("engine")
+            host   = cfg.get("host")
+        except Exception:
+            pass
+
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected":       bool(conn_row and conn_row["enabled"] == 1),
+        "engine":          engine,
+        "host":            host,
+    })
+
+
+@app.route("/connectors/aws_rds/job/get")
+def aws_rds_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute(
+            """
+            SELECT sync_type, schedule_time
+            FROM connector_jobs
+            WHERE uid=? AND source='aws_rds'
+            """,
+            (uid,),
+        )
+        row = fetchone_secure(cur)
+    finally:
+        con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists":        True,
+        "sync_type":     row["sync_type"],
+        "schedule_time": row["schedule_time"],
+    })
+
+
+@app.route("/connectors/aws_rds/job/save", methods=["POST"])
+def aws_rds_job_save():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data          = request.get_json() or {}
+    sync_type     = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'aws_rds', ?, ?)
+        """,
+        (uid, sync_type, schedule_time),
+    )
     con.commit()
     con.close()
 

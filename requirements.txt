@@ -36,3 +36,4 @@ databricks-sql-connector
 pyiceberg 
 s3fs 
 adlfs
+pymysql 
