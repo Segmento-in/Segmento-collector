@@ -36,8 +36,59 @@
   });
 </script>
 
+<section class="relative z-20 px-6 pt-2 md:px-10 md:pt-3">
+  <div class="max-w-7xl mx-auto flex justify-start">
+    <div class="relative ml-2 md:ml-3">
+      <button id="integrationDiscoveryButton" type="button"
+        class="inline-flex items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/78 px-4 py-3 text-left text-sm font-semibold text-slate-100 backdrop-blur-xl transition-all hover:border-cyan-400/40 hover:bg-slate-800/90 hover:text-white">
+        <span
+          class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 text-cyan-300">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M6 12h12m-9 8h6"></path>
+          </svg>
+        </span>
+        <span class="flex flex-col items-start">
+          <span class="text-[11px] uppercase tracking-[0.25em] text-slate-400">Explore Integrations</span>
+          <span>Filter sources and destinations</span>
+        </span>
+        <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+
+      <div id="integrationDiscoveryMenu"
+        class="absolute left-0 top-[calc(100%+0.75rem)] z-30 hidden w-[18rem] rounded-3xl border border-slate-700/60 bg-slate-950/95 p-3 text-left shadow-[0_25px_80px_rgba(2,6,23,0.75)] backdrop-blur-2xl">
+        <button type="button"
+          class="integration-discovery-option w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-900"
+          data-filter-key="available-sources">
+          <span class="block text-sm font-bold text-white">Available Sources</span>
+          <span class="mt-1 block text-xs text-slate-400">Browse the live source connector catalog.</span>
+        </button>
+        <button type="button"
+          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-900"
+          data-filter-key="available-destinations">
+          <span class="block text-sm font-bold text-white">Available Destinations</span>
+          <span class="mt-1 block text-xs text-slate-400">See active warehouse and storage targets.</span>
+        </button>
+        <button type="button"
+          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-900"
+          data-filter-key="upcoming-sources">
+          <span class="block text-sm font-bold text-white">Upcoming Sources</span>
+          <span class="mt-1 block text-xs text-slate-400">Preview integrations planned for future releases.</span>
+        </button>
+        <button type="button"
+          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-900"
+          data-filter-key="upcoming-destinations">
+          <span class="block text-sm font-bold text-white">Upcoming Destinations</span>
+          <span class="mt-1 block text-xs text-slate-400">Preview the next storage targets on the roadmap.</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Hero -->
-<section class="relative px-6 py-32 md:py-48 text-center overflow-hidden">
+<section class="relative px-6 pb-32 pt-24 md:pb-48 md:pt-28 text-center overflow-hidden">
   <div class="absolute inset-0 overflow-hidden -z-10">
     <div
       class="absolute inset-0 bg-[linear-gradient(to_right,#083344_1px,transparent_1px),linear-gradient(to_bottom,#083344_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]">
@@ -57,7 +108,7 @@
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
       </span>
-      44 connectors are in Live
+      52 connectors are in Live
     </div>
 
     <h1 data-aos="fade-up" class="text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-none">
@@ -88,6 +139,49 @@
     </div>
   </div>
 </section>
+
+<div id="integrationOverlay" class="fixed inset-x-0 top-28 bottom-6 z-40 hidden px-4 md:px-6">
+  <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" data-overlay-close="true"></div>
+  <div
+    class="integration-overlay-panel relative mx-auto flex h-full max-h-[calc(100vh-8.5rem)] w-full max-w-5xl min-h-0 flex-col overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-slate-900/95 shadow-[0_30px_100px_rgba(2,6,23,0.8)]">
+    <div
+      class="absolute inset-0 bg-[linear-gradient(to_right,#083344_1px,transparent_1px),linear-gradient(to_bottom,#083344_1px,transparent_1px)] bg-[size:40px_40px] opacity-25 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,#000_60%,transparent_100%)]">
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-500/10"></div>
+
+    <div class="relative z-10 flex items-start justify-between gap-4 border-b border-slate-800/80 px-5 py-4 md:px-7">
+      <div>
+        <div id="integrationOverlayEyebrow"
+          class="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-300">
+          Integration Discovery
+        </div>
+        <h2 id="integrationOverlayTitle" class="mt-3 text-2xl font-black tracking-tight text-white md:text-3xl"></h2>
+        <p id="integrationOverlayCount" class="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500"></p>
+        <p id="integrationOverlayDescription" class="mt-2 max-w-xl text-sm text-slate-400"></p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a id="integrationOverlayCatalogLink" href="/connectors"
+          class="hidden rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-300 transition-all hover:border-cyan-300 hover:bg-cyan-400 hover:text-slate-950">
+          Know more about sources
+        </a>
+        <button id="integrationOverlayClose" type="button"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-700/70 bg-slate-950/70 text-slate-300 transition-colors hover:border-cyan-400/40 hover:text-white"
+          aria-label="Close integrations overlay">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="relative z-10 flex-1 min-h-0 overflow-hidden px-5 py-5 md:px-7">
+      <div id="integrationOverlayGrid"
+        class="integration-overlay-grid h-full min-h-0 overflow-y-auto pr-1 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- What it does -->
 <section class="px-10 py-28 bg-slate-900 relative overflow-hidden">
@@ -258,6 +352,31 @@
 </section>
 
 <style>
+  .integration-overlay-panel {
+    backdrop-filter: blur(24px);
+  }
+
+  .integration-overlay-grid {
+    align-content: start;
+    scrollbar-gutter: stable;
+  }
+
+  .integration-icon-card {
+    min-height: 132px;
+    background: rgba(15, 23, 42, 0.78);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+  }
+
+  .integration-icon-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(34, 211, 238, 0.35);
+    box-shadow: 0 20px 50px -24px rgba(34, 211, 238, 0.45);
+  }
+
+  .integration-icon-card img {
+    filter: drop-shadow(0 10px 18px rgba(15, 23, 42, 0.35));
+  }
+
   @keyframes move {
     0% {
       left: -20%;
@@ -278,6 +397,158 @@
     }
   }
 </style>
+
+<script src="/static/js/connectors_data.js"></script>
+
+<script>
+  const AVAILABLE_DESTINATIONS = [
+    { id: "mysql", name: "MySQL", logo: "https://cdn.simpleicons.org/mysql/4479A1" },
+    { id: "postgres", name: "PostgreSQL", logo: "https://cdn.simpleicons.org/postgresql/4169E1" },
+    { id: "bigquery", name: "BigQuery", logo: "/static/images/logos/bigquery.png" },
+    { id: "snowflake", name: "Snowflake", logo: "https://cdn.simpleicons.org/snowflake/29B5E8" },
+    { id: "clickhouse", name: "ClickHouse", logo: "https://cdn.simpleicons.org/clickhouse/FFCC01" },
+    { id: "s3", name: "Amazon S3", logo: "/static/images/logos/s3.png" },
+    { id: "azure_datalake", name: "Azure Data Lake", logo: "/static/images/logos/adls.png" },
+    { id: "databricks", name: "Databricks", logo: "https://cdn.simpleicons.org/databricks/FF3621" },
+    { id: "redshift", name: "Amazon Redshift", logo: "/static/images/logos/redshift.png" }
+  ];
+
+  const UPCOMING_SOURCES = [
+    { id: "hubspot", name: "HubSpot", logo: "https://cdn.simpleicons.org/hubspot/FF7A59" },
+    { id: "salesforce", name: "Salesforce", logo: "https://cdn.simpleicons.org/salesforce/00A1E0" },
+    { id: "shopify", name: "Shopify", logo: "https://cdn.simpleicons.org/shopify/7AB55C" },
+    { id: "slack", name: "Slack", logo: "https://cdn.simpleicons.org/slack/4A154B" },
+    { id: "stripe", name: "Stripe", logo: "https://cdn.simpleicons.org/stripe/635BFF" },
+    { id: "airtable", name: "Airtable", logo: "https://cdn.simpleicons.org/airtable/18BFFF" },
+    { id: "notion", name: "Notion", logo: "https://cdn.simpleicons.org/notion/FFFFFF" },
+    { id: "zendesk", name: "Zendesk", logo: "https://cdn.simpleicons.org/zendesk/03363D" }
+  ];
+
+  const UPCOMING_DESTINATIONS = [
+    { id: "mongodb", name: "MongoDB", logo: "https://cdn.simpleicons.org/mongodb/47A248" },
+    { id: "elasticsearch", name: "Elasticsearch", logo: "https://cdn.simpleicons.org/elasticsearch/005571" },
+    { id: "kafka", name: "Apache Kafka", logo: "https://cdn.simpleicons.org/apachekafka/FFFFFF" },
+    { id: "duckdb", name: "DuckDB", logo: "https://cdn.simpleicons.org/duckdb/FFF000" },
+    { id: "adls-gen2", name: "Azure Synapse", logo: "https://cdn.simpleicons.org/microsoftazure/0078D4" },
+    { id: "gcs-destination", name: "Google Cloud Storage", logo: "/static/images/logos/gcs.png" }
+  ];
+
+  const INTEGRATION_FILTERS = {
+    "available-sources": {
+      title: "Available Sources",
+      description: "Live source integrations currently discoverable in Segmento Collector.",
+      items: () => (typeof CONNECTORS !== "undefined" ? CONNECTORS : []),
+      showCatalogLink: true
+    },
+    "available-destinations": {
+      title: "Available Destinations",
+      description: "Active destination writers supported by the current sync engine.",
+      items: () => AVAILABLE_DESTINATIONS,
+      showCatalogLink: false
+    },
+    "upcoming-sources": {
+      title: "Upcoming Sources",
+      description: "Planned source integrations reserved for future releases and onboarding flows.",
+      items: () => UPCOMING_SOURCES,
+      showCatalogLink: false
+    },
+    "upcoming-destinations": {
+      title: "Upcoming Destinations",
+      description: "Future storage and delivery destinations under evaluation for the platform roadmap.",
+      items: () => UPCOMING_DESTINATIONS,
+      showCatalogLink: false
+    }
+  };
+
+  const integrationDiscoveryButton = document.getElementById("integrationDiscoveryButton");
+  const integrationDiscoveryMenu = document.getElementById("integrationDiscoveryMenu");
+  const integrationOverlay = document.getElementById("integrationOverlay");
+  const integrationOverlayClose = document.getElementById("integrationOverlayClose");
+  const integrationOverlayTitle = document.getElementById("integrationOverlayTitle");
+  const integrationOverlayCount = document.getElementById("integrationOverlayCount");
+  const integrationOverlayDescription = document.getElementById("integrationOverlayDescription");
+  const integrationOverlayGrid = document.getElementById("integrationOverlayGrid");
+  const integrationOverlayCatalogLink = document.getElementById("integrationOverlayCatalogLink");
+
+  function renderIntegrationCards(items) {
+    const fragment = document.createDocumentFragment();
+    integrationOverlayGrid.innerHTML = "";
+
+    items.forEach((item) => {
+      const card = document.createElement("div");
+      card.className = "integration-icon-card group rounded-[1.5rem] border border-slate-800/80 p-4 transition-all duration-300";
+      card.innerHTML = `
+        <div class="flex h-full flex-col items-center justify-center text-center">
+          <div class="flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-slate-700/70 bg-slate-950/80 p-3 shadow-inner shadow-slate-950/40">
+            <img src="${item.logo}" alt="${item.name}" class="h-8 w-8 object-contain" loading="lazy">
+          </div>
+          <h3 class="mt-4 text-sm font-black tracking-tight text-white sm:text-base">${item.name}</h3>
+        </div>
+      `;
+      fragment.appendChild(card);
+    });
+
+    integrationOverlayGrid.appendChild(fragment);
+  }
+
+  function closeIntegrationDiscoveryMenu() {
+    integrationDiscoveryMenu.classList.add("hidden");
+  }
+
+  function openIntegrationOverlay(filterKey) {
+    const config = INTEGRATION_FILTERS[filterKey];
+    if (!config) {
+      return;
+    }
+
+    const items = [...config.items()];
+    integrationOverlayTitle.textContent = config.title;
+    integrationOverlayCount.textContent = `${items.length} integrations`;
+    integrationOverlayDescription.textContent = config.description;
+    integrationOverlayCatalogLink.classList.toggle("hidden", !config.showCatalogLink);
+    renderIntegrationCards(items);
+
+    integrationOverlay.classList.remove("hidden");
+    document.body.classList.add("overflow-hidden");
+    closeIntegrationDiscoveryMenu();
+  }
+
+  function closeIntegrationOverlay() {
+    integrationOverlay.classList.add("hidden");
+    document.body.classList.remove("overflow-hidden");
+  }
+
+  integrationDiscoveryButton.addEventListener("click", () => {
+    integrationDiscoveryMenu.classList.toggle("hidden");
+  });
+
+  document.querySelectorAll(".integration-discovery-option").forEach((button) => {
+    button.addEventListener("click", () => {
+      openIntegrationOverlay(button.dataset.filterKey);
+    });
+  });
+
+  integrationOverlayClose.addEventListener("click", closeIntegrationOverlay);
+
+  integrationOverlay.addEventListener("click", (event) => {
+    if (event.target instanceof HTMLElement && event.target.dataset.overlayClose === "true") {
+      closeIntegrationOverlay();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!integrationDiscoveryMenu.contains(event.target) && !integrationDiscoveryButton.contains(event.target)) {
+      closeIntegrationDiscoveryMenu();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeIntegrationDiscoveryMenu();
+      closeIntegrationOverlay();
+    }
+  });
+</script>
 
 <!--CAPABILITIES-->
 <section class="px-6 py-28 relative overflow-hidden bg-slate-900">
