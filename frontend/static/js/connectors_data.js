@@ -2196,7 +2196,7 @@ and Aurora PostgreSQL engines.
     steps: [
       { title: "Enter Credentials", desc: "Provide your RDS endpoint, engine, port, database name, username, and password." },
       { title: "Validate Connection", desc: "Segmento opens a live connection and runs a lightweight ping against your instance." },
-      { title: "Account Linked",     desc: "All tables are discovered automatically and rows are synced to your warehouse." }
+      { title: "Account Linked", desc: "All tables are discovered automatically and rows are synced to your warehouse." }
     ],
 
     tables: [
@@ -2210,6 +2210,48 @@ and Aurora PostgreSQL engines.
       "Full row extraction with batch pagination",
       "MySQL, MariaDB, Aurora MySQL support",
       "PostgreSQL, Aurora PostgreSQL support",
+      "Incremental and historical sync modes"
+    ]
+  },
+
+  {
+    id: "dynamodb",
+    name: "AWS DynamoDB",
+    categories: ["cloud", "database"],
+    logo: "/static/images/logos/dynamodb.png",
+
+    auth_type: "credentials",
+
+    route: "/connectors/dynamodb",
+    connect_url: "/connectors/dynamodb/connect",
+    sync_url: "/connectors/dynamodb/sync",
+    dashboard: "/dashboard/dynamodb",
+
+    long_description: `
+Connect directly to Amazon DynamoDB using AWS credentials and a target region.
+Segmento lists all tables in the region, scans items page by page, converts
+each record into normalized JSON, and streams both table metadata and item
+data into your configured warehouse destination.
+    `,
+
+    steps: [
+      { title: "Enter Credentials", desc: "Provide your AWS Access Key, AWS Secret Key, and region." },
+      { title: "Validate Access", desc: "Segmento verifies DynamoDB access by listing tables in the selected region." },
+      { title: "Run Sync", desc: "Table metadata and scanned item payloads are pushed into your warehouse." }
+    ],
+
+    tables: [
+      "dynamodb_tables",
+      "dynamodb_data"
+    ],
+
+    description: "Scans DynamoDB tables and items from a selected AWS region and loads them into your warehouse.",
+
+    data: [
+      "DynamoDB table metadata",
+      "Scanned table items with pagination",
+      "Primary-key based record identifiers",
+      "Normalized JSON payloads",
       "Incremental and historical sync modes"
     ]
   },
