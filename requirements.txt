@@ -37,3 +37,4 @@ pyiceberg
 s3fs 
 adlfs
 pymysql 
+boto3
