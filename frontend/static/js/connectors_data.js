@@ -1,6 +1,84 @@
 const CONNECTORS = [
 
   {
+    id: "notion",
+    name: "Notion",
+    categories: ["productivity", "documentation"],
+    logo: "/static/images/logos/notion.png",
+
+    auth_type: "api_key",
+    api_key_label: "Notion Integration Token",
+
+    connect_url: "/connectors/notion/connect",
+    sync_url: "/connectors/notion/sync",
+    disconnect_url: "/connectors/notion/disconnect",
+    status_api: "/api/status/notion",
+    save_app_url: "/connectors/notion/save_app",
+
+    models: [
+      { title: "Pages", desc: "Shared Notion pages and page metadata." },
+      { title: "Databases", desc: "Database containers and schema payloads." },
+      { title: "Blocks", desc: "Child blocks discovered under synced parents." }
+    ],
+
+    tables: [
+      "notion_pages",
+      "notion_databases",
+      "notion_blocks"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts Notion pages, databases, and blocks through an integration token.",
+
+    data: [
+      "Page content",
+      "Database entries",
+      "Block hierarchies",
+      "Timestamps",
+      "Object metadata"
+    ]
+  },
+
+  {
+    id: "airtable",
+    name: "Airtable",
+    categories: ["productivity", "database"],
+    logo: "/static/images/logos/airtable.png",
+
+    auth_type: "api_key",
+    api_key_label: "Airtable Personal Access Token",
+
+    connect_url: "/connectors/airtable/connect",
+    sync_url: "/connectors/airtable/sync",
+    disconnect_url: "/connectors/airtable/disconnect",
+    status_api: "/api/status/airtable",
+    save_app_url: "/connectors/airtable/save_app",
+
+    models: [
+      { title: "Tables", desc: "Base table metadata and schema details." },
+      { title: "Records", desc: "Rows extracted from the configured Airtable table." }
+    ],
+
+    tables: [
+      "airtable_tables",
+      "airtable_records"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts Airtable base metadata and table records through a personal access token.",
+
+    data: [
+      "Base tables",
+      "Table records",
+      "Field payloads",
+      "Created timestamps",
+      "Object metadata"
+    ]
+  },
+
+  {
     id: "slack",
     name: "Slack",
     categories: ["communication"],

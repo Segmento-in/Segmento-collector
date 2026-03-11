@@ -668,6 +668,58 @@ def linkedin_disconnect():
     connector_disconnect("linkedin")
     return redirect("/connectors/linkedin")
 
+# ================= SLACK ========================
+
+@app.route("/connectors/slack")
+@require_login
+def slack_page():
+    return render_template("connectors/slack.html")
+
+@app.route("/connectors/slack/connect")
+def slack_connect():
+    r = proxy_get("/connectors/slack/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/slack/sync")
+def slack_sync():
+    return jsonify(connector_sync("slack").json())
+
+@app.route("/api/status/slack")
+def slack_status_proxy():
+    return jsonify(connector_status("slack").json())
+
+@app.route("/connectors/slack/job/get")
+def slack_job_get_proxy():
+
+    r = connector_job_get("slack")
+
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({
+            "error": "invalid_response",
+            "status_code": r.status_code,
+            "body": r.text[:300]
+        }), r.status_code
+        
+@app.route("/connectors/slack/job/save", methods=["POST"])
+def slack_job_save_proxy():
+    return jsonify(connector_job_save("slack").json())
+
+@app.route("/connectors/slack/save_app", methods=["POST"])
+def slack_save_app_proxy():
+    r = requests.post(
+        "http://localhost:4000/connectors/slack/save_app",
+        json=request.get_json(),
+        cookies=request.cookies
+    )
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/slack/disconnect")
+def slack_disconnect():
+    connector_disconnect("slack")
+    return redirect("/connectors/slack")
+
 # ================= WHATSAPP ========================
 
 @app.route("/connectors/whatsapp")
@@ -4953,6 +5005,65 @@ def chartbeat_job_save_proxy():
     r = connector_job_save("chartbeat")
     return jsonify(r.json()), r.status_code
 
+# ================= STRIPE =================
+
+@app.route("/connectors/stripe")
+@require_login
+def stripe_page():
+    return render_template("connectors/stripe.html")
+
+
+@app.route("/connectors/stripe/save_app", methods=["POST"])
+@require_login
+def stripe_save_app_proxy():
+    r = proxy_post("/connectors/stripe/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/stripe/connect")
+@require_login
+def stripe_connect_proxy():
+    r = proxy_get("/connectors/stripe/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/stripe/disconnect")
+@require_login
+def stripe_disconnect_proxy():
+    r = connector_disconnect("stripe")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/stripe/sync")
+@require_login
+def stripe_sync_proxy():
+    r = connector_sync("stripe")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/stripe/status")
+@require_login
+def stripe_status_proxy():
+    r = connector_status("stripe")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/stripe/job/get")
+@require_login
+def stripe_job_get_proxy():
+    r = connector_job_get("stripe")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/stripe/job/save", methods=["POST"])
+@require_login
+def stripe_job_save_proxy():
+    r = connector_job_save("stripe")
+    return jsonify(r.json()), r.status_code
+
 # ================= DESTINATION =================
 
 @app.route("/destination/save", methods=["POST"])
@@ -5156,6 +5267,126 @@ def dynamodb_job_get_proxy():
 def dynamodb_job_save_proxy():
     r = connector_job_save("dynamodb")
     return jsonify(r.json()), r.status_code
+
+# ================= NOTION ========================
+
+@app.route("/connectors/notion")
+@require_login
+def notion_page():
+    return render_template("connectors/notion.html")
+
+
+@app.route("/connectors/notion/connect")
+@require_login
+def notion_connect():
+    r = proxy_get("/connectors/notion/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/notion/sync")
+@require_login
+def notion_sync():
+    r = connector_sync("notion")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/notion")
+@require_login
+def notion_status_proxy():
+    r = connector_status("notion")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/notion/job/get")
+@require_login
+def notion_job_get_proxy():
+    r = connector_job_get("notion")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/notion/job/save", methods=["POST"])
+@require_login
+def notion_job_save_proxy():
+    r = connector_job_save("notion")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/notion/save_app", methods=["POST"])
+@require_login
+def notion_save_app_proxy():
+    r = proxy_post("/connectors/notion/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/notion/disconnect")
+@require_login
+def notion_disconnect():
+    r = connector_disconnect("notion")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= AIRTABLE ========================
+
+@app.route("/connectors/airtable")
+@require_login
+def airtable_page():
+    return render_template("connectors/airtable.html")
+
+
+@app.route("/connectors/airtable/connect")
+@require_login
+def airtable_connect_proxy():
+    r = proxy_get("/connectors/airtable/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/airtable/sync")
+@require_login
+def airtable_sync_proxy():
+    r = connector_sync("airtable")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/airtable")
+@require_login
+def airtable_status_proxy():
+    r = connector_status("airtable")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/airtable/job/get")
+@require_login
+def airtable_job_get_proxy():
+    r = connector_job_get("airtable")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/airtable/job/save", methods=["POST"])
+@require_login
+def airtable_job_save_proxy():
+    r = connector_job_save("airtable")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/airtable/save_app", methods=["POST"])
+@require_login
+def airtable_save_app_proxy():
+    r = proxy_post("/connectors/airtable/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/airtable/disconnect")
+@require_login
+def airtable_disconnect_proxy():
+    r = connector_disconnect("airtable")
+    return jsonify(r.json()), r.status_code
+
 
 # ================= MAIN ==========================
 
