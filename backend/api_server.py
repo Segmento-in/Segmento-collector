@@ -122,6 +122,12 @@ from backend.connectors.chartbeat import (
        sync_chartbeat,
        disconnect_chartbeat,
 )
+from backend.connectors.stripe import (
+    save_credentials as save_stripe_credentials,
+    connect_stripe,
+    sync_stripe,
+    disconnect_stripe,
+)
 from backend.connectors.socialinsider import (
     connect_socialinsider,
     sync_socialinsider,
@@ -139,6 +145,24 @@ from backend.connectors.dynamodb import (
     sync_dynamodb,
     disconnect_dynamodb,
     save_config as save_dynamodb_config,
+)
+from backend.connectors.slack import (
+    connect_slack,
+    sync_slack,
+    disconnect_slack,
+    save_config as save_slack_config,
+)
+from backend.connectors.notion import (
+    connect_notion,
+    sync_notion,
+    disconnect_notion,
+    save_config as save_notion_config,
+)
+from backend.connectors.airtable import (
+    connect_airtable,
+    sync_airtable,
+    disconnect_airtable,
+    save_config as save_airtable_config,
 )
 
 # ---------------- CONFIG ----------------
@@ -843,6 +867,51 @@ def init_db():
         platform TEXT,
         handle TEXT,
         created_at TEXT
+    )
+    """)
+
+    # slack
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS slack_channels (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        channel_id TEXT,
+        name TEXT,
+        is_private INTEGER,
+        is_archived INTEGER,
+        member_count INTEGER,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+    
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS slack_users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        user_id TEXT,
+        name TEXT,
+        real_name TEXT,
+        is_bot INTEGER,
+        deleted INTEGER,
+        raw_json TEXT,
+        fetched_at TEXT
+    )
+    """)
+    
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS slack_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT,
+        message_id TEXT,
+        channel_id TEXT,
+        user_id TEXT,
+        ts TEXT,
+        text TEXT,
+        type TEXT,
+        subtype TEXT,
+        raw_json TEXT,
+        fetched_at TEXT
     )
     """)
 
@@ -3133,6 +3202,16 @@ def init_db():
         id           INTEGER PRIMARY KEY AUTOINCREMENT,
         uid          TEXT UNIQUE,
         host         TEXT,
+        connected_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS stripe_connections (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid          TEXT UNIQUE,
+        account_id   TEXT,
+        display_name TEXT,
         connected_at TEXT
     )
     """)
@@ -14053,7 +14132,6 @@ def universal_job_get(source):
                enabled
         FROM connector_jobs
         WHERE uid=? AND source=?
-        ORDER BY id DESC
         LIMIT 1
     """, (uid, source))
 
@@ -14850,6 +14928,305 @@ def chartbeat_job_save():
     return jsonify({"status": "job_saved"})
 
 
+# -------- SLACK --------
+
+@app.route("/connectors/slack/save_app", methods=["POST"])
+def api_slack_save_config():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.json or {}
+    bot_token = data.get("bot_token")
+
+    if not bot_token:
+        return jsonify({"error": "Missing bot token"}), 400
+
+    save_slack_config(uid, bot_token)
+    ensure_connector_initialized(uid, "slack")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/slack/connect")
+def api_slack_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    result = connect_slack(uid)
+    if result.get("status") != "success":
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@app.route("/connectors/slack/sync")
+def api_slack_sync():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='slack'
+        LIMIT 1
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "incremental"
+    return jsonify(sync_slack(uid, sync_type=sync_type))
+
+
+@app.route("/connectors/slack/disconnect")
+def api_slack_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+    return jsonify(disconnect_slack(uid))
+
+@app.route("/api/status/slack")
+def slack_status():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='slack'
+        LIMIT 1
+    """, (uid,))
+    creds = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='slack'
+        LIMIT 1
+    """, (uid,))
+    conn = fetchone_secure(cur)
+
+    con.close()
+
+    return jsonify({
+        "has_credentials": bool(creds),
+        "connected": bool(conn and conn["enabled"] == 1)
+    })
+
+@app.route("/connectors/slack/job/get")
+def slack_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT sync_type, schedule_time
+        FROM connector_jobs
+        WHERE uid=? AND source='slack'
+    """, (uid,))
+
+    row = fetchone_secure(cur)
+    con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"],
+    })
+
+@app.route("/connectors/slack/job/save", methods=["POST"])
+def slack_job_save():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'slack', ?, ?)
+    """, (uid, sync_type, schedule_time))
+
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
+# -------- STRIPE --------
+
+@app.route("/connectors/stripe/save_app", methods=["POST"])
+def stripe_save_app():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    secret_key = (data.get("secret_key") or "").strip()
+
+    if not secret_key:
+        return jsonify({"error": "secret_key is required"}), 400
+
+    save_stripe_credentials(uid, secret_key)
+    ensure_connector_initialized(uid, "stripe")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/stripe/connect")
+def stripe_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    result = connect_stripe(uid)
+    if result.get("status") != "success":
+        return jsonify(result), 400
+    return jsonify(result)
+
+
+@app.route("/connectors/stripe/disconnect")
+def stripe_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    disconnect_stripe(uid)
+    return jsonify({"status": "disconnected"})
+
+
+@app.route("/connectors/stripe/sync")
+def stripe_sync_route():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='stripe'
+        LIMIT 1
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_stripe(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/stripe")
+def stripe_status():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='stripe'
+        LIMIT 1
+    """, (uid,))
+    creds = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='stripe'
+        LIMIT 1
+    """, (uid,))
+    conn = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT account_id, display_name
+        FROM stripe_connections
+        WHERE uid=?
+        LIMIT 1
+    """, (uid,))
+    stripe_conn = fetchone_secure(cur)
+
+    con.close()
+
+    return jsonify({
+        "has_credentials": bool(creds),
+        "connected": bool(conn and conn["enabled"] == 1),
+        "account_id": stripe_conn["account_id"] if stripe_conn else None,
+        "display_name": stripe_conn["display_name"] if stripe_conn else None,
+    })
+
+
+@app.route("/connectors/stripe/job/get")
+def stripe_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("""
+            SELECT sync_type, schedule_time
+            FROM connector_jobs
+            WHERE uid=? AND source='stripe'
+        """, (uid,))
+        row = fetchone_secure(cur)
+    finally:
+        con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"],
+    })
+
+
+@app.route("/connectors/stripe/job/save", methods=["POST"])
+def stripe_job_save():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'stripe', ?, ?)
+    """, (uid, sync_type, schedule_time))
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
+
 # -------- SOCIAL INSIDER --------
 
 @app.route("/connectors/socialinsider/save_app", methods=["POST"])
@@ -15366,6 +15743,352 @@ def dynamodb_job_save():
     con.close()
 
     return jsonify({"status": "job_saved"})
+
+# ================= NOTION ========================
+
+@app.route("/connectors/notion/save_app", methods=["POST"])
+def _notion_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json() or {}
+    access_token = (data.get("access_token") or "").strip()
+
+    if not access_token:
+        return jsonify({"error": "missing token"}), 400
+
+    save_notion_config(uid, access_token)
+    ensure_connector_initialized(uid, "notion")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/notion/connect")
+def _notion_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_notion(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+
+
+@app.route("/connectors/notion/disconnect")
+def _notion_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = disconnect_notion(uid)
+    return jsonify(res)
+
+
+@app.route("/connectors/notion/sync")
+def _notion_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='notion'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_notion(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/notion")
+def _notion_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='notion'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+
+    cur.execute(
+        """
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='notion'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+
+    access_token = None
+    if cfg_row and cfg_row.get("config_json"):
+        try:
+            cfg = json.loads(cfg_row["config_json"])
+            raw_token = cfg.get("access_token")
+            if raw_token:
+                access_token = f"{raw_token[:4]}{'*' * max(len(raw_token) - 8, 4)}{raw_token[-4:]}"
+        except Exception:
+            pass
+
+    return jsonify(
+        {
+            "has_credentials": bool(cfg_row),
+            "connected": bool(conn_row and conn_row.get("enabled") == 1),
+            "access_token": access_token,
+        }
+    )
+
+@app.route("/connectors/notion/job/get")
+def get_notion_job():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT sync_type, schedule_time
+        FROM connector_jobs
+        WHERE uid=? AND source=?
+        """,
+        (uid, "notion"),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify(
+        {
+            "exists": True,
+            "sync_type": row["sync_type"],
+            "schedule_time": row["schedule_time"],
+        }
+    )
+
+@app.route("/connectors/notion/job/save", methods=["POST"])
+def save_notion_job():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, ?, ?, ?)
+        """,
+        (uid, "notion", sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
+
+# ================= AIRTABLE ========================
+
+@app.route("/connectors/airtable/save_app", methods=["POST"])
+def airtable_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json() or {}
+    access_token = (data.get("access_token") or "").strip()
+    base_id = (data.get("base_id") or "").strip()
+    table_name = (data.get("table_name") or "").strip()
+
+    if not access_token or not base_id or not table_name:
+        return jsonify({"error": "missing fields: access_token, base_id, table_name"}), 400
+
+    save_airtable_config(uid, access_token, base_id, table_name)
+    ensure_connector_initialized(uid, "airtable")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/airtable/connect")
+def airtable_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_airtable(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+
+
+@app.route("/connectors/airtable/disconnect")
+def airtable_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = disconnect_airtable(uid)
+    return jsonify(res)
+
+
+@app.route("/connectors/airtable/sync")
+def airtable_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='airtable'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_airtable(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/airtable")
+def airtable_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT config_json
+        FROM connector_configs
+        WHERE uid=? AND connector='airtable'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+
+    cur.execute(
+        """
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='airtable'
+        LIMIT 1
+        """,
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+
+    access_token = None
+    base_id = None
+    table_name = None
+    if cfg_row and cfg_row.get("config_json"):
+        try:
+            cfg = json.loads(cfg_row["config_json"])
+            base_id = cfg.get("base_id")
+            table_name = cfg.get("table_name")
+            raw_token = cfg.get("access_token")
+            if raw_token:
+                access_token = f"{raw_token[:4]}{'*' * max(len(raw_token) - 8, 4)}{raw_token[-4:]}"
+        except Exception:
+            pass
+
+    return jsonify(
+        {
+            "has_credentials": bool(cfg_row),
+            "connected": bool(conn_row and conn_row.get("enabled") == 1),
+            "access_token": access_token,
+            "base_id": base_id,
+            "table_name": table_name,
+        }
+    )
+
+
+@app.route("/connectors/airtable/job/get")
+def airtable_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT sync_type, schedule_time
+        FROM connector_jobs
+        WHERE uid=? AND source=?
+        """,
+        (uid, "airtable"),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify(
+        {
+            "exists": True,
+            "sync_type": row["sync_type"],
+            "schedule_time": row["schedule_time"],
+        }
+    )
+
+
+@app.route("/connectors/airtable/job/save", methods=["POST"])
+def airtable_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, ?, ?, ?)
+        """,
+        (uid, "airtable", sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
 
 init_db()
 seed_test_user()
