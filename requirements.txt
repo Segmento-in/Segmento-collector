@@ -38,3 +38,6 @@ s3fs
 adlfs
 pymysql 
 boto3
+pymongo
+elasticsearch
+duckdb
