@@ -1,238 +1,95 @@
-import os
 import glob
+import os
 import re
 
-# Path where all connector templates live
-path = r"c:/Users/HP/OneDrive/Desktop/PROJECTS/Segmento_Collector/frontend/templates/connectors"
-files = glob.glob(os.path.join(path, "*.html"))
 
-def update_template(f):
-    with open(f, "r", encoding="utf-8") as file:
-        content = file.read()
-    
-    # 1. Extract Source ID
-    # Usually in saveDestination: let payload = { source: "google_news", type }; or similar
-    source_match = re.search(r'source:\s*["\']([^"\']+)["\']', content)
-    if not source_match:
-        # Fallback: try to guess from filename
-        source_id = os.path.basename(f).replace(".html", "")
-    else:
-        source_id = source_match.group(1)
+TEMPLATES_PATH = r"c:/Users/HP/OneDrive/Desktop/PROJECTS/Segmento_Collector/frontend/templates/connectors"
+FILES = glob.glob(os.path.join(TEMPLATES_PATH, "*.html"))
 
-    # 2. Dropdown Entries (Ensure Icons + OnClick for new types)
-    # We'll look for the end of the menu entries
-    new_items = '''                    <div onclick="selectDestination('mongodb', 'MongoDB', 'https://cdn.simpleicons.org/mongodb/47A248')"
-                      class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                      <img src="https://cdn.simpleicons.org/mongodb/47A248" class="w-6 h-6 object-contain">
-                      <span class="text-slate-200 group-hover:text-white font-medium">MongoDB</span>
-                    </div>
-                    <div onclick="selectDestination('elasticsearch', 'Elasticsearch', 'https://cdn.simpleicons.org/elasticsearch/005571')"
-                      class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                      <img src="https://cdn.simpleicons.org/elasticsearch/005571" class="w-6 h-6 object-contain">
-                      <span class="text-slate-200 group-hover:text-white font-medium">Elasticsearch</span>
-                    </div>
-                    <div onclick="selectDestination('duckdb', 'DuckDB', 'https://cdn.simpleicons.org/duckdb/FFF000')"
-                      class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                      <img src="https://cdn.simpleicons.org/duckdb/FFF000" class="w-6 h-6 object-contain">
-                      <span class="text-slate-200 group-hover:text-white font-medium">DuckDB</span>
-                    </div>
-                    <div onclick="selectDestination('gcs', 'Google Cloud Storage', 'https://cdn.simpleicons.org/googlecloudstorage/4285F4')"
-                      class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                      <img src="https://cdn.simpleicons.org/googlecloudstorage/4285F4" class="w-6 h-6 object-contain">
-                      <span class="text-slate-200 group-hover:text-white font-medium">Google Cloud Storage</span>
-                    </div>'''
-    
-    # If mongodb not in dropdown, inject it after databricks or ClickHouse or Snowflake
-    if "selectDestination('mongodb'" not in content:
-        for anchor in ["databricks", "clickhouse", "snowflake", "bigquery"]:
-            pattern = fr'(<div onclick="selectDestination\(\'{anchor}\'.*?</div>)'
-            if re.search(pattern, content, flags=re.DOTALL):
-                content = re.sub(pattern, r'\1\n' + new_items, content, flags=re.DOTALL)
-                break
+DESTINATIONS = [
+    ("mysql", "MySQL", "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg", "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg"),
+    ("postgres", "PostgreSQL", "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg", "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"),
+    ("redshift", "Amazon Redshift", "/static/images/logos/redshift.png", "/static/images/logos/redshift.png"),
+    ("bigquery", "Google BigQuery", "https://cdn.simpleicons.org/googlebigquery/4285F4", "https://cdn.simpleicons.org/googlebigquery/4285F4"),
+    ("snowflake", "Snowflake", "https://cdn.simpleicons.org/snowflake/29B5E8", "https://cdn.simpleicons.org/snowflake/29B5E8"),
+    ("clickhouse", "ClickHouse", "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg", "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg"),
+    ("s3", "AWS S3", "", "{{ url_for('static', filename='images/logos/s3.png') }}"),
+    ("azure_datalake", "Azure Data Lake", "/static/images/logos/adls.png", "/static/images/logos/adls.png"),
+    ("databricks", "Databricks", "https://cdn.simpleicons.org/databricks/EF3A2C", "https://cdn.simpleicons.org/databricks/EF3A2C"),
+    ("mongodb", "MongoDB", "https://cdn.simpleicons.org/mongodb/47A248", "https://cdn.simpleicons.org/mongodb/47A248"),
+    ("elasticsearch", "Elasticsearch", "https://cdn.simpleicons.org/elasticsearch/005571", "https://cdn.simpleicons.org/elasticsearch/005571"),
+    ("duckdb", "DuckDB", "https://cdn.simpleicons.org/duckdb/FFF000", "https://cdn.simpleicons.org/duckdb/FFF000"),
+    ("gcs", "Google Cloud Storage", "https://cdn.simpleicons.org/googlecloudstorage/4285F4", "https://cdn.simpleicons.org/googlecloudstorage/4285F4"),
+]
 
-    # 3. Unified Toggle Function
-    new_toggle = '''  function toggleDestFields(type) {
-    const fields = document.getElementById("dbFields");
-    if (!type) {
-      if (fields) fields.classList.add("hidden");
-      return;
-    }
-    if (fields) fields.classList.remove("hidden");
 
-    const sqlFields = document.getElementById("sqlFields");
-    const bqFields = document.getElementById("bigqueryFields");
-    const s3Fields = document.getElementById("s3Fields");
-    const adlsFields = document.getElementById("adlsFields");
-    const dbxFields = document.getElementById("databricksFields");
-    const formatField = document.getElementById("formatField");
+def detect_indent(block: str) -> str:
+    match = re.search(r"^(\s*)<input type=\"hidden\" id=\"destType\" value=\"\">", block, flags=re.MULTILINE)
+    return match.group(1) if match else "                "
 
-    if (sqlFields) sqlFields.classList.toggle("hidden", type === "bigquery" || type === "s3" || type === "azure_datalake" || type === "databricks");
-    if (bqFields) bqFields.classList.toggle("hidden", type !== "bigquery");
-    if (s3Fields) s3Fields.classList.toggle("hidden", type !== "s3");
-    if (adlsFields) adlsFields.classList.toggle("hidden", type !== "azure_datalake");
-    if (dbxFields) dbxFields.classList.toggle("hidden", type !== "databricks");
-    if (formatField) formatField.classList.toggle("hidden", type === "mongodb" || type === "elasticsearch");
 
-    const hostInp = document.getElementById("dbHost");
-    const portInp = document.getElementById("dbPort");
-    const userInp = document.getElementById("dbUser");
-    const passInp = document.getElementById("dbPass");
-    const nameInp = document.getElementById("dbName");
+def detect_item_classes(block: str):
+    item_class_match = re.search(r'class="([^"]*cursor-pointer transition-colors group)"', block)
+    img_class_match = re.search(r'<img[^>]*class="([^"]+)"', block)
+    span_class_match = re.search(r'<span class="([^"]+font-medium)">', block)
+    item_class = item_class_match.group(1) if item_class_match else "flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors group"
+    img_class = img_class_match.group(1) if img_class_match else "w-6 h-6 object-contain"
+    span_class = span_class_match.group(1) if span_class_match else "text-slate-200 group-hover:text-white font-medium"
+    return item_class, img_class, span_class
 
-    [hostInp, portInp, userInp, passInp, nameInp].forEach(el => {
-      if (el) el.classList.remove("hidden");
-    });
 
-    if (type === "mongodb") {
-      if (hostInp) hostInp.placeholder = "Cluster URI (mongodb+srv://...)";
-      if (nameInp) nameInp.placeholder = "Database Name";
-      if (userInp) userInp.placeholder = "Username";
-      if (passInp) passInp.placeholder = "Password";
-      if (portInp) portInp.classList.add("hidden");
-    } else if (type === "elasticsearch") {
-      if (hostInp) hostInp.placeholder = "Endpoint (http://...)";
-      if (portInp) portInp.placeholder = "Port (9200)";
-      if (nameInp) nameInp.placeholder = "Index Name";
-    } else if (type === "duckdb") {
-      if (hostInp) hostInp.placeholder = "File Path (e.g. data/my.db)";
-      if (portInp) portInp.classList.add("hidden");
-      if (userInp) userInp.classList.add("hidden");
-      if (passInp) passInp.classList.add("hidden");
-      if (nameInp) nameInp.classList.add("hidden");
-    } else if (type === "gcs") {
-      if (hostInp) hostInp.placeholder = "Bucket Name";
-      if (portInp) portInp.placeholder = "Region (optional)";
-      if (userInp) userInp.classList.add("hidden");
-      if (passInp) passInp.placeholder = "Service Account JSON Key";
-      if (nameInp) nameInp.classList.add("hidden");
-    } else {
-      if (hostInp) hostInp.placeholder = "Host (e.g. 127.0.0.1)";
-      if (portInp) portInp.placeholder = "Port";
-      if (userInp) userInp.placeholder = "Username";
-      if (passInp) passInp.placeholder = "Password";
-      if (nameInp) nameInp.placeholder = "Database Name";
-    }
+def build_dropdown_block(block: str) -> str:
+    indent = detect_indent(block)
+    item_class, img_class, span_class = detect_item_classes(block)
+    item_indent = indent + "    "
+    img_indent = item_indent + "  "
 
-    const icebergBtn = document.getElementById("format-iceberg");
-    const hudiBtn = document.getElementById("format-hudi");
-    const formatInput = document.getElementById("dataFormat");
-    const currentFormat = formatInput ? formatInput.value : "";
+    lines = [
+        f'{indent}<input type="hidden" id="destType" value="">',
+        "",
+        f'{indent}<div id="dropdownMenu"',
+        f'{indent}  class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">',
+        f'{indent}  <div class="p-2 space-y-1">',
+    ]
 
-    if (type === "bigquery" || type === "duckdb") {
-      if (icebergBtn) icebergBtn.classList.add("hidden");
-      if (hudiBtn) hudiBtn.classList.add("hidden");
-      if (currentFormat === "iceberg" || currentFormat === "hudi") {
-        if (typeof selectFormat === "function") selectFormat("parquet");
-      }
-    } else {
-      if (icebergBtn) icebergBtn.classList.remove("hidden");
-      if (hudiBtn) hudiBtn.classList.remove("hidden");
-    }
-  }'''
+    for key, label, onclick_logo, img_logo in DESTINATIONS:
+        lines.extend([
+            f'{item_indent}<div onclick="selectDestination(\'{key}\', \'{label}\', \'{onclick_logo}\')"',
+            f'{item_indent}  class="{item_class}">',
+            f'{img_indent}<img src="{img_logo}" class="{img_class}">',
+            f'{img_indent}<span class="{span_class}">{label}</span>',
+            f'{item_indent}</div>',
+        ])
 
-    # Replace both toggleDestFields and toggleDest with a single toggleDestFields
-    toggle_pattern = r'function (toggleDestFields|toggleDest)\s*\([^)]*\)\s*\{.*?\}\s*(?=async function|function|window\.onclick|$)'
-    content = re.sub(toggle_pattern, new_toggle + "\n", content, flags=re.DOTALL)
-    
-    # Fix call sites (in selectDestination or elsewhere)
-    content = content.replace("toggleDest(", "toggleDestFields(")
+    lines.extend([
+        f'{indent}  </div>',
+        f'{indent}</div>',
+        f'{indent}</div>',
+    ])
+    return "\n".join(lines)
 
-    # 4. Save Destination Function Reconstruction
-    new_save_dest = f'''  async function saveDestination() {{
-    const btn = document.getElementById("saveDestBtn");
-    btn.innerText = "CONNECTING...";
-    const type = document.getElementById("destType").value;
-    let payload = {{ source: "{source_id}", type }};
 
-    if (type === "bigquery") {{
-      payload.host = document.getElementById("bqProject").value;
-      payload.database = document.getElementById("bqDataset").value;
-      payload.password = document.getElementById("bqKey").value;
-      payload.format = document.getElementById("dataFormat").value;
-    }}
-    else if (type === "s3") {{
-      payload.host = document.getElementById("s3Bucket").value;
-      payload.port = document.getElementById("s3Region").value;
-      payload.username = document.getElementById("s3AccessKey").value;
-      payload.password = document.getElementById("s3SecretKey").value;
-      payload.database = "s3";
-      payload.format = document.getElementById("dataFormat").value;
-    }}
-    else if (type === "azure_datalake") {{
-      payload.host = document.getElementById("adlsAccount").value;
-      payload.port = document.getElementById("adlsFilesystem").value;
-      payload.username = document.getElementById("adlsPath").value;
-      payload.password = document.getElementById("adlsKey").value;
-      payload.database = "adls";
-      payload.format = document.getElementById("dataFormat").value;
-    }}
-    else if (type === "databricks") {{
-      payload.host = document.getElementById("dbxHost").value;
-      payload.port = document.getElementById("dbxHttpPath").value;
-      payload.password = document.getElementById("dbxToken").value;
-      payload.database = document.getElementById("dbxCatalogSchema").value || "hive_metastore.default";
-    }}
-    else if (type === "duckdb") {{
-      payload.host = document.getElementById("dbHost").value;
-      payload.format = document.getElementById("dataFormat").value;
-    }}
-    else if (type === "mongodb") {{
-      payload.host = document.getElementById("dbHost").value;
-      payload.database = document.getElementById("dbName").value;
-      payload.username = document.getElementById("dbUser").value;
-      payload.password = document.getElementById("dbPass").value;
-    }}
-    else if (type === "elasticsearch") {{
-      payload.host = document.getElementById("dbHost").value;
-      payload.port = document.getElementById("dbPort").value;
-      payload.database = document.getElementById("dbName").value;
-    }}
-    else if (type === "gcs") {{
-      payload.host = document.getElementById("dbHost").value;
-      payload.port = document.getElementById("dbPort").value;
-      payload.password = document.getElementById("dbPass").value;
-      payload.database = "gcs";
-      payload.format = document.getElementById("dataFormat").value;
-    }}
-    else {{
-      payload.host = document.getElementById("dbHost").value;
-      payload.port = document.getElementById("dbPort").value;
-      payload.username = document.getElementById("dbUser").value;
-      payload.password = document.getElementById("dbPass").value;
-      payload.database = document.getElementById("dbName").value;
-    }}
+def repair_template(filename: str) -> str:
+    with open(filename, "r", encoding="utf-8") as handle:
+        content = handle.read()
 
-    try {{
-      const res = await fetch("/destination/save", {{
-        method: "POST",
-        headers: {{ "Content-Type": "application/json" }},
-        body: JSON.stringify(payload)
-      }});
-      if (res.ok) {{
-        btn.innerText = "SUCCESS ✓";
-        if (typeof loadDestinations === "function") loadDestinations();
-        setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
-      }} else {{
-        btn.innerText = "Failed";
-        setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
-      }}
-    }} catch (e) {{
-      btn.innerText = "Error";
-      setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
-    }}
-  }}'''
+    pattern = re.compile(
+        r'<input type="hidden" id="destType" value="">[\s\S]*?(?=\n\s*<div id="dbFields")'
+    )
+    match = pattern.search(content)
+    if not match:
+        raise RuntimeError(f"Destination block not found in {os.path.basename(filename)}")
 
-    save_pattern = r'async function saveDestination\(\)\s*\{.*?\}\s*(?=async function|function|window\.onclick|$)'
-    content = re.sub(save_pattern, new_save_dest + "\n", content, flags=re.DOTALL)
+    replacement = build_dropdown_block(match.group(0))
+    return content[:match.start()] + replacement + content[match.end():]
 
-    return content
 
 count = 0
-for f in files:
-    new_content = update_template(f)
-    with open(f, "w", encoding="utf-8") as file:
-        file.write(new_content)
+for filename in FILES:
+    updated = repair_template(filename)
+    with open(filename, "w", encoding="utf-8") as handle:
+        handle.write(updated)
     count += 1
-    print(f"Propagated: {os.path.basename(f)}")
+    print(f"Repaired: {os.path.basename(filename)}")
 
-print(f"Total Propagated: {count}")
+print(f"Total Repaired: {count}")
