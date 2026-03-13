@@ -170,6 +170,36 @@ from backend.connectors.airtable import (
     disconnect_airtable,
     save_config as save_airtable_config,
 )
+from backend.connectors.shopify import (
+    connect_shopify,
+    sync_shopify,
+    disconnect_shopify,
+    save_config as save_shopify_config,
+)
+from backend.connectors.zendesk import (
+    connect_zendesk,
+    sync_zendesk,
+    disconnect_zendesk,
+    save_config as save_zendesk_config,
+)
+from backend.connectors.intercom import (
+    connect_intercom,
+    sync_intercom,
+    disconnect_intercom,
+    save_config as save_intercom_config,
+)
+from backend.connectors.mailchimp import (
+    connect_mailchimp,
+    sync_mailchimp,
+    disconnect_mailchimp,
+    save_config as save_mailchimp_config,
+)
+from backend.connectors.twilio import (
+    connect_twilio,
+    sync_twilio,
+    disconnect_twilio,
+    save_config as save_twilio_config,
+)
 
 # ---------------- CONFIG ----------------
 load_dotenv()
@@ -16086,6 +16116,469 @@ def hubspot_job_save():
     con.commit()
     con.close()
 
+    return jsonify({"status": "job_saved"})
+
+
+# ================= ZENDESK ========================
+
+@app.route("/connectors/zendesk/save_app", methods=["POST"])
+def _zendesk_save_config():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    subdomain = data.get("subdomain")
+    email = data.get("email")
+    api_token = data.get("api_token")
+    if not subdomain or not email or not api_token:
+        return jsonify({"error": "missing subdomain, email or api_token"}), 400
+    save_zendesk_config(uid, subdomain, email, api_token)
+    ensure_connector_initialized(uid, "zendesk")
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/zendesk/connect")
+def _zendesk_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    res = connect_zendesk(uid)
+    return jsonify(res)
+
+@app.route("/connectors/zendesk/disconnect")
+def _zendesk_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_zendesk(uid))
+
+@app.route("/connectors/zendesk/sync")
+def _zendesk_sync():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT sync_type FROM connector_jobs WHERE uid=? AND source='zendesk' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_zendesk(uid, sync_type=sync_type))
+
+@app.route("/api/status/zendesk")
+def _zendesk_status():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT 1 FROM connector_configs WHERE uid=? AND connector='zendesk'", (uid,))
+    creds = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='zendesk'", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(creds), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+@app.route("/connectors/zendesk/job/get")
+def _zendesk_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='zendesk'", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row: return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+
+@app.route("/connectors/zendesk/job/save", methods=["POST"])
+def _zendesk_job_save():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'zendesk', ?, ?)", (uid, sync_type, schedule_time))
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+
+# ================= INTERCOM ========================
+
+@app.route("/connectors/intercom/save_app", methods=["POST"])
+def _intercom_save_config():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    access_token = data.get("access_token")
+    if not access_token:
+        return jsonify({"error": "missing access_token"}), 400
+    save_intercom_config(uid, access_token)
+    ensure_connector_initialized(uid, "intercom")
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/intercom/connect")
+def _intercom_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_intercom(uid))
+
+@app.route("/connectors/intercom/disconnect")
+def _intercom_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_intercom(uid))
+
+@app.route("/connectors/intercom/sync")
+def _intercom_sync():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT sync_type FROM connector_jobs WHERE uid=? AND source='intercom' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_intercom(uid, sync_type=sync_type))
+
+@app.route("/api/status/intercom")
+def _intercom_status():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT 1 FROM connector_configs WHERE uid=? AND connector='intercom'", (uid,))
+    creds = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='intercom'", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(creds), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+@app.route("/connectors/intercom/job/get")
+def _intercom_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='intercom'", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row: return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+
+@app.route("/connectors/intercom/job/save", methods=["POST"])
+def _intercom_job_save():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'intercom', ?, ?)", (uid, sync_type, schedule_time))
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+
+# ================= SHOPIFY ========================
+
+@app.route("/connectors/shopify/save_app", methods=["POST"])
+def _shopify_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json() or {}
+    shop_domain = (data.get("shopDomain") or "").strip()
+    access_token = (data.get("accessToken") or "").strip()
+
+    if not shop_domain or not access_token:
+        return jsonify({"error": "missing shopDomain or accessToken"}), 400
+
+    save_shopify_config(uid, shop_domain, access_token)
+    ensure_connector_initialized(uid, "shopify")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/shopify/connect")
+def _shopify_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_shopify(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+
+
+@app.route("/connectors/shopify/disconnect")
+def _shopify_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = disconnect_shopify(uid)
+    return jsonify(res)
+
+
+@app.route("/connectors/shopify/sync")
+def _shopify_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type
+        FROM connector_jobs
+        WHERE uid=? AND source='shopify'
+        LIMIT 1
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_shopify(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/shopify")
+def _shopify_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+
+    cur.execute("""
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector='shopify'
+        LIMIT 1
+    """, (uid,))
+    creds = fetchone_secure(cur)
+
+    cur.execute("""
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source='shopify'
+        LIMIT 1
+    """, (uid,))
+    conn = fetchone_secure(cur)
+
+    con.close()
+
+    return jsonify({
+        "has_credentials": bool(creds),
+        "connected": bool(conn and conn["enabled"] == 1)
+    })
+
+
+@app.route("/connectors/shopify/job/get")
+def _shopify_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        SELECT sync_type, schedule_time
+        FROM connector_jobs
+        WHERE uid=? AND source='shopify'
+    """, (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+
+    if not row:
+        return jsonify({"exists": False})
+
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"],
+    })
+
+
+@app.route("/connectors/shopify/job/save", methods=["POST"])
+def _shopify_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO connector_jobs
+        (uid, source, sync_type, schedule_time)
+        VALUES (?, 'shopify', ?, ?)
+    """, (uid, sync_type, schedule_time))
+    con.commit()
+    con.close()
+
+    return jsonify({"status": "job_saved"})
+
+
+# ================= MAILCHIMP ========================
+
+@app.route("/connectors/mailchimp/save_app", methods=["POST"])
+def _mailchimp_save_config():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    api_key = data.get("api_key")
+    if not api_key:
+        return jsonify({"error": "missing api_key"}), 400
+    save_mailchimp_config(uid, api_key)
+    ensure_connector_initialized(uid, "mailchimp")
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/mailchimp/connect")
+def _mailchimp_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_mailchimp(uid))
+
+@app.route("/connectors/mailchimp/disconnect")
+def _mailchimp_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_mailchimp(uid))
+
+@app.route("/connectors/mailchimp/sync")
+def _mailchimp_sync():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT sync_type FROM connector_jobs WHERE uid=? AND source='mailchimp' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_mailchimp(uid, sync_type=sync_type))
+
+@app.route("/api/status/mailchimp")
+def _mailchimp_status():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT 1 FROM connector_configs WHERE uid=? AND connector='mailchimp'", (uid,))
+    creds = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='mailchimp'", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(creds), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+@app.route("/connectors/mailchimp/job/get")
+def _mailchimp_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='mailchimp'", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row: return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+
+@app.route("/connectors/mailchimp/job/save", methods=["POST"])
+def _mailchimp_job_save():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'mailchimp', ?, ?)", (uid, sync_type, schedule_time))
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+
+# ================= TWILIO ========================
+
+@app.route("/connectors/twilio/save_app", methods=["POST"])
+def _twilio_save_config():
+    uid = getattr(g, "user_id", None)
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    account_sid = data.get("account_sid")
+    auth_token = data.get("auth_token")
+    if not account_sid or not auth_token:
+        return jsonify({"error": "missing account_sid or auth_token"}), 400
+    save_twilio_config(uid, account_sid, auth_token)
+    ensure_connector_initialized(uid, "twilio")
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/twilio/connect")
+def _twilio_connect():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_twilio(uid))
+
+@app.route("/connectors/twilio/disconnect")
+def _twilio_disconnect():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_twilio(uid))
+
+@app.route("/connectors/twilio/sync")
+def _twilio_sync():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT sync_type FROM connector_jobs WHERE uid=? AND source='twilio' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_twilio(uid, sync_type=sync_type))
+
+@app.route("/api/status/twilio")
+def _twilio_status():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT 1 FROM connector_configs WHERE uid=? AND connector='twilio'", (uid,))
+    creds = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='twilio'", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(creds), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+@app.route("/connectors/twilio/job/get")
+def _twilio_job_get():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='twilio'", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row: return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+
+@app.route("/connectors/twilio/job/save", methods=["POST"])
+def _twilio_job_save():
+    uid = getattr(g, "user_id", None)
+    if not uid: return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'twilio', ?, ?)", (uid, sync_type, schedule_time))
+    con.commit()
+    con.close()
     return jsonify({"status": "job_saved"})
 
 

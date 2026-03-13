@@ -5445,6 +5445,306 @@ def airtable_save_app_proxy():
 @require_login
 def airtable_disconnect_proxy():
     r = connector_disconnect("airtable")
+    return jsonify(res)
+
+
+# ================= ZENDESK ========================
+
+@app.route("/connectors/zendesk")
+@require_login
+def zendesk_page():
+    return render_template("connectors/zendesk.html")
+
+
+@app.route("/connectors/zendesk/connect")
+@require_login
+def zendesk_connect():
+    r = proxy_get("/connectors/zendesk/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/zendesk/sync")
+@require_login
+def zendesk_sync():
+    r = connector_sync("zendesk")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/zendesk")
+@require_login
+def zendesk_status_proxy():
+    r = connector_status("zendesk")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/zendesk/job/get")
+@require_login
+def zendesk_job_get_proxy():
+    r = connector_job_get("zendesk")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/zendesk/job/save", methods=["POST"])
+@require_login
+def zendesk_job_save_proxy():
+    r = connector_job_save("zendesk")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/zendesk/save_app", methods=["POST"])
+@require_login
+def zendesk_save_app_proxy():
+    r = proxy_post("/connectors/zendesk/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/zendesk/disconnect")
+@require_login
+def zendesk_disconnect():
+    r = connector_disconnect("zendesk")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= INTERCOM ========================
+
+@app.route("/connectors/intercom")
+@require_login
+def intercom_page():
+    return render_template("connectors/intercom.html")
+
+
+@app.route("/connectors/intercom/connect")
+@require_login
+def intercom_connect():
+    r = proxy_get("/connectors/intercom/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/intercom/sync")
+@require_login
+def intercom_sync():
+    r = connector_sync("intercom")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/intercom")
+@require_login
+def intercom_status_proxy():
+    r = connector_status("intercom")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/intercom/job/get")
+@require_login
+def intercom_job_get_proxy():
+    r = connector_job_get("intercom")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/intercom/job/save", methods=["POST"])
+@require_login
+def intercom_job_save_proxy():
+    r = connector_job_save("intercom")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/intercom/save_app", methods=["POST"])
+@require_login
+def intercom_save_app_proxy():
+    r = proxy_post("/connectors/intercom/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/intercom/disconnect")
+@require_login
+def intercom_disconnect():
+    r = connector_disconnect("intercom")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= MAILCHIMP ========================
+
+@app.route("/connectors/mailchimp")
+@require_login
+def mailchimp_page():
+    return render_template("connectors/mailchimp.html")
+
+
+@app.route("/connectors/mailchimp/connect")
+@require_login
+def mailchimp_connect():
+    r = proxy_get("/connectors/mailchimp/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/mailchimp/sync")
+@require_login
+def mailchimp_sync():
+    r = connector_sync("mailchimp")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/mailchimp")
+@require_login
+def mailchimp_status_proxy():
+    r = connector_status("mailchimp")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/mailchimp/job/get")
+@require_login
+def mailchimp_job_get_proxy():
+    r = connector_job_get("mailchimp")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/mailchimp/job/save", methods=["POST"])
+@require_login
+def mailchimp_job_save_proxy():
+    r = connector_job_save("mailchimp")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/mailchimp/save_app", methods=["POST"])
+@require_login
+def mailchimp_save_app_proxy():
+    r = proxy_post("/connectors/mailchimp/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/mailchimp/disconnect")
+@require_login
+def mailchimp_disconnect():
+    r = connector_disconnect("mailchimp")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= TWILIO ========================
+
+@app.route("/connectors/twilio")
+@require_login
+def twilio_page():
+    return render_template("connectors/twilio.html")
+
+
+@app.route("/connectors/twilio/connect")
+@require_login
+def twilio_connect():
+    r = proxy_get("/connectors/twilio/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/twilio/sync")
+@require_login
+def twilio_sync():
+    r = connector_sync("twilio")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/twilio")
+@require_login
+def twilio_status_proxy():
+    r = connector_status("twilio")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/twilio/job/get")
+@require_login
+def twilio_job_get_proxy():
+    r = connector_job_get("twilio")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/twilio/job/save", methods=["POST"])
+@require_login
+def twilio_job_save_proxy():
+    r = connector_job_save("twilio")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/twilio/save_app", methods=["POST"])
+@require_login
+def twilio_save_app_proxy():
+    r = proxy_post("/connectors/twilio/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/twilio/disconnect")
+@require_login
+def twilio_disconnect():
+    r = connector_disconnect("twilio")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= SHOPIFY ========================
+
+@app.route("/connectors/shopify")
+@require_login
+def shopify_page():
+    return render_template("connectors/shopify.html")
+
+
+@app.route("/connectors/shopify/connect")
+@require_login
+def shopify_connect():
+    r = proxy_get("/connectors/shopify/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/shopify/sync")
+@require_login
+def shopify_sync():
+    r = connector_sync("shopify")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/shopify/status")
+@require_login
+def shopify_status_proxy():
+    r = connector_status("shopify")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/shopify/job/get")
+@require_login
+def shopify_job_get_proxy():
+    r = connector_job_get("shopify")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/shopify/job/save", methods=["POST"])
+@require_login
+def shopify_job_save_proxy():
+    r = connector_job_save("shopify")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/shopify/save_app", methods=["POST"])
+@require_login
+def shopify_save_app_proxy():
+    r = proxy_post("/connectors/shopify/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/shopify/disconnect")
+@require_login
+def shopify_disconnect():
+    r = connector_disconnect("shopify")
     return jsonify(r.json()), r.status_code
 
 
