@@ -296,52 +296,77 @@
 
                                 <input type="hidden" id="destType" value="">
 
-                                <div id="dropdownMenu"
-                                    class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
-                                    <div class="p-2 space-y-1">
-                                        <!-- Same options as other templates -->
-                                        <div onclick="selectDestination('mysql', 'MySQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg"
-                                                class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
-                                        </div>
-                                        <div onclick="selectDestination('postgres', 'PostgreSQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"
-                                                class="w-6 h-6 object-contain">
-                                            <span
-                                                class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
-                                        </div>
-                                        <div onclick="selectDestination('bigquery', 'Google BigQuery', 'https://cdn.simpleicons.org/googlebigquery/4285F4')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.simpleicons.org/googlebigquery/4285F4"
-                                                class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">Google
-                                                BigQuery</span>
-                                        </div>
-                                        <div onclick="selectDestination('snowflake', 'Snowflake', 'https://cdn.simpleicons.org/snowflake/29B5E8')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.simpleicons.org/snowflake/29B5E8"
-                                                class="w-6 h-6 object-contain">
-                                            <span
-                                                class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
-                                        </div>
-                                        <div onclick="selectDestination('mongodb', 'MongoDB', 'https://cdn.simpleicons.org/mongodb/47A248')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.simpleicons.org/mongodb/47A248" class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">MongoDB</span>
-                                        </div>
-                                        <div onclick="selectDestination('duckdb', 'DuckDB', 'https://cdn.simpleicons.org/duckdb/FFF000')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.simpleicons.org/duckdb/FFF000" class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">DuckDB</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Destination input fields -->
+<div id="dropdownMenu"
+  class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
+  <div class="p-2 space-y-1">
+    <div onclick="selectDestination('mysql', 'MySQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
+    </div>
+    <div onclick="selectDestination('postgres', 'PostgreSQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+    </div>
+    <div onclick="selectDestination('redshift', 'Amazon Redshift', '/static/images/logos/redshift.png')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="/static/images/logos/redshift.png" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Amazon Redshift</span>
+    </div>
+    <div onclick="selectDestination('bigquery', 'Google BigQuery', 'https://cdn.simpleicons.org/googlebigquery/4285F4')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+    </div>
+    <div onclick="selectDestination('snowflake', 'Snowflake', 'https://cdn.simpleicons.org/snowflake/29B5E8')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+    </div>
+    <div onclick="selectDestination('clickhouse', 'ClickHouse', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+    </div>
+    <div onclick="selectDestination('s3', 'AWS S3', '')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+    </div>
+    <div onclick="selectDestination('azure_datalake', 'Azure Data Lake', '/static/images/logos/adls.png')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="/static/images/logos/adls.png" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Azure Data Lake</span>
+    </div>
+    <div onclick="selectDestination('databricks', 'Databricks', 'https://cdn.simpleicons.org/databricks/EF3A2C')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/databricks/EF3A2C" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Databricks</span>
+    </div>
+    <div onclick="selectDestination('mongodb', 'MongoDB', 'https://cdn.simpleicons.org/mongodb/47A248')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/mongodb/47A248" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">MongoDB</span>
+    </div>
+    <div onclick="selectDestination('elasticsearch', 'Elasticsearch', 'https://cdn.simpleicons.org/elasticsearch/005571')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/elasticsearch/005571" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Elasticsearch</span>
+    </div>
+    <div onclick="selectDestination('duckdb', 'DuckDB', 'https://cdn.simpleicons.org/duckdb/FFF000')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/duckdb/FFF000" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">DuckDB</span>
+    </div>
+    <div onclick="selectDestination('gcs', 'Google Cloud Storage', 'https://cdn.simpleicons.org/googlecloudstorage/4285F4')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/googlecloudstorage/4285F4" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Google Cloud Storage</span>
+    </div>
+  </div>
+</div>
+</div>
                             <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                                 <div id="sqlFields" class="contents">
                                     <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)"
@@ -354,6 +379,95 @@
                                         class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
                                     <input id="dbName" placeholder="Database Name"
                                         class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                </div>
+
+                                <div id="bigqueryFields" class="hidden contents">
+                                    <input id="bqProject" placeholder="Project ID"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="bqDataset" placeholder="Dataset ID"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <div class="md:col-span-2">
+                                        <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3"
+                                            class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono shadow-inner"></textarea>
+                                    </div>
+                                </div>
+
+                                <div id="s3Fields" class="hidden contents">
+                                    <input id="s3Bucket" placeholder="Bucket Name (my-data-lake)"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="s3Region" placeholder="Region (us-east-1)"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="s3AccessKey" placeholder="Access Key ID"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="s3SecretKey" type="password" placeholder="Secret Access Key"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                </div>
+
+                                <div id="adlsFields" class="hidden contents">
+                                    <input id="adlsAccount" placeholder="Storage Account (mystorageacct)"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="adlsFilesystem" placeholder="File System / Container (segmento-data)"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="adlsPath" placeholder="Base Path (optional, e.g. raw/events)"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="adlsKey" type="password" placeholder="Account Key"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                </div>
+
+                                <div id="databricksFields" class="hidden contents">
+                                    <input id="dbxHost" placeholder="Workspace Hostname (adb-xxx.azuredatabricks.net)"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="dbxHttpPath" placeholder="HTTP Path (/sql/1.0/warehouses/...)"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="dbxCatalogSchema"
+                                        placeholder="Catalog.Schema (optional, e.g. hive_metastore.default)"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                    <input id="dbxToken" type="password" placeholder="Personal Access Token"
+                                        class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 shadow-inner">
+                                </div>
+
+                                <div id="formatField" class="hidden md:col-span-2">
+                                    <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block">Data
+                                        Format</label>
+                                    <div class="flex gap-4">
+                                        <button onclick="selectFormat('parquet')" id="format-parquet"
+                                            class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                                            <span class="font-bold">Parquet</span>
+                                            <div
+                                                class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                                                <div
+                                                    class="dot w-2 h-2 rounded-full bg-stone-200 scale-0 transition-transform"></div>
+                                            </div>
+                                        </button>
+                                        <button onclick="selectFormat('json')" id="format-json"
+                                            class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                                            <span class="font-bold">JSON</span>
+                                            <div
+                                                class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                                                <div
+                                                    class="dot w-2 h-2 rounded-full bg-stone-200 scale-0 transition-transform"></div>
+                                            </div>
+                                        </button>
+                                        <button onclick="selectFormat('iceberg')" id="format-iceberg"
+                                            class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                                            <span class="font-bold">Iceberg</span>
+                                            <div
+                                                class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                                                <div
+                                                    class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                                            </div>
+                                        </button>
+                                        <button onclick="selectFormat('hudi')" id="format-hudi"
+                                            class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                                            <span class="font-bold">Hudi</span>
+                                            <div
+                                                class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                                                <div
+                                                    class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                                            </div>
+                                        </button>
+                                    </div>
+                                    <input type="hidden" id="dataFormat" value="parquet">
                                 </div>
 
                                 <div class="md:col-span-2 pt-2">
@@ -488,6 +602,7 @@
         checkShopifyStatus();
         loadDestinations();
         loadJob();
+        selectFormat('parquet');
     });
 
     async function checkShopifyStatus() {
@@ -733,59 +848,200 @@
         document.getElementById("dropdownMenu").classList.toggle("hidden");
     }
 
-    function selectDestination(type, name, logo) {
+    function selectFormat(val) {
+        document.getElementById('dataFormat').value = val;
+        document.querySelectorAll('.format-option').forEach(el => el.classList.remove('selected'));
+        document.getElementById('format-' + val).classList.add('selected');
+    }
+
+        function selectDestination(type, name, logo) {
         document.getElementById("destType").value = type;
         const trigger = document.getElementById("selectedOption");
         trigger.innerHTML = `<img src="${logo}" class="w-6 h-6 object-contain"> <span class="text-white font-medium">${name}</span>`;
         document.getElementById("dropdownMenu").classList.add("hidden");
-        document.getElementById("dbFields").classList.remove("hidden");
-        
-        // Simple logic to show/hide fields based on type
-        // In a real app this would be more complex like in common.js
-        const sqlFields = document.getElementById("sqlFields");
-        if (['mysql', 'postgres', 'redshift', 'snowflake', 'clickhouse', 'mongodb', 'duckdb'].includes(type)) {
-            sqlFields.classList.remove("hidden");
-        } else {
-            sqlFields.classList.add("hidden");
-            alert("Field mapping for this destination type is handled by the shared UI server. Please select a SQL-compatible destination for this preview.");
-        }
+        toggleDestFields(type);
     }
 
-    async function saveDestination() {
-        const type = document.getElementById("destType").value;
-        const payload = {
-            source: "shopify",
-            dest_type: type,
-            host: document.getElementById("dbHost").value,
-            port: document.getElementById("dbPort").value,
-            username: document.getElementById("dbUser").value,
-            password: document.getElementById("dbPass").value,
-            database_name: document.getElementById("dbName").value
-        };
-
-        const btn = document.getElementById("saveDestBtn");
-        btn.disabled = true;
-        btn.innerText = "SAVING...";
-
-        try {
-            const res = await fetch("/destination/save", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-            if (res.ok) {
-                alert("Destination saved and activated.");
-                location.reload();
-            } else {
-                alert("Failed to save destination.");
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            btn.disabled = false;
-            btn.innerText = "Authenticate & Save";
-        }
+          function toggleDestFields(type) {
+    const formatMatrix = {
+      mysql: ["json"],
+      postgres: ["json"],
+      mongodb: ["json"],
+      elasticsearch: ["json"],
+      bigquery: ["json", "parquet"],
+      snowflake: ["json", "parquet"],
+      redshift: ["json", "parquet"],
+      clickhouse: ["json", "parquet"],
+      duckdb: ["json", "parquet"],
+      s3: ["json", "parquet", "iceberg", "hudi"],
+      azure_datalake: ["json", "parquet", "iceberg", "hudi"],
+      databricks: ["json", "parquet", "iceberg", "hudi"],
+      gcs: ["json", "parquet", "iceberg", "hudi"]
+    };
+    const fields = document.getElementById("dbFields");
+    if (!type) {
+      if (fields) fields.classList.add("hidden");
+      return;
     }
+    if (fields) fields.classList.remove("hidden");
+
+    const sqlFields = document.getElementById("sqlFields");
+    const bqFields = document.getElementById("bigqueryFields");
+    const s3Fields = document.getElementById("s3Fields");
+    const adlsFields = document.getElementById("adlsFields");
+    const dbxFields = document.getElementById("databricksFields");
+    const formatField = document.getElementById("formatField");
+
+    if (sqlFields) sqlFields.classList.toggle("hidden", type === "bigquery" || type === "s3" || type === "azure_datalake" || type === "databricks");
+    if (bqFields) bqFields.classList.toggle("hidden", type !== "bigquery");
+    if (s3Fields) s3Fields.classList.toggle("hidden", type !== "s3");
+    if (adlsFields) adlsFields.classList.toggle("hidden", type !== "azure_datalake");
+    if (dbxFields) dbxFields.classList.toggle("hidden", type !== "databricks");
+
+    const hostInp = document.getElementById("dbHost");
+    const portInp = document.getElementById("dbPort");
+    const userInp = document.getElementById("dbUser");
+    const passInp = document.getElementById("dbPass");
+    const nameInp = document.getElementById("dbName");
+
+    [hostInp, portInp, userInp, passInp, nameInp].forEach(el => {
+      if (el) el.classList.remove("hidden");
+    });
+
+    if (type === "mongodb") {
+      if (hostInp) hostInp.placeholder = "Cluster URI (mongodb+srv://...)";
+      if (nameInp) nameInp.placeholder = "Database Name";
+      if (userInp) userInp.placeholder = "Username";
+      if (passInp) passInp.placeholder = "Password";
+      if (portInp) portInp.classList.add("hidden");
+    } else if (type === "elasticsearch") {
+      if (hostInp) hostInp.placeholder = "Endpoint (http://...)";
+      if (portInp) portInp.placeholder = "Port (9200)";
+      if (nameInp) nameInp.placeholder = "Index Name";
+    } else if (type === "duckdb") {
+      if (hostInp) hostInp.placeholder = "File Path (e.g. data/my.db)";
+      if (portInp) portInp.classList.add("hidden");
+      if (userInp) userInp.classList.add("hidden");
+      if (passInp) passInp.classList.add("hidden");
+      if (nameInp) nameInp.classList.add("hidden");
+    } else if (type === "gcs") {
+      if (hostInp) hostInp.placeholder = "Bucket Name";
+      if (portInp) portInp.placeholder = "Region (optional)";
+      if (userInp) userInp.classList.add("hidden");
+      if (passInp) passInp.placeholder = "Service Account JSON Key";
+      if (nameInp) nameInp.classList.add("hidden");
+    } else {
+      if (hostInp) hostInp.placeholder = "Host (e.g. 127.0.0.1)";
+      if (portInp) portInp.placeholder = "Port";
+      if (userInp) userInp.placeholder = "Username";
+      if (passInp) passInp.placeholder = "Password";
+      if (nameInp) nameInp.placeholder = "Database Name";
+    }
+
+    const formatButtons = {
+      json: document.getElementById("format-json"),
+      parquet: document.getElementById("format-parquet"),
+      iceberg: document.getElementById("format-iceberg"),
+      hudi: document.getElementById("format-hudi")
+    };
+    const supportedFormats = formatMatrix[type] || ["json"];
+    const formatInput = document.getElementById("dataFormat");
+    const currentFormat = formatInput ? formatInput.value : "";
+
+    Object.entries(formatButtons).forEach(([format, btn]) => {
+      if (btn) btn.classList.toggle("hidden", !supportedFormats.includes(format));
+    });
+
+    if (formatField) {
+      formatField.classList.toggle("hidden", supportedFormats.length <= 1);
+    }
+
+    if (formatInput && !supportedFormats.includes(currentFormat) && typeof selectFormat === "function") {
+      selectFormat(supportedFormats[0]);
+    }
+  }
+async function saveDestination() {
+    const btn = document.getElementById("saveDestBtn");
+    btn.innerText = "CONNECTING...";
+    const type = document.getElementById("destType").value;
+    let payload = { source: "shopify", type };
+
+    if (type === "bigquery") {
+      payload.host = document.getElementById("bqProject").value;
+      payload.database = document.getElementById("bqDataset").value;
+      payload.password = document.getElementById("bqKey").value;
+    }
+    else if (type === "s3") {
+      payload.host = document.getElementById("s3Bucket").value;
+      payload.port = document.getElementById("s3Region").value;
+      payload.username = document.getElementById("s3AccessKey").value;
+      payload.password = document.getElementById("s3SecretKey").value;
+      payload.database = "s3";
+    }
+    else if (type === "azure_datalake") {
+      payload.host = document.getElementById("adlsAccount").value;
+      payload.port = document.getElementById("adlsFilesystem").value;
+      payload.username = document.getElementById("adlsPath").value;
+      payload.password = document.getElementById("adlsKey").value;
+      payload.database = "adls";
+    }
+    else if (type === "databricks") {
+      payload.host = document.getElementById("dbxHost").value;
+      payload.port = document.getElementById("dbxHttpPath").value;
+      payload.password = document.getElementById("dbxToken").value;
+      payload.database = document.getElementById("dbxCatalogSchema").value || "hive_metastore.default";
+    }
+    else if (type === "duckdb") {
+      payload.host = document.getElementById("dbHost").value;
+    }
+    else if (type === "mongodb") {
+      payload.host = document.getElementById("dbHost").value;
+      payload.database = document.getElementById("dbName").value;
+      payload.username = document.getElementById("dbUser").value;
+      payload.password = document.getElementById("dbPass").value;
+    }
+    else if (type === "elasticsearch") {
+      payload.host = document.getElementById("dbHost").value;
+      payload.port = document.getElementById("dbPort").value;
+      payload.database = document.getElementById("dbName").value;
+    }
+    else if (type === "gcs") {
+      payload.host = document.getElementById("dbHost").value;
+      payload.port = document.getElementById("dbPort").value;
+      payload.password = document.getElementById("dbPass").value;
+      payload.database = "gcs";
+    }
+    else {
+      payload.host = document.getElementById("dbHost").value;
+      payload.port = document.getElementById("dbPort").value;
+      payload.username = document.getElementById("dbUser").value;
+      payload.password = document.getElementById("dbPass").value;
+      payload.database = document.getElementById("dbName").value;
+    }
+
+    if (["azure_datalake", "bigquery", "clickhouse", "databricks", "duckdb", "gcs", "redshift", "s3", "snowflake"].includes(type)) {
+      payload.format = document.getElementById("dataFormat").value;
+    }
+
+    try {
+      const res = await fetch("/destination/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        btn.innerText = "SUCCESS âœ“";
+        if (typeof loadDestinations === "function") loadDestinations();
+        setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
+      } else {
+        btn.innerText = "Failed";
+        setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
+      }
+    } catch (e) {
+      btn.innerText = "Error";
+      setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
+    }
+  }
 </script>
 
 {% endblock %}

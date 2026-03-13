@@ -293,94 +293,77 @@
 
                                 <input type="hidden" id="destType" value="">
 
-                                <div id="dropdownMenu"
-                                    class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
-                                    <div class="p-2 space-y-1">
-                                        <div onclick="selectDestination('mysql', 'MySQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg"
-                                                class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
-                                        </div>
-                                        <div onclick="selectDestination('postgres', 'PostgreSQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"
-                                                class="w-6 h-6 object-contain">
-                                            <span
-                                                class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
-                                        </div>
-                                        <div onclick="selectDestination('redshift', 'Amazon Redshift', '/static/images/logos/redshift.png')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="/static/images/logos/redshift.png" class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">Amazon
-                                                Redshift</span>
-                                        </div>
-                                        <div onclick="selectDestination('bigquery', 'Google BigQuery', 'https://cdn.simpleicons.org/googlebigquery/4285F4')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.simpleicons.org/googlebigquery/4285F4"
-                                                class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">Google
-                                                BigQuery</span>
-                                        </div>
-                                        <div onclick="selectDestination('snowflake', 'Snowflake', 'https://cdn.simpleicons.org/snowflake/29B5E8')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.simpleicons.org/snowflake/29B5E8"
-                                                class="w-6 h-6 object-contain">
-                                            <span
-                                                class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
-                                        </div>
-                                        <div onclick="selectDestination('clickhouse', 'ClickHouse', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg"
-                                                class="w-6 h-6 object-contain">
-                                            <span
-                                                class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
-                                        </div>
-                                        <div onclick="selectDestination('s3', 'AWS S3', '')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="{{ url_for('static', filename='images/logos/s3.png') }}"
-                                                class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">AWS
-                                                S3</span>
-                                        </div>
-                                        <div onclick="selectDestination('azure_datalake', 'Azure Data Lake', '/static/images/logos/adls.png')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="/static/images/logos/adls.png" class="w-6 h-6 object-contain">
-                                            <span class="text-slate-200 group-hover:text-white font-medium">Azure Data
-                                                Lake</span>
-                                        </div>
-                                        <div onclick="selectDestination('databricks', 'Databricks', 'https://cdn.simpleicons.org/databricks/EF3A2C')"
-                                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
-                                            <img src="https://cdn.simpleicons.org/databricks/EF3A2C"
-                                                class="w-6 h-6 object-contain">
-                                            <span
-                                                class="text-slate-200 group-hover:text-white font-medium">Databricks</span>
-                                        </div>
-                    <div onclick="selectDestination('mongodb', 'MongoDB', 'https://cdn.simpleicons.org/mongodb/47A248')"
-                      class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                      <img src="https://cdn.simpleicons.org/mongodb/47A248" class="w-6 h-6 object-contain">
-                      <span class="text-slate-200 group-hover:text-white font-medium">MongoDB</span>
-                    </div>
-                    <div onclick="selectDestination('elasticsearch', 'Elasticsearch', 'https://cdn.simpleicons.org/elasticsearch/005571')"
-                      class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                      <img src="https://cdn.simpleicons.org/elasticsearch/005571" class="w-6 h-6 object-contain">
-                      <span class="text-slate-200 group-hover:text-white font-medium">Elasticsearch</span>
-                    </div>
-                    <div onclick="selectDestination('duckdb', 'DuckDB', 'https://cdn.simpleicons.org/duckdb/FFF000')"
-                      class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                      <img src="https://cdn.simpleicons.org/duckdb/FFF000" class="w-6 h-6 object-contain">
-                      <span class="text-slate-200 group-hover:text-white font-medium">DuckDB</span>
-                    </div>
-                    <div onclick="selectDestination('gcs', 'Google Cloud Storage', 'https://cdn.simpleicons.org/googlecloudstorage/4285F4')"
-                      class="flex items-center gap-3 px-4 py-3 hover:bg-cyan-500/10 rounded-xl cursor-pointer transition-colors group">
-                      <img src="https://cdn.simpleicons.org/googlecloudstorage/4285F4" class="w-6 h-6 object-contain">
-                      <span class="text-slate-200 group-hover:text-white font-medium">Google Cloud Storage</span>
-                    </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Destination input fields — identical to instagram.html -->
+<div id="dropdownMenu"
+  class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
+  <div class="p-2 space-y-1">
+    <div onclick="selectDestination('mysql', 'MySQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
+    </div>
+    <div onclick="selectDestination('postgres', 'PostgreSQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+    </div>
+    <div onclick="selectDestination('redshift', 'Amazon Redshift', '/static/images/logos/redshift.png')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="/static/images/logos/redshift.png" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Amazon Redshift</span>
+    </div>
+    <div onclick="selectDestination('bigquery', 'Google BigQuery', 'https://cdn.simpleicons.org/googlebigquery/4285F4')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+    </div>
+    <div onclick="selectDestination('snowflake', 'Snowflake', 'https://cdn.simpleicons.org/snowflake/29B5E8')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+    </div>
+    <div onclick="selectDestination('clickhouse', 'ClickHouse', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+    </div>
+    <div onclick="selectDestination('s3', 'AWS S3', '')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+    </div>
+    <div onclick="selectDestination('azure_datalake', 'Azure Data Lake', '/static/images/logos/adls.png')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="/static/images/logos/adls.png" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Azure Data Lake</span>
+    </div>
+    <div onclick="selectDestination('databricks', 'Databricks', 'https://cdn.simpleicons.org/databricks/EF3A2C')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/databricks/EF3A2C" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Databricks</span>
+    </div>
+    <div onclick="selectDestination('mongodb', 'MongoDB', 'https://cdn.simpleicons.org/mongodb/47A248')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/mongodb/47A248" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">MongoDB</span>
+    </div>
+    <div onclick="selectDestination('elasticsearch', 'Elasticsearch', 'https://cdn.simpleicons.org/elasticsearch/005571')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/elasticsearch/005571" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Elasticsearch</span>
+    </div>
+    <div onclick="selectDestination('duckdb', 'DuckDB', 'https://cdn.simpleicons.org/duckdb/FFF000')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/duckdb/FFF000" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">DuckDB</span>
+    </div>
+    <div onclick="selectDestination('gcs', 'Google Cloud Storage', 'https://cdn.simpleicons.org/googlecloudstorage/4285F4')"
+      class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-xl cursor-pointer transition-colors group">
+      <img src="https://cdn.simpleicons.org/googlecloudstorage/4285F4" class="w-6 h-6 object-contain">
+      <span class="text-slate-200 group-hover:text-white font-medium">Google Cloud Storage</span>
+    </div>
+  </div>
+</div>
+</div>
                             <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
                                 <div id="sqlFields" class="contents">
                                     <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)"
@@ -843,7 +826,22 @@
         toggleDestFields(value);
     }
 
-            function toggleDestFields(type) {
+                      function toggleDestFields(type) {
+    const formatMatrix = {
+      mysql: ["json"],
+      postgres: ["json"],
+      mongodb: ["json"],
+      elasticsearch: ["json"],
+      bigquery: ["json", "parquet"],
+      snowflake: ["json", "parquet"],
+      redshift: ["json", "parquet"],
+      clickhouse: ["json", "parquet"],
+      duckdb: ["json", "parquet"],
+      s3: ["json", "parquet", "iceberg", "hudi"],
+      azure_datalake: ["json", "parquet", "iceberg", "hudi"],
+      databricks: ["json", "parquet", "iceberg", "hudi"],
+      gcs: ["json", "parquet", "iceberg", "hudi"]
+    };
     const fields = document.getElementById("dbFields");
     if (!type) {
       if (fields) fields.classList.add("hidden");
@@ -863,7 +861,6 @@
     if (s3Fields) s3Fields.classList.toggle("hidden", type !== "s3");
     if (adlsFields) adlsFields.classList.toggle("hidden", type !== "azure_datalake");
     if (dbxFields) dbxFields.classList.toggle("hidden", type !== "databricks");
-    if (formatField) formatField.classList.toggle("hidden", type === "mongodb" || type === "elasticsearch");
 
     const hostInp = document.getElementById("dbHost");
     const portInp = document.getElementById("dbPort");
@@ -905,33 +902,38 @@
       if (nameInp) nameInp.placeholder = "Database Name";
     }
 
-    const icebergBtn = document.getElementById("format-iceberg");
-    const hudiBtn = document.getElementById("format-hudi");
+    const formatButtons = {
+      json: document.getElementById("format-json"),
+      parquet: document.getElementById("format-parquet"),
+      iceberg: document.getElementById("format-iceberg"),
+      hudi: document.getElementById("format-hudi")
+    };
+    const supportedFormats = formatMatrix[type] || ["json"];
     const formatInput = document.getElementById("dataFormat");
     const currentFormat = formatInput ? formatInput.value : "";
 
-    if (type === "bigquery" || type === "duckdb") {
-      if (icebergBtn) icebergBtn.classList.add("hidden");
-      if (hudiBtn) hudiBtn.classList.add("hidden");
-      if (currentFormat === "iceberg" || currentFormat === "hudi") {
-        if (typeof selectFormat === "function") selectFormat("parquet");
-      }
-    } else {
-      if (icebergBtn) icebergBtn.classList.remove("hidden");
-      if (hudiBtn) hudiBtn.classList.remove("hidden");
+    Object.entries(formatButtons).forEach(([format, btn]) => {
+      if (btn) btn.classList.toggle("hidden", !supportedFormats.includes(format));
+    });
+
+    if (formatField) {
+      formatField.classList.toggle("hidden", supportedFormats.length <= 1);
+    }
+
+    if (formatInput && !supportedFormats.includes(currentFormat) && typeof selectFormat === "function") {
+      selectFormat(supportedFormats[0]);
     }
   }
   async function saveDestination() {
     const btn = document.getElementById("saveDestBtn");
     btn.innerText = "CONNECTING...";
     const type = document.getElementById("destType").value;
-      let payload = { source: "hubspot", type };
+    let payload = { source: "hubspot", type };
 
     if (type === "bigquery") {
       payload.host = document.getElementById("bqProject").value;
       payload.database = document.getElementById("bqDataset").value;
       payload.password = document.getElementById("bqKey").value;
-      payload.format = document.getElementById("dataFormat").value;
     }
     else if (type === "s3") {
       payload.host = document.getElementById("s3Bucket").value;
@@ -939,7 +941,6 @@
       payload.username = document.getElementById("s3AccessKey").value;
       payload.password = document.getElementById("s3SecretKey").value;
       payload.database = "s3";
-      payload.format = document.getElementById("dataFormat").value;
     }
     else if (type === "azure_datalake") {
       payload.host = document.getElementById("adlsAccount").value;
@@ -947,7 +948,6 @@
       payload.username = document.getElementById("adlsPath").value;
       payload.password = document.getElementById("adlsKey").value;
       payload.database = "adls";
-      payload.format = document.getElementById("dataFormat").value;
     }
     else if (type === "databricks") {
       payload.host = document.getElementById("dbxHost").value;
@@ -957,7 +957,6 @@
     }
     else if (type === "duckdb") {
       payload.host = document.getElementById("dbHost").value;
-      payload.format = document.getElementById("dataFormat").value;
     }
     else if (type === "mongodb") {
       payload.host = document.getElementById("dbHost").value;
@@ -975,7 +974,6 @@
       payload.port = document.getElementById("dbPort").value;
       payload.password = document.getElementById("dbPass").value;
       payload.database = "gcs";
-      payload.format = document.getElementById("dataFormat").value;
     }
     else {
       payload.host = document.getElementById("dbHost").value;
@@ -985,6 +983,10 @@
       payload.database = document.getElementById("dbName").value;
     }
 
+    if (["azure_datalake", "bigquery", "clickhouse", "databricks", "duckdb", "gcs", "redshift", "s3", "snowflake"].includes(type)) {
+      payload.format = document.getElementById("dataFormat").value;
+    }
+
     try {
       const res = await fetch("/destination/save", {
         method: "POST",
@@ -992,7 +994,7 @@
         body: JSON.stringify(payload)
       });
       if (res.ok) {
-        btn.innerText = "SUCCESS ✓";
+        btn.innerText = "SUCCESS âœ“";
         if (typeof loadDestinations === "function") loadDestinations();
         setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
       } else {
