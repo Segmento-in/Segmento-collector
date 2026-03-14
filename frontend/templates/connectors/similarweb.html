@@ -165,9 +165,8 @@
       <div id="accessOverlay"
         class="absolute inset-0 bg-slate-900/90 flex items-center justify-center z-20 rounded-[2.5rem]">
         <div class="text-center space-y-4 p-8 bg-slate-800/50 rounded-3xl border border-white/10 shadow-2xl">
-          <div
-            class="w-16 h-16 bg-[#2B3D52]/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <svg class="w-8 h-8 text-[#2B3D52]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
@@ -184,8 +183,8 @@
           <div class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
             <div class="flex items-center gap-3 mb-8">
               <div
-                class="w-10 h-10 bg-[#2B3D52]/10 rounded-xl flex items-center justify-center border border-blue-400/20">
-                <svg class="w-5 h-5 text-[#2B3D52]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
@@ -195,29 +194,29 @@
 
             <div class="space-y-6">
               <div>
-                <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Refresh
+                <label class="text-[10px] font-mono text-slate-400 uppercase mb-3 block tracking-widest">Refresh
                   Strategy</label>
                 <select id="syncType"
-                  class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-blue-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
+                  class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-red-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
                   <option value="incremental">Incremental (Delta)</option>
                   <option value="historical">Historical (Full Load)</option>
                 </select>
               </div>
 
               <div>
-                <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Daily
+                <label class="text-[10px] font-mono text-slate-400 uppercase mb-3 block tracking-widest">Daily
                   Schedule</label>
                 <div class="grid grid-cols-2 gap-3">
                   <div class="relative">
                     <select id="hourSelect"
-                      class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-blue-500 outline-none">
+                      class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-red-500 outline-none">
                       {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}" class="bg-slate-800">{{ '%02d' % h }}
                       </option>{% endfor %}
                     </select>
                   </div>
                   <div class="relative">
                     <select id="minSelect"
-                      class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-blue-500 outline-none">
+                      class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-red-500 outline-none">
                       {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}" class="bg-slate-800">{{ '%02d' % m
                         }}</option>{% endfor %}
                     </select>
@@ -230,7 +229,7 @@
                   class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update
                   Schedule</button>
                 <button onclick="runSync()" id="syncBtn"
-                  class="w-full py-4 bg-blue-500 hover:bg-blue-400 text-white rounded-2xl font-black transition-all shadow-lg shadow-blue-500/30 text-xs uppercase tracking-widest">Run
+                  class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-emerald-600/30 text-xs uppercase tracking-widest">Run
                   Manual Sync</button>
               </div>
             </div>
@@ -242,8 +241,8 @@
             <div class="flex items-center justify-between mb-8">
               <div class="flex items-center gap-3">
                 <div
-                  class="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-400/20">
-                  <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  class="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center border border-rose-500/20">
+                  <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
@@ -251,222 +250,256 @@
                 <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
               </div>
               <div id="destStatus"
-                class="text-[10px] font-mono text-[#2B3D52] bg-blue-500/10 px-4 py-1.5 rounded-full border border-blue-400/20 uppercase font-bold tracking-tighter">
+                class="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-4 py-1.5 rounded-full border border-rose-500/20 uppercase font-bold tracking-tighter">
                 System Ready</div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div class="md:col-span-2 relative">
-                <label class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Target
-                  Platform</label>
-
-                <div id="customSelectTrigger" onclick="toggleDropdown()"
-                  class="w-full px-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl text-white flex items-center justify-between cursor-pointer hover:border-blue-400 transition-all">
-                  <div id="selectedOption" class="flex items-center gap-3">
-                    <span class="text-slate-500">Select Connector...</span>
-                  </div>
-                  <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <!-- New Saved Destinations Section at Top -->
+            <div class="mb-8 p-6 bg-black/20 border border-white/5 rounded-3xl">
+              <div class="flex items-center justify-between mb-4">
+                <label class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Active & Saved
+                  Destinations</label>
+                <button onclick="toggleSetupMode()" id="toggleSetupBtn"
+                  class="text-[10px] font-bold text-rose-400 hover:text-rose-300 transition-colors uppercase tracking-widest flex items-center gap-2">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
                   </svg>
-                </div>
-
-                <input type="hidden" id="destType" value="">
-
-<div id="dropdownMenu"
-  class="hidden absolute w-full mt-2 bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl z-50 max-h-60 overflow-y-auto backdrop-blur-xl">
-  <div class="p-2 space-y-1">
-    <div onclick="selectDestination('mysql', 'MySQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
-    </div>
-    <div onclick="selectDestination('postgres', 'PostgreSQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
-    </div>
-    <div onclick="selectDestination('redshift', 'Amazon Redshift', '/static/images/logos/redshift.png')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="/static/images/logos/redshift.png" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">Amazon Redshift</span>
-    </div>
-    <div onclick="selectDestination('bigquery', 'Google BigQuery', 'https://cdn.simpleicons.org/googlebigquery/4285F4')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
-    </div>
-    <div onclick="selectDestination('snowflake', 'Snowflake', 'https://cdn.simpleicons.org/snowflake/29B5E8')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
-    </div>
-    <div onclick="selectDestination('clickhouse', 'ClickHouse', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
-    </div>
-    <div onclick="selectDestination('s3', 'AWS S3', '')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="{{ url_for('static', filename='images/logos/s3.png') }}" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
-    </div>
-    <div onclick="selectDestination('azure_datalake', 'Azure Data Lake', '/static/images/logos/adls.png')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="/static/images/logos/adls.png" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">Azure Data Lake</span>
-    </div>
-    <div onclick="selectDestination('databricks', 'Databricks', 'https://cdn.simpleicons.org/databricks/EF3A2C')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.simpleicons.org/databricks/EF3A2C" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">Databricks</span>
-    </div>
-    <div onclick="selectDestination('mongodb', 'MongoDB', 'https://cdn.simpleicons.org/mongodb/47A248')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.simpleicons.org/mongodb/47A248" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">MongoDB</span>
-    </div>
-    <div onclick="selectDestination('elasticsearch', 'Elasticsearch', 'https://cdn.simpleicons.org/elasticsearch/005571')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.simpleicons.org/elasticsearch/005571" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">Elasticsearch</span>
-    </div>
-    <div onclick="selectDestination('duckdb', 'DuckDB', 'https://cdn.simpleicons.org/duckdb/FFF000')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.simpleicons.org/duckdb/FFF000" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">DuckDB</span>
-    </div>
-    <div onclick="selectDestination('gcs', 'Google Cloud Storage', 'https://cdn.simpleicons.org/googlecloudstorage/4285F4')"
-      class="flex items-center gap-3 px-4 py-3 hover:bg-blue-400/10 rounded-xl cursor-pointer transition-colors group">
-      <img src="https://cdn.simpleicons.org/googlecloudstorage/4285F4" class="w-6 h-6 object-contain">
-      <span class="text-slate-200 group-hover:text-white font-medium">Google Cloud Storage</span>
-    </div>
-  </div>
-</div>
-</div>
-
-              <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
-                <div id="sqlFields" class="contents">
-                  <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="dbPort" placeholder="Port"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="dbUser" placeholder="Username"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="dbPass" type="password" placeholder="Password"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="dbName" placeholder="Database Name"
-                    class="md:col-span-2 w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                </div>
-
-                <div id="bigqueryFields" class="hidden contents">
-                  <input id="bqProject" placeholder="Project ID"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="bqDataset" placeholder="Dataset ID"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <div class="md:col-span-2">
-                    <textarea id="bqKey" placeholder="Service Account JSON Key" rows="3"
-                      class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono"></textarea>
-                  </div>
-                </div>
-
-                <div id="s3Fields" class="hidden contents">
-                  <input id="s3Bucket" placeholder="Bucket Name (my-data-lake)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="s3Region" placeholder="Region (us-east-1)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="s3AccessKey" placeholder="Access Key ID"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="s3SecretKey" type="password" placeholder="Secret Access Key"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                </div>
-
-                <div id="adlsFields" class="hidden contents">
-                  <input id="adlsAccount" placeholder="Storage Account (mystorageacct)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="adlsFilesystem" placeholder="File System / Container (segmento-data)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="adlsPath" placeholder="Base Path (optional, e.g. raw/events)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="adlsKey" type="password" placeholder="Account Key"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                </div>
-
-                <div id="databricksFields" class="hidden contents">
-                  <input id="dbxHost" placeholder="Workspace Hostname (adb-xxx.azuredatabricks.net)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="dbxHttpPath" placeholder="HTTP Path (/sql/1.0/warehouses/...)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="dbxCatalogSchema" placeholder="Catalog.Schema (optional, e.g. hive_metastore.default)"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                  <input id="dbxToken" type="password" placeholder="Personal Access Token"
-                    class="w-full p-4 rounded-xl bg-slate-900/50 text-white border border-white/5">
-                </div>
-
-                <div id="formatField" class="hidden md:col-span-2">
-                  <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block">Data Format</label>
-                  <div class="flex gap-4">
-                    <button onclick="selectFormat('parquet')" id="format-parquet"
-                      class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
-                      <span class="font-bold">Parquet</span>
-                      <div
-                        class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
-                        <div class="dot w-2 h-2 rounded-full bg-blue-500 scale-0 transition-transform"></div>
-                      </div>
-                    </button>
-                    <button onclick="selectFormat('json')" id="format-json"
-                      class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
-                      <span class="font-bold">JSON</span>
-                      <div
-                        class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
-                        <div class="dot w-2 h-2 rounded-full bg-blue-500 scale-0 transition-transform"></div>
-                      </div>
-                    </button>
-
-                    <button onclick="selectFormat('iceberg')" id="format-iceberg"
-                      class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
-                      <span class="font-bold">Iceberg</span>
-                      <div
-                        class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
-                        <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
-                      </div>
-                    </button>
-
-                    <button onclick="selectFormat('hudi')" id="format-hudi"
-                      class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
-                      <span class="font-bold">Hudi</span>
-                      <div
-                        class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
-                        <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
-                      </div>
-                    </button>
-
-
-                  </div>
-                  <input type="hidden" id="dataFormat" value="parquet">
-                </div>
-
-                <div class="md:col-span-2 pt-2">
-                  <button onclick="saveDestination()" id="saveDestBtn"
-                    class="w-full py-5 bg-blue-500 hover:bg-blue-400 text-white rounded-2xl font-black transition-all shadow-lg shadow-blue-500/30 text-xs uppercase tracking-widest">Authenticate
-                    & Save</button>
-                </div>
+                  Setup New
+                </button>
               </div>
 
-              <div class="mt-8 pt-8 border-t border-white/5 md:col-span-2">
-                <label class="text-[10px] font-mono text-slate-500 uppercase mb-3 block tracking-widest">Active
-                  Connection Switcher</label>
-                <select id="destDropdown" onchange="activateDest(this.value)"
-                  class="w-full p-4 rounded-xl bg-slate-900/50 text-blue-300 border border-blue-400/20 outline-none text-sm font-bold cursor-pointer hover:bg-slate-900 transition-all">
-                  <option value="">Loading connections...</option>
-                </select>
+              <div id="savedDestList" class="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                <!-- Destinations will be injected here as cards -->
+                <div class="animate-pulse flex space-x-4 p-3 rounded-2xl bg-slate-900/50">
+                  <div class="rounded-xl bg-slate-800 h-9 w-9"></div>
+                  <div class="flex-1 space-y-2 py-1">
+                    <div class="h-2 bg-slate-800 rounded w-3/4"></div>
+                    <div class="h-2 bg-slate-800 rounded w-1/2"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="manualSetupFields" class="hidden animate-in fade-in slide-in-from-top-4 duration-500">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="md:col-span-2 relative">
+                  <label class="text-[9px] font-mono text-slate-400 uppercase mb-1.5 block ml-1 tracking-widest">Target
+                    Platform</label>
+                  <div id="customSelectTrigger" onclick="toggleDropdown()"
+                    class="w-full px-5 py-3.5 bg-slate-900 border border-slate-700 rounded-xl text-white flex items-center justify-between cursor-pointer hover:border-rose-500 transition-all">
+                    <div id="selectedOption" class="flex items-center gap-3">
+                      <span class="text-slate-400 text-sm">Select Connector...</span>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </div>
+                  <input type="hidden" id="destType" value="">
+                  <div id="dropdownMenu"
+                    class="hidden absolute w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto backdrop-blur-xl custom-scrollbar">
+                    <!-- Dropdown items ... -->
+                    <div class="p-2 space-y-1">
+                      <div
+                        onclick="selectDestination('mysql', 'MySQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg"
+                          class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('postgres', 'PostgreSQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"
+                          class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('redshift', 'Amazon Redshift', '/static/images/logos/redshift.png')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="/static/images/logos/redshift.png" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">Amazon Redshift</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('bigquery', 'Google BigQuery', 'https://cdn.simpleicons.org/googlebigquery/4285F4')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.simpleicons.org/googlebigquery/4285F4" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">Google BigQuery</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('snowflake', 'Snowflake', 'https://cdn.simpleicons.org/snowflake/29B5E8')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.simpleicons.org/snowflake/29B5E8" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('clickhouse', 'ClickHouse', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg"
+                          class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+                      </div>
+                      <div onclick="selectDestination('s3', 'AWS S3', '')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="{{ url_for('static', filename='images/logos/s3.png') }}"
+                          class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('azure_datalake', 'Azure Data Lake', '/static/images/logos/adls.png')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="/static/images/logos/adls.png" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">Azure Data Lake</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('databricks', 'Databricks', 'https://cdn.simpleicons.org/databricks/EF3A2C')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.simpleicons.org/databricks/EF3A2C" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">Databricks</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('mongodb', 'MongoDB', 'https://cdn.simpleicons.org/mongodb/47A248')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.simpleicons.org/mongodb/47A248" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">MongoDB</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('elasticsearch', 'Elasticsearch', 'https://cdn.simpleicons.org/elasticsearch/005571')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.simpleicons.org/elasticsearch/005571" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">Elasticsearch</span>
+                      </div>
+                      <div onclick="selectDestination('duckdb', 'DuckDB', 'https://cdn.simpleicons.org/duckdb/FFF000')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.simpleicons.org/duckdb/FFF000" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">DuckDB</span>
+                      </div>
+                      <div
+                        onclick="selectDestination('gcs', 'Google Cloud Storage', 'https://cdn.simpleicons.org/googlecloudstorage/4285F4')"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors group">
+                        <img src="https://cdn.simpleicons.org/googlecloudstorage/4285F4" class="w-6 h-6 object-contain">
+                        <span class="text-slate-200 group-hover:text-white font-medium">Google Cloud Storage</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
+                  <div id="sqlFields" class="contents">
+                    <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="dbPort" placeholder="Port"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="dbUser" placeholder="Username"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="dbPass" type="password" placeholder="Password"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="dbName" placeholder="Database Name"
+                      class="md:col-span-2 w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                  </div>
+
+                  <div id="bigqueryFields" class="hidden contents">
+                    <input id="bqProject" placeholder="Project ID"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="bqDataset" placeholder="Dataset ID"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <div class="md:col-span-2">
+                      <textarea id="bqKey" placeholder="Service Account JSON Key" rows="2"
+                        class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono text-xs"></textarea>
+                    </div>
+                  </div>
+
+                  <div id="s3Fields" class="hidden contents">
+                    <input id="s3Bucket" placeholder="Bucket Name"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="s3Region" placeholder="Region"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="s3AccessKey" placeholder="Access Key ID"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="s3SecretKey" type="password" placeholder="Secret Access Key"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                  </div>
+
+                  <div id="adlsFields" class="hidden contents">
+                    <input id="adlsAccount" placeholder="Storage Account"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="adlsFilesystem" placeholder="File System"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="adlsPath" placeholder="Base Path"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="adlsKey" type="password" placeholder="Account Key"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                  </div>
+
+                  <div id="databricksFields" class="hidden contents">
+                    <input id="dbxHost" placeholder="Workspace Hostname"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="dbxHttpPath" placeholder="HTTP Path"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="dbxCatalogSchema" placeholder="Catalog.Schema"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                    <input id="dbxToken" type="password" placeholder="Personal Access Token"
+                      class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                  </div>
+
+                  <div id="formatField" class="hidden md:col-span-2">
+                    <label class="text-[10px] font-mono text-slate-400 uppercase mb-3 block">
+                      Data Format
+                    </label>
+                    <div class="flex gap-4">
+                      <button onclick="selectFormat('parquet')" id="format-parquet"
+                        class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                        <span class="font-bold">Parquet</span>
+                        <div
+                          class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                          <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                        </div>
+                      </button>
+                      <button onclick="selectFormat('json')" id="format-json"
+                        class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                        <span class="font-bold">JSON</span>
+                        <div
+                          class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                          <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                        </div>
+                      </button>
+
+                      <button onclick="selectFormat('iceberg')" id="format-iceberg"
+                        class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                        <span class="font-bold">Iceberg</span>
+                        <div
+                          class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                          <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                        </div>
+                      </button>
+
+                      <button onclick="selectFormat('hudi')" id="format-hudi"
+                        class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                        <span class="font-bold">Hudi</span>
+                        <div
+                          class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                          <div class="dot w-2 h-2 rounded-full bg-red-500 scale-0 transition-transform"></div>
+                        </div>
+                      </button>
+
+
+                    </div>
+                    <input type="hidden" id="dataFormat" value="parquet">
+                  </div>
+
+                  <div class="md:col-span-2 pt-2">
+                    <button onclick="saveDestination()" id="saveDestBtn"
+                      class="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-rose-600/20"> 
+                      Authenticate & Save 
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        </div>
       </div>
-    </div>
-
-    <div class="pt-12">
+      <div class="pt-12">
       <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">SimilarWeb <span
           class="text-blue-400">Schema</span></h2>
       <div class="grid lg:grid-cols-2 gap-12 items-start">
@@ -550,7 +583,7 @@
 </section>
 
 <style>
-  .bg-slate-900 {
+.bg-\[\#0f172a\] {
     background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.02) 1px, transparent 0);
     background-size: 40px 40px;
   }
@@ -563,14 +596,16 @@
     background-size: 1em;
   }
 
+  /* Format Option Styling */
   .format-option.selected {
-    border-color: #3b82f6;
+    border-color: #f43f5e;
     color: white;
-    background-color: rgba(59, 130, 246, 0.08);
+    background-color: rgba(244, 63, 94, 0.05);
   }
 
+
   .format-option.selected .radio-indicator {
-    border-color: #3b82f6;
+    border-color: #f43f5e;
   }
 
   .format-option.selected .dot {
@@ -592,44 +627,94 @@
   .animate-pulse-once {
     animation: pulse-once 2s ease-in-out;
   }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 </style>
 <style>
-  /* SimilarWeb brand color overrides */
-  .bg-blue-500 {
-    background-color: #2B3D52;
+.bg-\[\#0f172a\] {
+    background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.02) 1px, transparent 0);
+    background-size: 40px 40px;
   }
 
-  .bg-blue-500\/10 {
-    background-color: #2B3D5210;
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
   }
 
-  .bg-blue-500\/20 {
-    background-color: #2B3D5220;
+  /* Format Option Styling */
+  .format-option.selected {
+    border-color: #f43f5e;
+    color: white;
+    background-color: rgba(244, 63, 94, 0.05);
   }
 
-  .border-blue-400 {
-    border-color: #2B3D52;
+
+  .format-option.selected .radio-indicator {
+    border-color: #f43f5e;
   }
 
-  .text-blue-400 {
-    color: #2B3D52;
+  .format-option.selected .dot {
+    transform: scale(1);
   }
 
-  .hover\:bg-blue-400:hover {
-    background-color: #FF9700;
+  @keyframes pulse-once {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: .6;
+    }
   }
 
-  .hover\:text-blue-600:hover {
-    color: #FF9700;
+  .animate-pulse-once {
+    animation: pulse-once 2s ease-in-out;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    checkSimilarWebStatus();
+document.addEventListener("DOMContentLoaded", () => {
+    checkSimilarwebStatus();
     loadDestinations();
     loadJob();
-    selectFormat('parquet');
+    selectFormat('parquet'); // Default selection
   });
 
   function selectFormat(val) {
@@ -638,7 +723,7 @@
     document.getElementById('format-' + val).classList.add('selected');
   }
 
-  async function checkSimilarWebStatus() {
+  async function checkSimilarwebStatus() {
     try {
       const res = await fetch("/api/status/similarweb");
       const data = await res.json();
@@ -649,33 +734,52 @@
       const accessOverlay = document.getElementById("accessOverlay");
 
       if (data.connected) {
-        badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
-        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
 
-        if (data.domain) {
-          connectedAs.innerHTML = `Connected domain <strong>${data.domain}</strong>`;
+        badge.innerHTML =
+          `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
+
+        badge.className =
+          "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
+        if (data.email) {
+          connectedAs.innerHTML =
+            `Connected as <strong>${data.email}</strong>`;
         }
 
         updateFlowUI(3);
 
-        syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+        syncContent.classList.remove(
+          "opacity-65", "blur-sm", "pointer-events-none"
+        );
         accessOverlay.classList.add("hidden");
       }
+
       else if (data.has_credentials) {
-        badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
-        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
+        badge.innerHTML =
+          `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
+
+        badge.className =
+          "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
 
         updateFlowUI(1);
 
-        syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+        syncContent.classList.add(
+          "opacity-65", "blur-sm", "pointer-events-none"
+        );
         accessOverlay.classList.remove("hidden");
       }
-      else {
-        badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
 
-        syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+      else {
+        badge.innerHTML =
+          `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
+
+        syncContent.classList.add(
+          "opacity-65", "blur-sm", "pointer-events-none"
+        );
         accessOverlay.classList.remove("hidden");
       }
+
     } catch (e) {
       console.error(e);
     }
@@ -692,11 +796,11 @@
     if (step >= 1) {
       s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
       s1.innerHTML = "✓";
-      s2.className = "w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+      s2.className = "w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
 
-      btn.innerText = "Authorize with SimilarWeb";
-      btn.className = "w-full py-5 bg-white text-blue-600 rounded-2xl font-black hover:bg-blue-500 hover:text-white transition-all shadow-lg text-xs uppercase tracking-widest mt-2 hover:shadow-blue-500/40";
-      btn.onclick = () => connectSimilarWeb();
+      btn.innerText = "Authorize with Google";
+      btn.className = "w-full py-5 bg-white text-red-600 rounded-2xl font-black hover:bg-red-600 hover:text-white transition-all shadow-lg text-xs uppercase tracking-widest mt-2 hover:shadow-red-600/40";
+      btn.onclick = () => window.location.href = "/connectors/similarweb/connect";
     }
 
     if (step >= 3) {
@@ -712,56 +816,32 @@
   }
 
   async function saveCredentials() {
-    const appId = document.getElementById("appId").value.trim();
-    const accountId = document.getElementById("accountId").value.trim();
-    if (!appId || !accountId) { alert("API Key and Domain are required"); return; }
-
-    const btn = document.getElementById("saveCredsBtn");
-    btn.disabled = true;
-    btn.innerText = "SAVING...";
-
+    const clientId = document.getElementById("clientId").value.trim();
+    const clientSecret = document.getElementById("clientSecret").value.trim();
+    if (!clientId || !clientSecret) { alert("Credentials required"); return; }
     try {
       const res = await fetch("/connectors/similarweb/save_app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ api_key: appId, domain: accountId })
+        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
       });
-      if (res.ok) { checkSimilarWebStatus(); }
-      else { alert("Failed to save credentials"); }
-    } catch (e) { alert("Save error"); }
-    finally {
-      btn.disabled = false;
-      btn.innerText = "Save Credentials & Continue";
-    }
+      if (res.ok) { checkSimilarwebStatus(); }
+    } catch (e) { alert("Save failed"); }
   }
 
-  async function connectSimilarWeb() {
-    const btn = document.getElementById("saveCredsBtn");
-    btn.disabled = true;
-    btn.innerText = "CONNECTING...";
-    try {
-      const res = await fetch("/connectors/similarweb/connect");
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || err.message || "Connection failed");
-      }
-      await checkSimilarWebStatus();
-    } catch (e) {
-      alert(e.message || "Connection failed");
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "Authorize with SimilarWeb";
-    }
-  }
+  async function disconnectSimilarweb() {
 
-  async function disconnectSimilarWeb() {
-    if (!confirm("Disconnecting will stop all future SimilarWeb syncs.\n\nContinue?")) return;
+    if (!confirm(
+      "Disconnecting will stop all future Similarweb syncs.\n\nContinue?"
+    )) return;
     const btn = document.getElementById("disconnectBtn");
+
     btn.disabled = true;
     btn.innerText = "Disconnecting...";
 
     try {
-      const res = await fetch("/connectors/similarweb/disconnect");
+      const res =
+        await fetch("/connectors/similarweb/disconnect");
       if (res.ok) {
         alert("Connection revoked.");
         location.reload();
@@ -771,9 +851,6 @@
       }
     } catch (e) {
       alert("Disconnect error.");
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "Disconnect this account";
     }
   }
 
@@ -781,149 +858,107 @@
     try {
       const res = await fetch(`/destination/list/similarweb`);
       const data = await res.json();
-      const dropdown = document.getElementById("destDropdown");
+      const listContainer = document.getElementById("savedDestList");
       const statusEl = document.getElementById("destStatus");
-      dropdown.innerHTML = '<option value="">Loading connections...</option>';
-      if (data.destinations?.length) {
-        data.destinations.forEach(d => {
-          const opt = document.createElement("option");
-          opt.value = d.id;
-          opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database || d.host || '—'}`;
-          if (d.active) {
-            opt.selected = true;
-            statusEl.innerText = "Connection Active";
-            statusEl.classList.replace("text-blue-400", "text-emerald-400");
-          }
-          dropdown.appendChild(opt);
-        });
+
+      listContainer.innerHTML = '';
+
+      if (!data.destinations || data.destinations.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-6 border-2 border-dashed border-white/5 rounded-2xl">
+            <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">No saved connections found</p>
+          </div>
+        `;
+        toggleSetupMode(true); // Show fields if none exist
+        return;
       }
-    } catch (e) { }
-  }
 
-  function toggleDropdown() {
-    document.getElementById('dropdownMenu').classList.toggle('hidden');
-  }
+      data.destinations.forEach(d => {
+        const isActive = d.active;
+        if (isActive) {
+          statusEl.innerText = "Connection Active";
+          statusEl.classList.replace("text-rose-400", "text-emerald-400");
+          statusEl.classList.replace("bg-rose-500/10", "bg-emerald-500/10");
+          statusEl.classList.replace("border-rose-500/20", "border-emerald-500/20");
+        }
 
-  function selectDestination(value, label, logoUrl) {
-    document.getElementById('destType').value = value;
+        const card = document.createElement("div");
+        card.onclick = () => activateDest(d.id);
+        card.className = `group flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer ${isActive
+            ? 'bg-rose-500/10 border-rose-500/40 shadow-lg shadow-rose-500/10'
+            : 'bg-slate-900/50 border-white/5 hover:border-white/10 hover:bg-slate-900'
+          }`;
 
-    const selectedDiv = document.getElementById('selectedOption');
-    selectedDiv.innerHTML = '';
+        const logoMap = {
+          'mysql': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
+          'postgres': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg',
+          'mongodb': 'https://cdn.simpleicons.org/mongodb/47A248',
+          'elasticsearch': 'https://cdn.simpleicons.org/elasticsearch/005571',
+          'redshift': '/static/images/logos/redshift.png',
+          'bigquery': 'https://cdn.simpleicons.org/googlebigquery/4285F4',
+          'snowflake': 'https://cdn.simpleicons.org/snowflake/29B5E8',
+          'clickhouse': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg',
+          'duckdb': 'https://cdn.simpleicons.org/duckdb/FFF000',
+          's3': '/static/images/logos/s3.png',
+          'azure_datalake': '/static/images/logos/adls.png',
+          'databricks': 'https://cdn.simpleicons.org/databricks/EF3A2C',
+          'gcs': 'https://cdn.simpleicons.org/googlecloudstorage/4285F4'
+        };
 
-    if (logoUrl) {
-      const img = document.createElement('img');
-      img.src = logoUrl;
-      img.className = "w-5 h-5 object-contain";
-      selectedDiv.appendChild(img);
+        const logoUrl = logoMap[d.type.toLowerCase()] || '';
+
+        card.innerHTML = `
+          <div class="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+            ${logoUrl ? `<img src="${logoUrl}" class="w-full h-full object-contain">` : '<div class="w-full h-full bg-slate-700 rounded"></div>'}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h4 class="text-white font-bold text-sm truncate uppercase tracking-tighter">${d.type}</h4>
+              ${isActive ? '<span class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]"><span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span><span class="text-emerald-400 text-[8px] font-black uppercase tracking-widest">Current Active Destination</span></span>' : ''}
+            </div>
+            <p class="text-slate-500 text-[10px] font-mono truncate lowercase">${d.database || d.host || 'active session'}</p>
+          </div>
+          <div class="shrink-0">
+            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? 'border-rose-500 bg-rose-500' : 'border-slate-700'}">
+              ${isActive ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+            </div>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+    } catch (e) {
+      console.error("Error loading destinations:", e);
     }
-
-    const textSpan = document.createElement('span');
-    textSpan.className = "text-white font-bold";
-    textSpan.innerText = label;
-    selectedDiv.appendChild(textSpan);
-
-    document.getElementById('dropdownMenu').classList.add('hidden');
-    toggleDestFields(value);
   }
 
-                function toggleDestFields(type) {
-    const formatMatrix = {
-      mysql: ["json"],
-      postgres: ["json"],
-      mongodb: ["json"],
-      elasticsearch: ["json"],
-      bigquery: ["json", "parquet"],
-      snowflake: ["json", "parquet"],
-      redshift: ["json", "parquet"],
-      clickhouse: ["json", "parquet"],
-      duckdb: ["json", "parquet"],
-      s3: ["json", "parquet", "iceberg", "hudi"],
-      azure_datalake: ["json", "parquet", "iceberg", "hudi"],
-      databricks: ["json", "parquet", "iceberg", "hudi"],
-      gcs: ["json", "parquet", "iceberg", "hudi"]
-    };
-    const fields = document.getElementById("dbFields");
-    if (!type) {
-      if (fields) fields.classList.add("hidden");
-      return;
-    }
-    if (fields) fields.classList.remove("hidden");
+  let isSetupVisible = false;
+  function toggleSetupMode(forceShow = false) {
+    const fields = document.getElementById("manualSetupFields");
+    const btn = document.getElementById("toggleSetupBtn");
 
-    const sqlFields = document.getElementById("sqlFields");
-    const bqFields = document.getElementById("bigqueryFields");
-    const s3Fields = document.getElementById("s3Fields");
-    const adlsFields = document.getElementById("adlsFields");
-    const dbxFields = document.getElementById("databricksFields");
-    const formatField = document.getElementById("formatField");
+    if (forceShow) isSetupVisible = false;
 
-    if (sqlFields) sqlFields.classList.toggle("hidden", type === "bigquery" || type === "s3" || type === "azure_datalake" || type === "databricks");
-    if (bqFields) bqFields.classList.toggle("hidden", type !== "bigquery");
-    if (s3Fields) s3Fields.classList.toggle("hidden", type !== "s3");
-    if (adlsFields) adlsFields.classList.toggle("hidden", type !== "azure_datalake");
-    if (dbxFields) dbxFields.classList.toggle("hidden", type !== "databricks");
+    isSetupVisible = !isSetupVisible;
 
-    const hostInp = document.getElementById("dbHost");
-    const portInp = document.getElementById("dbPort");
-    const userInp = document.getElementById("dbUser");
-    const passInp = document.getElementById("dbPass");
-    const nameInp = document.getElementById("dbName");
-
-    [hostInp, portInp, userInp, passInp, nameInp].forEach(el => {
-      if (el) el.classList.remove("hidden");
-    });
-
-    if (type === "mongodb") {
-      if (hostInp) hostInp.placeholder = "Cluster URI (mongodb+srv://...)";
-      if (nameInp) nameInp.placeholder = "Database Name";
-      if (userInp) userInp.placeholder = "Username";
-      if (passInp) passInp.placeholder = "Password";
-      if (portInp) portInp.classList.add("hidden");
-    } else if (type === "elasticsearch") {
-      if (hostInp) hostInp.placeholder = "Endpoint (http://...)";
-      if (portInp) portInp.placeholder = "Port (9200)";
-      if (nameInp) nameInp.placeholder = "Index Name";
-    } else if (type === "duckdb") {
-      if (hostInp) hostInp.placeholder = "File Path (e.g. data/my.db)";
-      if (portInp) portInp.classList.add("hidden");
-      if (userInp) userInp.classList.add("hidden");
-      if (passInp) passInp.classList.add("hidden");
-      if (nameInp) nameInp.classList.add("hidden");
-    } else if (type === "gcs") {
-      if (hostInp) hostInp.placeholder = "Bucket Name";
-      if (portInp) portInp.placeholder = "Region (optional)";
-      if (userInp) userInp.classList.add("hidden");
-      if (passInp) passInp.placeholder = "Service Account JSON Key";
-      if (nameInp) nameInp.classList.add("hidden");
+    if (isSetupVisible) {
+      fields.classList.remove("hidden");
+      btn.innerHTML = `
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        Cancel Setup
+      `;
     } else {
-      if (hostInp) hostInp.placeholder = "Host (e.g. 127.0.0.1)";
-      if (portInp) portInp.placeholder = "Port";
-      if (userInp) userInp.placeholder = "Username";
-      if (passInp) passInp.placeholder = "Password";
-      if (nameInp) nameInp.placeholder = "Database Name";
-    }
-
-    const formatButtons = {
-      json: document.getElementById("format-json"),
-      parquet: document.getElementById("format-parquet"),
-      iceberg: document.getElementById("format-iceberg"),
-      hudi: document.getElementById("format-hudi")
-    };
-    const supportedFormats = formatMatrix[type] || ["json"];
-    const formatInput = document.getElementById("dataFormat");
-    const currentFormat = formatInput ? formatInput.value : "";
-
-    Object.entries(formatButtons).forEach(([format, btn]) => {
-      if (btn) btn.classList.toggle("hidden", !supportedFormats.includes(format));
-    });
-
-    if (formatField) {
-      formatField.classList.toggle("hidden", supportedFormats.length <= 1);
-    }
-
-    if (formatInput && !supportedFormats.includes(currentFormat) && typeof selectFormat === "function") {
-      selectFormat(supportedFormats[0]);
+      fields.classList.add("hidden");
+      btn.innerHTML = `
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Setup New
+      `;
     }
   }
+
   async function saveDestination() {
     const btn = document.getElementById("saveDestBtn");
     btn.innerText = "CONNECTING...";
@@ -994,7 +1029,7 @@
         body: JSON.stringify(payload)
       });
       if (res.ok) {
-        btn.innerText = "SUCCESS âœ“";
+        btn.innerText = "SUCCESS ✓";
         if (typeof loadDestinations === "function") loadDestinations();
         setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
       } else {
@@ -1006,7 +1041,7 @@
       setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
     }
   }
-async function loadJob() {
+  async function loadJob() {
     try {
       const data = await fetch("/connectors/similarweb/job/get").then(r => r.json());
       if (data.schedule_time) {
@@ -1030,21 +1065,13 @@ async function loadJob() {
 
   async function runSync() {
     const btn = document.getElementById("syncBtn");
-    btn.innerText = "SYNCING...";
-    btn.disabled = true;
+    btn.innerText = "SYNCING..."; btn.disabled = true;
     try {
       const res = await fetch("/connectors/similarweb/sync");
       const d = await res.json();
-      btn.innerText = `SYNCED (${d.rows_pushed || d.rows_found || 0} rows)`;
-    } catch (e) {
-      btn.innerText = "FAILED";
-    }
-    finally {
-      setTimeout(() => {
-        btn.innerText = "Run Manual Sync";
-        btn.disabled = false;
-      }, 3000);
-    }
+      btn.innerText = `SYNCED (${d.messages || 0} MSGS)`;
+    } catch (e) { btn.innerText = "FAILED"; }
+    finally { setTimeout(() => { btn.innerText = "Run Manual Sync"; btn.disabled = false; }, 3000); }
   }
 
   async function activateDest(id) {
@@ -1057,9 +1084,140 @@ async function loadJob() {
     loadDestinations();
   }
 
+  function toggleDropdown() {
+    const menu = document.getElementById('dropdownMenu');
+    menu.classList.toggle('hidden');
+  }
+
+  function selectDestination(value, label, logoUrl) {
+    // 1. Update the hidden input for your existing save logic
+    document.getElementById('destType').value = value;
+
+    // 2. Update the Trigger UI
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain">` : ''; // Fallback logic if needed
+
+    // Using the icons from the options list
+    const selectedDiv = document.getElementById('selectedOption');
+    const clickedElement = event.currentTarget;
+    const imgClone = clickedElement.querySelector('img').cloneNode(true);
+
+    selectedDiv.innerHTML = '';
+    selectedDiv.appendChild(imgClone);
+    const textSpan = document.createElement('span');
+    textSpan.className = "text-white font-bold";
+    textSpan.innerText = label;
+    selectedDiv.appendChild(textSpan);
+
+    // 3. Hide menu
+    document.getElementById('dropdownMenu').classList.add('hidden');
+
+    // 4. Trigger your existing form field visibility logic
+    toggleDestFields(value);
+  }
+
+  // Close dropdown if user clicks outside
   window.onclick = function (event) {
     if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
       document.getElementById('dropdownMenu').classList.add('hidden');
+    }
+  }
+
+  function toggleDestFields(type) {
+    const formatMatrix = {
+      mysql: ["json"],
+      postgres: ["json"],
+      mongodb: ["json"],
+      elasticsearch: ["json"],
+      bigquery: ["json", "parquet"],
+      snowflake: ["json", "parquet"],
+      redshift: ["json", "parquet"],
+      clickhouse: ["json", "parquet"],
+      duckdb: ["json", "parquet"],
+      s3: ["json", "parquet", "iceberg", "hudi"],
+      azure_datalake: ["json", "parquet", "iceberg", "hudi"],
+      databricks: ["json", "parquet", "iceberg", "hudi"],
+      gcs: ["json", "parquet", "iceberg", "hudi"]
+    };
+    const fields = document.getElementById("dbFields");
+    if (!type) {
+      if (fields) fields.classList.add("hidden");
+      return;
+    }
+    if (fields) fields.classList.remove("hidden");
+
+    const sqlFields = document.getElementById("sqlFields");
+    const bqFields = document.getElementById("bigqueryFields");
+    const s3Fields = document.getElementById("s3Fields");
+    const adlsFields = document.getElementById("adlsFields");
+    const dbxFields = document.getElementById("databricksFields");
+    const formatField = document.getElementById("formatField");
+
+    if (sqlFields) sqlFields.classList.toggle("hidden", ["bigquery", "s3", "azure_datalake", "databricks"].includes(type));
+    if (bqFields) bqFields.classList.toggle("hidden", type !== "bigquery");
+    if (s3Fields) s3Fields.classList.toggle("hidden", type !== "s3");
+    if (adlsFields) adlsFields.classList.toggle("hidden", type !== "azure_datalake");
+    if (dbxFields) dbxFields.classList.toggle("hidden", type !== "databricks");
+
+    const supportedFormats = formatMatrix[type] || ["json"];
+    if (formatField) {
+      formatField.classList.toggle("hidden", supportedFormats.length <= 1);
+    }
+
+    const formatButtons = {
+      json: document.getElementById("format-json"),
+      parquet: document.getElementById("format-parquet"),
+      iceberg: document.getElementById("format-iceberg"),
+      hudi: document.getElementById("format-hudi")
+    };
+
+    Object.entries(formatButtons).forEach(([fmt, btn]) => {
+      if (btn) btn.classList.toggle("hidden", !supportedFormats.includes(fmt));
+    });
+
+    const formatInput = document.getElementById("dataFormat");
+    if (formatInput && !supportedFormats.includes(formatInput.value)) {
+      selectFormat(supportedFormats[0]);
+    }
+
+    // Input field placeholders and visibility
+    const hostInp = document.getElementById("dbHost");
+    const portInp = document.getElementById("dbPort");
+    const userInp = document.getElementById("dbUser");
+    const passInp = document.getElementById("dbPass");
+    const nameInp = document.getElementById("dbName");
+
+    [hostInp, portInp, userInp, passInp, nameInp].forEach(el => {
+      if (el) el.classList.remove("hidden");
+    });
+
+    if (type === "mongodb") {
+      if (hostInp) hostInp.placeholder = "Cluster URI";
+      if (nameInp) nameInp.placeholder = "Database Name";
+      if (userInp) userInp.placeholder = "Username";
+      if (passInp) passInp.placeholder = "Password";
+      if (portInp) portInp.classList.add("hidden");
+    } else if (type === "elasticsearch") {
+      if (hostInp) hostInp.placeholder = "Endpoint URL";
+      if (portInp) portInp.placeholder = "Port (9200)";
+      if (nameInp) nameInp.placeholder = "Index Name";
+    } else if (type === "duckdb") {
+      if (hostInp) hostInp.placeholder = "File Path";
+      if (portInp) portInp.classList.add("hidden");
+      if (userInp) userInp.classList.add("hidden");
+      if (passInp) passInp.classList.add("hidden");
+      if (nameInp) nameInp.classList.add("hidden");
+    } else if (type === "gcs") {
+      if (hostInp) hostInp.placeholder = "Bucket Name";
+      if (portInp) portInp.placeholder = "Region";
+      if (userInp) userInp.classList.add("hidden");
+      if (passInp) passInp.placeholder = "JSON Key";
+      if (nameInp) nameInp.classList.add("hidden");
+    } else {
+      if (hostInp) hostInp.placeholder = "Host (IP/DNS)";
+      if (portInp) portInp.placeholder = "Port";
+      if (userInp) userInp.placeholder = "Username";
+      if (passInp) passInp.placeholder = "Password";
+      if (nameInp) nameInp.placeholder = "Database Name";
     }
   }
 </script>
