@@ -10,8 +10,8 @@
   <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-blue-500/10 blur-3xl text-white">
   </div>
 
-  <div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full opacity-50"></div>
-  <div class="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-600/10 blur-[150px] rounded-full opacity-50">
+  <div class="parallax-bg absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full opacity-50" data-speed="0.1"></div>
+  <div class="parallax-bg absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-blue-600/10 blur-[150px] rounded-full opacity-50" data-speed="0.15">
   </div>
 
   <div class="max-w-7xl mx-auto relative z-10">
@@ -20,7 +20,7 @@
 
       <div class="flex justify-center mb-6">
         <a href="javascript:history.back()"
-          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-cyan-400 bg-cyan-950/50 text-cyan-400 text-sm font-bold hover:bg-cyan-400 hover:text-slate-900 transition-all shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:shadow-[0_0_25px_rgba(34,211,238,0.5)] hover:-translate-x-1">
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-cyan-400 bg-cyan-950/50 text-cyan-400 text-sm font-bold hover:bg-cyan-400 hover:text-slate-900 transition-all hover:-translate-x-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18">
             </path>
@@ -49,7 +49,7 @@
     </div>
 
     <div
-      class="flex flex-col lg:flex-row gap-6 mb-16 items-center justify-between bg-slate-900/40 p-4 rounded-3xl border border-white/5 backdrop-blur-xl shadow-2xl">
+      class="flex flex-col lg:flex-row gap-6 mb-16 items-center justify-between bg-slate-900/60 p-6 rounded-3xl border border-white/10 backdrop-blur-md">
 
       <div class="relative w-full lg:w-1/3 group">
         <div
@@ -65,7 +65,7 @@
 
       <div class="flex flex-wrap gap-2 justify-center">
         <button
-          class="filterBtn active px-6 py-2.5 bg-cyan-400 text-black rounded-xl font-bold text-sm shadow-lg shadow-cyan-400/20 transition-all"
+          class="filterBtn active-pills px-6 py-2.5 rounded-xl font-bold text-sm transition-all"
           data-cat="all">
           All
         </button>
@@ -125,24 +125,48 @@
 <script src="/static/js/connectors_data.js"></script>
 
 <style>
-  /* Prevent cards from merging into background using a subtle multi-layered border */
+  /* Neumorphic Connector Cards */
   .connector-card {
-    background: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    background: #fcfcfc;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.2, 0, 0, 1);
+    transform-style: preserve-3d;
+    perspective: 1000px;
   }
 
   .connector-card:hover {
-    background: #ffffff;
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px -10px rgba(34, 211, 238, 0.3);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 10px 10px 25px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Inner elements for 3D depth */
+  .connector-card > div {
+    transform: translateZ(20px);
   }
 
   .active-pills {
-    background: #22d3ee !important;
-    color: #000 !important;
+    background: #0ea5e9 !important; /* Cyan 500 */
+    color: #ffffff !important;
     font-weight: 800 !important;
-    box-shadow: 0 10px 20px -5px rgba(34, 211, 238, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3) !important;
     border-color: transparent !important;
+  }
+
+  .filterBtn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+  }
+
+  .filterBtn:hover:not(.active-pills) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+    transform: translateY(-1px);
+  }
+
+  .parallax-bg {
+    transition: transform 0.2s ease-out;
   }
 </style>
 
@@ -225,7 +249,7 @@
         ${c.description}
       </p>
 
-      <div class="mb-8 p-4 bg-slate-50/50 rounded-2xl border border-slate-100">
+      <div class="mb-8 p-4 bg-slate-50/50 rounded-2xl border border-slate-100 shadow-[inset_2px_2px_5px_#e2e8f0,inset_-2px_-2px_5px_#ffffff]">
           <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Captured Data</p>
           <ul class="text-xs text-slate-600 space-y-2">
             ${dataPreview}
@@ -233,7 +257,7 @@
       </div>
 
       <button
-        class="w-full py-3.5 bg-slate-900 text-white rounded-2xl group-hover:bg-cyan-400 group-hover:text-black group-hover:shadow-lg group-hover:shadow-cyan-400/30 transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2"
+        class="view-btn w-full py-3.5 bg-slate-900 text-white rounded-2xl group-hover:bg-cyan-400 group-hover:text-black group-hover:shadow-[4px_4px_10px_#cbd5e1] transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 transform-gpu"
       >
         View Connector
         <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -241,6 +265,38 @@
     `;
 
       grid.appendChild(card);
+
+      // Magnetic effect for the button
+      const btn = card.querySelector('.view-btn');
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // 3D Tilt Logic
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+        
+        // Button Magnetic Pull
+        const btnRect = btn.getBoundingClientRect();
+        const btnX = e.clientX - (btnRect.left + btnRect.width / 2);
+        const btnY = e.clientY - (btnRect.top + btnRect.height / 2);
+        
+        if (Math.abs(btnX) < 100 && Math.abs(btnY) < 50) {
+          btn.style.transform = `translate(${btnX * 0.2}px, ${btnY * 0.2}px)`;
+        } else {
+          btn.style.transform = `translate(0, 0)`;
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        card.style.zIndex = "1";
+      });
     });
   }
 
@@ -268,6 +324,16 @@
 
       const cat = btn.dataset.cat;
       render(cat === "all" ? CONNECTORS : CONNECTORS.filter(c => c.categories && c.categories.includes(cat)));
+    });
+  });
+
+  // Background Parallax Effect
+  window.addEventListener('scroll', () => {
+    const pBgs = document.querySelectorAll('.parallax-bg');
+    const scrollY = window.scrollY;
+    pBgs.forEach(bg => {
+      const speed = parseFloat(bg.dataset.speed);
+      bg.style.transform = `translateY(${scrollY * speed}px)`;
     });
   });
 
