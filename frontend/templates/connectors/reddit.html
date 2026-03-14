@@ -538,7 +538,7 @@
 </section>
 
 <style>
-  .bg-slate-900 {
+.bg-\[\#0f172a\] {
     background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.02) 1px, transparent 0);
     background-size: 40px 40px;
   }
@@ -551,11 +551,13 @@
     background-size: 1em;
   }
 
+  /* Format Option Styling */
   .format-option.selected {
     border-color: #f97316;
     color: white;
     background-color: rgba(249, 115, 22, 0.05);
   }
+
 
   .format-option.selected .radio-indicator {
     border-color: #f97316;
@@ -580,14 +582,31 @@
   .animate-pulse-once {
     animation: pulse-once 2s ease-in-out;
   }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
 </style>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    checkStatus();
+document.addEventListener("DOMContentLoaded", () => {
+    checkRedditStatus();
     loadDestinations();
     loadJob();
-    selectFormat('parquet');
+    selectFormat('parquet'); // Default selection
   });
 
   function selectFormat(val) {
@@ -596,35 +615,63 @@
     document.getElementById('format-' + val).classList.add('selected');
   }
 
-  async function checkStatus() {
+  async function checkRedditStatus() {
     try {
       const res = await fetch("/api/status/reddit");
       const data = await res.json();
 
       const badge = document.getElementById("statusBadge");
+      const connectedAs = document.getElementById("connectedAs");
       const syncContent = document.getElementById("syncContent");
       const accessOverlay = document.getElementById("accessOverlay");
 
       if (data.connected) {
-        badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
-        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
+        badge.innerHTML =
+          `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
+
+        badge.className =
+          "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
+        if (data.email) {
+          connectedAs.innerHTML =
+            `Connected as <strong>${data.email}</strong>`;
+        }
+
         updateFlowUI(3);
-        syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+
+        syncContent.classList.remove(
+          "opacity-65", "blur-sm", "pointer-events-none"
+        );
         accessOverlay.classList.add("hidden");
       }
+
       else if (data.has_credentials) {
-        badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-orange-500"></span> CREDENTIALS SAVED`;
-        badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
-        updateFlowUI(2);
-        syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
-        accessOverlay.classList.remove("hidden");
-      }
-      else {
-        badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
+
+        badge.innerHTML =
+          `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
+
+        badge.className =
+          "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+
         updateFlowUI(1);
-        syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+
+        syncContent.classList.add(
+          "opacity-65", "blur-sm", "pointer-events-none"
+        );
         accessOverlay.classList.remove("hidden");
       }
+
+      else {
+        badge.innerHTML =
+          `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
+
+        syncContent.classList.add(
+          "opacity-65", "blur-sm", "pointer-events-none"
+        );
+        accessOverlay.classList.remove("hidden");
+      }
+
     } catch (e) {
       console.error(e);
     }
@@ -634,80 +681,64 @@
     const s1 = document.getElementById("step1-circle");
     const s2 = document.getElementById("step2-circle");
     const s3 = document.getElementById("step3-circle");
-    const btn = document.getElementById("authBtn");
+    const btn = document.getElementById("saveCredsBtn");
     const form = document.getElementById("credentialsForm");
     const success = document.getElementById("successState");
 
-    // Reset
-    [s1, s2, s3].forEach(s => {
-      s.innerHTML = s.id.includes("1") ? "1" : s.id.includes("2") ? "2" : "3";
-      s.className = "w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300";
-    });
-    btn.innerText = "Save Credentials";
-    btn.onclick = handleAuthAction;
-
     if (step >= 1) {
-      s1.innerHTML = "✓";
       s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+      s1.innerHTML = "✓";
       s2.className = "w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
-      btn.innerText = "Authorize with Reddit";
+
+      btn.innerText = "Authorize with Google";
+      btn.className = "w-full py-5 bg-white text-orange-600 rounded-2xl font-black hover:bg-orange-600 hover:text-white transition-all shadow-lg text-xs uppercase tracking-widest mt-2 hover:shadow-orange-600/40";
       btn.onclick = () => window.location.href = "/connectors/reddit/connect";
     }
+
     if (step >= 3) {
-      s2.innerHTML = "✓";
       s2.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
-      s3.innerHTML = "✓";
+      s2.innerHTML = "✓";
       s3.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+      s3.innerHTML = "✓";
+
       form.classList.add("opacity-0", "hidden");
       success.classList.remove("hidden");
       success.classList.add("opacity-100");
     }
   }
 
-  async function handleAuthAction() {
-    const clientId = document.getElementById("client_id").value.trim();
-    const clientSecret = document.getElementById("client_secret").value.trim();
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    if (!clientId || !clientSecret || !username || !password) {
-      return alert("All fields are required");
-    }
-
-    const btn = document.getElementById("authBtn");
-    btn.disabled = true;
-    btn.innerText = "SAVING...";
-
+  async function saveCredentials() {
+    const clientId = document.getElementById("clientId").value.trim();
+    const clientSecret = document.getElementById("clientSecret").value.trim();
+    if (!clientId || !clientSecret) { alert("Credentials required"); return; }
     try {
-      const res = await fetch("/connectors/reddit/save_config", {
+      const res = await fetch("/connectors/reddit/save_app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, username, password })
+        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
       });
-
-      if (res.ok) {
-        checkStatus();
-      } else {
-        alert("Failed to save credentials");
-      }
-    } catch (e) {
-      alert("Save error");
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "Save Credentials";
-    }
+      if (res.ok) { checkRedditStatus(); }
+    } catch (e) { alert("Save failed"); }
   }
 
   async function disconnectReddit() {
-    if (!confirm("Disconnecting will stop Reddit sync.\n\nContinue?")) return;
+
+    if (!confirm(
+      "Disconnecting will stop all future Reddit syncs.\n\nContinue?"
+    )) return;
     const btn = document.getElementById("disconnectBtn");
+
     btn.disabled = true;
     btn.innerText = "Disconnecting...";
+
     try {
-      const res = await fetch("/connectors/reddit/disconnect");
+      const res =
+        await fetch("/connectors/reddit/disconnect");
       if (res.ok) {
+        alert("Connection revoked.");
         location.reload();
-      } else {
+      }
+      else {
         alert("Failed to disconnect.");
       }
     } catch (e) {
@@ -715,152 +746,111 @@
     }
   }
 
-  // ────────────────────────────────────────────────
-  //  Destination + Job logic (consistent with others)
-  // ────────────────────────────────────────────────
-
   async function loadDestinations() {
     try {
       const res = await fetch(`/destination/list/reddit`);
       const data = await res.json();
-      const dropdown = document.getElementById("destDropdown");
+      const listContainer = document.getElementById("savedDestList");
       const statusEl = document.getElementById("destStatus");
-      dropdown.innerHTML = '<option value="">Select Connection...</option>';
-      if (data.destinations?.length) {
-        data.destinations.forEach(d => {
-          const opt = document.createElement("option");
-          opt.value = d.id;
-          opt.textContent = `${d.active ? '● ' : ''}${d.type.toUpperCase()} | ${d.database}`;
-          if (d.active) {
-            opt.selected = true;
-            statusEl.innerText = "Connection Active";
-            statusEl.classList.replace("text-orange-400", "text-emerald-400");
-          }
-          dropdown.appendChild(opt);
-        });
+
+      listContainer.innerHTML = '';
+
+      if (!data.destinations || data.destinations.length === 0) {
+        listContainer.innerHTML = `
+          <div class="text-center py-6 border-2 border-dashed border-white/5 rounded-2xl">
+            <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">No saved connections found</p>
+          </div>
+        `;
+        toggleSetupMode(true); // Show fields if none exist
+        return;
       }
-    } catch (e) { }
-  }
 
-  function toggleDropdown() {
-    document.getElementById('dropdownMenu').classList.toggle('hidden');
-  }
+      data.destinations.forEach(d => {
+        const isActive = d.active;
+        if (isActive) {
+          statusEl.innerText = "Connection Active";
+          statusEl.classList.replace("text-orange-400", "text-emerald-400");
+          statusEl.classList.replace("bg-orange-500/10", "bg-emerald-500/10");
+          statusEl.classList.replace("border-orange-500/20", "border-emerald-500/20");
+        }
 
-  function selectDestination(value, label, logoUrl) {
-    document.getElementById('destType').value = value;
-    const selectedDiv = document.getElementById('selectedOption');
-    const clicked = event.currentTarget;
-    const imgClone = clicked.querySelector('img')?.cloneNode(true);
+        const card = document.createElement("div");
+        card.onclick = () => activateDest(d.id);
+        card.className = `group flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer ${isActive
+            ? 'bg-orange-500/10 border-orange-500/40 shadow-lg shadow-orange-500/10'
+            : 'bg-slate-900/50 border-white/5 hover:border-white/10 hover:bg-slate-900'
+          }`;
 
-    selectedDiv.innerHTML = '';
-    if (imgClone) selectedDiv.appendChild(imgClone);
-    const textSpan = document.createElement('span');
-    textSpan.className = "text-white font-bold";
-    textSpan.innerText = label;
-    selectedDiv.appendChild(textSpan);
+        const logoMap = {
+          'mysql': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
+          'postgres': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg',
+          'mongodb': 'https://cdn.simpleicons.org/mongodb/47A248',
+          'elasticsearch': 'https://cdn.simpleicons.org/elasticsearch/005571',
+          'redshift': '/static/images/logos/redshift.png',
+          'bigquery': 'https://cdn.simpleicons.org/googlebigquery/4285F4',
+          'snowflake': 'https://cdn.simpleicons.org/snowflake/29B5E8',
+          'clickhouse': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg',
+          'duckdb': 'https://cdn.simpleicons.org/duckdb/FFF000',
+          's3': '/static/images/logos/s3.png',
+          'azure_datalake': '/static/images/logos/adls.png',
+          'databricks': 'https://cdn.simpleicons.org/databricks/EF3A2C',
+          'gcs': 'https://cdn.simpleicons.org/googlecloudstorage/4285F4'
+        };
 
-    document.getElementById('dropdownMenu').classList.add('hidden');
-    toggleDestFields(value);
-  }
+        const logoUrl = logoMap[d.type.toLowerCase()] || '';
 
-                    function toggleDestFields(type) {
-    const formatMatrix = {
-      mysql: ["json"],
-      postgres: ["json"],
-      mongodb: ["json"],
-      elasticsearch: ["json"],
-      bigquery: ["json", "parquet"],
-      snowflake: ["json", "parquet"],
-      redshift: ["json", "parquet"],
-      clickhouse: ["json", "parquet"],
-      duckdb: ["json", "parquet"],
-      s3: ["json", "parquet", "iceberg", "hudi"],
-      azure_datalake: ["json", "parquet", "iceberg", "hudi"],
-      databricks: ["json", "parquet", "iceberg", "hudi"],
-      gcs: ["json", "parquet", "iceberg", "hudi"]
-    };
-    const fields = document.getElementById("dbFields");
-    if (!type) {
-      if (fields) fields.classList.add("hidden");
-      return;
+        card.innerHTML = `
+          <div class="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+            ${logoUrl ? `<img src="${logoUrl}" class="w-full h-full object-contain">` : '<div class="w-full h-full bg-slate-700 rounded"></div>'}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h4 class="text-white font-bold text-sm truncate uppercase tracking-tighter">${d.type}</h4>
+              ${isActive ? '<span class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]"><span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span><span class="text-emerald-400 text-[8px] font-black uppercase tracking-widest">Current Active Destination</span></span>' : ''}
+            </div>
+            <p class="text-slate-500 text-[10px] font-mono truncate lowercase">${d.database || d.host || 'active session'}</p>
+          </div>
+          <div class="shrink-0">
+            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? 'border-orange-500 bg-orange-500' : 'border-slate-700'}">
+              ${isActive ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+            </div>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+    } catch (e) {
+      console.error("Error loading destinations:", e);
     }
-    if (fields) fields.classList.remove("hidden");
+  }
 
-    const sqlFields = document.getElementById("sqlFields");
-    const bqFields = document.getElementById("bigqueryFields");
-    const s3Fields = document.getElementById("s3Fields");
-    const adlsFields = document.getElementById("adlsFields");
-    const dbxFields = document.getElementById("databricksFields");
-    const formatField = document.getElementById("formatField");
+  let isSetupVisible = false;
+  function toggleSetupMode(forceShow = false) {
+    const fields = document.getElementById("manualSetupFields");
+    const btn = document.getElementById("toggleSetupBtn");
 
-    if (sqlFields) sqlFields.classList.toggle("hidden", type === "bigquery" || type === "s3" || type === "azure_datalake" || type === "databricks");
-    if (bqFields) bqFields.classList.toggle("hidden", type !== "bigquery");
-    if (s3Fields) s3Fields.classList.toggle("hidden", type !== "s3");
-    if (adlsFields) adlsFields.classList.toggle("hidden", type !== "azure_datalake");
-    if (dbxFields) dbxFields.classList.toggle("hidden", type !== "databricks");
+    if (forceShow) isSetupVisible = false;
 
-    const hostInp = document.getElementById("dbHost");
-    const portInp = document.getElementById("dbPort");
-    const userInp = document.getElementById("dbUser");
-    const passInp = document.getElementById("dbPass");
-    const nameInp = document.getElementById("dbName");
+    isSetupVisible = !isSetupVisible;
 
-    [hostInp, portInp, userInp, passInp, nameInp].forEach(el => {
-      if (el) el.classList.remove("hidden");
-    });
-
-    if (type === "mongodb") {
-      if (hostInp) hostInp.placeholder = "Cluster URI (mongodb+srv://...)";
-      if (nameInp) nameInp.placeholder = "Database Name";
-      if (userInp) userInp.placeholder = "Username";
-      if (passInp) passInp.placeholder = "Password";
-      if (portInp) portInp.classList.add("hidden");
-    } else if (type === "elasticsearch") {
-      if (hostInp) hostInp.placeholder = "Endpoint (http://...)";
-      if (portInp) portInp.placeholder = "Port (9200)";
-      if (nameInp) nameInp.placeholder = "Index Name";
-    } else if (type === "duckdb") {
-      if (hostInp) hostInp.placeholder = "File Path (e.g. data/my.db)";
-      if (portInp) portInp.classList.add("hidden");
-      if (userInp) userInp.classList.add("hidden");
-      if (passInp) passInp.classList.add("hidden");
-      if (nameInp) nameInp.classList.add("hidden");
-    } else if (type === "gcs") {
-      if (hostInp) hostInp.placeholder = "Bucket Name";
-      if (portInp) portInp.placeholder = "Region (optional)";
-      if (userInp) userInp.classList.add("hidden");
-      if (passInp) passInp.placeholder = "Service Account JSON Key";
-      if (nameInp) nameInp.classList.add("hidden");
+    if (isSetupVisible) {
+      fields.classList.remove("hidden");
+      btn.innerHTML = `
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        Cancel Setup
+      `;
     } else {
-      if (hostInp) hostInp.placeholder = "Host (e.g. 127.0.0.1)";
-      if (portInp) portInp.placeholder = "Port";
-      if (userInp) userInp.placeholder = "Username";
-      if (passInp) passInp.placeholder = "Password";
-      if (nameInp) nameInp.placeholder = "Database Name";
-    }
-
-    const formatButtons = {
-      json: document.getElementById("format-json"),
-      parquet: document.getElementById("format-parquet"),
-      iceberg: document.getElementById("format-iceberg"),
-      hudi: document.getElementById("format-hudi")
-    };
-    const supportedFormats = formatMatrix[type] || ["json"];
-    const formatInput = document.getElementById("dataFormat");
-    const currentFormat = formatInput ? formatInput.value : "";
-
-    Object.entries(formatButtons).forEach(([format, btn]) => {
-      if (btn) btn.classList.toggle("hidden", !supportedFormats.includes(format));
-    });
-
-    if (formatField) {
-      formatField.classList.toggle("hidden", supportedFormats.length <= 1);
-    }
-
-    if (formatInput && !supportedFormats.includes(currentFormat) && typeof selectFormat === "function") {
-      selectFormat(supportedFormats[0]);
+      fields.classList.add("hidden");
+      btn.innerHTML = `
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Setup New
+      `;
     }
   }
+
   async function saveDestination() {
     const btn = document.getElementById("saveDestBtn");
     btn.innerText = "CONNECTING...";
@@ -931,7 +921,7 @@
         body: JSON.stringify(payload)
       });
       if (res.ok) {
-        btn.innerText = "SUCCESS âœ“";
+        btn.innerText = "SUCCESS ✓";
         if (typeof loadDestinations === "function") loadDestinations();
         setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
       } else {
@@ -943,7 +933,7 @@
       setTimeout(() => btn.innerText = "Authenticate & Save", 2000);
     }
   }
-async function loadJob() {
+  async function loadJob() {
     try {
       const data = await fetch("/connectors/reddit/job/get").then(r => r.json());
       if (data.schedule_time) {
@@ -971,7 +961,7 @@ async function loadJob() {
     try {
       const res = await fetch("/connectors/reddit/sync");
       const d = await res.json();
-      btn.innerText = `SYNCED (${d.posts || 0} posts)`;
+      btn.innerText = `SYNCED (${d.messages || 0} MSGS)`;
     } catch (e) { btn.innerText = "FAILED"; }
     finally { setTimeout(() => { btn.innerText = "Run Manual Sync"; btn.disabled = false; }, 3000); }
   }
@@ -986,9 +976,140 @@ async function loadJob() {
     loadDestinations();
   }
 
+  function toggleDropdown() {
+    const menu = document.getElementById('dropdownMenu');
+    menu.classList.toggle('hidden');
+  }
+
+  function selectDestination(value, label, logoUrl) {
+    // 1. Update the hidden input for your existing save logic
+    document.getElementById('destType').value = value;
+
+    // 2. Update the Trigger UI
+    const logoHtml = logoUrl ? `<img src="${logoUrl}" class="w-5 h-5 object-contain">` : ''; // Fallback logic if needed
+
+    // Using the icons from the options list
+    const selectedDiv = document.getElementById('selectedOption');
+    const clickedElement = event.currentTarget;
+    const imgClone = clickedElement.querySelector('img').cloneNode(true);
+
+    selectedDiv.innerHTML = '';
+    selectedDiv.appendChild(imgClone);
+    const textSpan = document.createElement('span');
+    textSpan.className = "text-white font-bold";
+    textSpan.innerText = label;
+    selectedDiv.appendChild(textSpan);
+
+    // 3. Hide menu
+    document.getElementById('dropdownMenu').classList.add('hidden');
+
+    // 4. Trigger your existing form field visibility logic
+    toggleDestFields(value);
+  }
+
+  // Close dropdown if user clicks outside
   window.onclick = function (event) {
     if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
       document.getElementById('dropdownMenu').classList.add('hidden');
+    }
+  }
+
+  function toggleDestFields(type) {
+    const formatMatrix = {
+      mysql: ["json"],
+      postgres: ["json"],
+      mongodb: ["json"],
+      elasticsearch: ["json"],
+      bigquery: ["json", "parquet"],
+      snowflake: ["json", "parquet"],
+      redshift: ["json", "parquet"],
+      clickhouse: ["json", "parquet"],
+      duckdb: ["json", "parquet"],
+      s3: ["json", "parquet", "iceberg", "hudi"],
+      azure_datalake: ["json", "parquet", "iceberg", "hudi"],
+      databricks: ["json", "parquet", "iceberg", "hudi"],
+      gcs: ["json", "parquet", "iceberg", "hudi"]
+    };
+    const fields = document.getElementById("dbFields");
+    if (!type) {
+      if (fields) fields.classList.add("hidden");
+      return;
+    }
+    if (fields) fields.classList.remove("hidden");
+
+    const sqlFields = document.getElementById("sqlFields");
+    const bqFields = document.getElementById("bigqueryFields");
+    const s3Fields = document.getElementById("s3Fields");
+    const adlsFields = document.getElementById("adlsFields");
+    const dbxFields = document.getElementById("databricksFields");
+    const formatField = document.getElementById("formatField");
+
+    if (sqlFields) sqlFields.classList.toggle("hidden", ["bigquery", "s3", "azure_datalake", "databricks"].includes(type));
+    if (bqFields) bqFields.classList.toggle("hidden", type !== "bigquery");
+    if (s3Fields) s3Fields.classList.toggle("hidden", type !== "s3");
+    if (adlsFields) adlsFields.classList.toggle("hidden", type !== "azure_datalake");
+    if (dbxFields) dbxFields.classList.toggle("hidden", type !== "databricks");
+
+    const supportedFormats = formatMatrix[type] || ["json"];
+    if (formatField) {
+      formatField.classList.toggle("hidden", supportedFormats.length <= 1);
+    }
+
+    const formatButtons = {
+      json: document.getElementById("format-json"),
+      parquet: document.getElementById("format-parquet"),
+      iceberg: document.getElementById("format-iceberg"),
+      hudi: document.getElementById("format-hudi")
+    };
+
+    Object.entries(formatButtons).forEach(([fmt, btn]) => {
+      if (btn) btn.classList.toggle("hidden", !supportedFormats.includes(fmt));
+    });
+
+    const formatInput = document.getElementById("dataFormat");
+    if (formatInput && !supportedFormats.includes(formatInput.value)) {
+      selectFormat(supportedFormats[0]);
+    }
+
+    // Input field placeholders and visibility
+    const hostInp = document.getElementById("dbHost");
+    const portInp = document.getElementById("dbPort");
+    const userInp = document.getElementById("dbUser");
+    const passInp = document.getElementById("dbPass");
+    const nameInp = document.getElementById("dbName");
+
+    [hostInp, portInp, userInp, passInp, nameInp].forEach(el => {
+      if (el) el.classList.remove("hidden");
+    });
+
+    if (type === "mongodb") {
+      if (hostInp) hostInp.placeholder = "Cluster URI";
+      if (nameInp) nameInp.placeholder = "Database Name";
+      if (userInp) userInp.placeholder = "Username";
+      if (passInp) passInp.placeholder = "Password";
+      if (portInp) portInp.classList.add("hidden");
+    } else if (type === "elasticsearch") {
+      if (hostInp) hostInp.placeholder = "Endpoint URL";
+      if (portInp) portInp.placeholder = "Port (9200)";
+      if (nameInp) nameInp.placeholder = "Index Name";
+    } else if (type === "duckdb") {
+      if (hostInp) hostInp.placeholder = "File Path";
+      if (portInp) portInp.classList.add("hidden");
+      if (userInp) userInp.classList.add("hidden");
+      if (passInp) passInp.classList.add("hidden");
+      if (nameInp) nameInp.classList.add("hidden");
+    } else if (type === "gcs") {
+      if (hostInp) hostInp.placeholder = "Bucket Name";
+      if (portInp) portInp.placeholder = "Region";
+      if (userInp) userInp.classList.add("hidden");
+      if (passInp) passInp.placeholder = "JSON Key";
+      if (nameInp) nameInp.classList.add("hidden");
+    } else {
+      if (hostInp) hostInp.placeholder = "Host (IP/DNS)";
+      if (portInp) portInp.placeholder = "Port";
+      if (userInp) userInp.placeholder = "Username";
+      if (passInp) passInp.placeholder = "Password";
+      if (nameInp) nameInp.placeholder = "Database Name";
     }
   }
 </script>
