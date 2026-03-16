@@ -21,6 +21,9 @@ from backend.destinations.destination_router import push_to_destination
 from dotenv import load_dotenv
 from google_auth_oauthlib.flow import Flow
 
+# Scheduler
+from backend.scheduler.scheduler import start_scheduler
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REAL_DB = os.path.join(PROJECT_ROOT, "identity.db")
 
@@ -212,6 +215,9 @@ CORS(
     supports_credentials=True,
     origins=["http://localhost:3000", "http://127.0.0.1:3000"]
 )
+
+# Start scheduler once when API server starts
+start_scheduler()
 
 from flask import g
 
