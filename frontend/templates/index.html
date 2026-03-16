@@ -415,9 +415,10 @@
   }
 
   .motion-card-3d p {
-    color: #f1f5f9 !important; /* Slate 100 - Peak legibility */
+    color: #f1f5f9 !important;
+    /* Slate 100 - Peak legibility */
     font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 </style>
 
@@ -444,7 +445,17 @@
     { id: "salesforce", name: "Salesforce", logo: "/static/images/logos/salesforce.png" },
     { id: "jira", name: "Jira", logo: "https://cdn.simpleicons.org/jira/0052CC" },
     { id: "asana", name: "Asana", logo: "https://cdn.simpleicons.org/asana/F06A6A" },
-    { id: "sendgrid", name: "SendGrid", logo: "/static/images/logos/sendgrid.png" }
+    { id: "sendgrid", name: "SendGrid", logo: "/static/images/logos/sendgrid.png" },
+    { id: "zoho_crm", name: "Zoho CRM", logo: "https://cdn.simpleicons.org/zoho/DE4B39" },
+    { id: "pipedrive", name: "Pipedrive", logo: "/static/images/logos/pipedrive.png" },
+    { id: "monday", name: "Monday.com", logo: "/static/images/logos/monday.png" },
+    { id: "clickup", name: "ClickUp", logo: "https://cdn.simpleicons.org/clickup/7B68EE" },
+    { id: "freshdesk", name: "Freshdesk", logo: "/static/images/logos/freshdesk.png" },
+    { id: "helpscout", name: "HelpScout", logo: "https://cdn.simpleicons.org/helpscout/1292EE" },
+    { id: "klaviyo", name: "Klaviyo", logo: "/static/images/logos/klaviyo.png" },
+    { id: "mixpanel", name: "Mixpanel", logo: "https://cdn.simpleicons.org/mixpanel/7856FF" },
+    { id: "amplitude", name: "Amplitude", logo: "/static/images/logos/amplitude.png" },
+    { id: "paypal", name: "PayPal", logo: "https://cdn.simpleicons.org/paypal/003087" }
   ];
 
   const UPCOMING_DESTINATIONS = [
@@ -750,7 +761,7 @@
     const skyBg = document.getElementById("sky-bg");
     const updateSky = () => {
       const scrollPct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-      
+
       // colors: Sunrise (Saffron) -> Noon (Cyan/White) -> Sunset (Deep Purple/Orange)
       let r, g, b;
       if (scrollPct < 0.5) {
@@ -767,7 +778,7 @@
         g = Math.round(6 * (1 - pct) + 29 * pct);
         b = Math.round(23 * (1 - pct) + 149 * pct);
       }
-      
+
       if (skyBg) {
         skyBg.style.background = `radial-gradient(circle at 50% -20%, rgb(${r}, ${g}, ${b}), transparent 80%)`;
       }
