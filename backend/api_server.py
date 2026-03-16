@@ -646,6 +646,7 @@ def init_db():
         schedule_time TEXT,
         enabled INTEGER DEFAULT 1,
         created_at TEXT,
+        last_run_at TEXT,
         PRIMARY KEY (uid, source)
     )
     """)

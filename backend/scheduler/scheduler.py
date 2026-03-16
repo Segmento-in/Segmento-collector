@@ -46,6 +46,49 @@ def get_due_jobs():
 
     return rows
 
+# Check if job already ran today
+
+def already_ran_today(uid, source):
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT last_run_at
+        FROM connector_jobs
+        WHERE uid=? AND source=?
+    """, (uid, source))
+
+    row = cur.fetchone()
+    conn.close()
+
+    if not row or not row[0]:
+        return False
+
+    last_run = datetime.datetime.fromisoformat(row[0])
+    now = datetime.datetime.now()
+
+    return last_run.date() == now.date()
+
+# Mark job as executed
+def mark_job_run(uid, source):
+
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE connector_jobs
+        SET last_run_at=?
+        WHERE uid=? AND source=?
+    """, (
+        datetime.datetime.now().isoformat(),
+        uid,
+        source
+    ))
+
+    conn.commit()
+    conn.close()
+
 # -------------------------------
 # Run One Job (UNIVERSAL)
 # -------------------------------
@@ -84,6 +127,7 @@ def run_job(job):
 
         if r.status_code == 200:
             print(f"[SCHEDULER] {source} sync OK →", r.json())
+            mark_job_run(uid, source)
         else:
             print(f"[SCHEDULER] {source} sync FAILED:", r.text)
 
@@ -111,6 +155,9 @@ def scheduler_tick():
         uid, source, sync_type, schedule_time = job
 
         if is_time_match(now, schedule_time):
+            if already_ran_today(uid, source):
+                return
+
             run_job(job)
 
 # -------------------------------
