@@ -4,13 +4,17 @@ import sqlite3
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
+import os
 
-DB_PATH = "identity.db"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(PROJECT_ROOT, "identity.db")
 BASE_URL = "http://localhost:4000"
 
 # Prevent overlapping runs
 RUNNING_JOBS = set()
 
+# Keep scheduler instance globally
+scheduler = None
 
 # -------------------------------
 # Get Active Jobs
@@ -41,7 +45,6 @@ def get_due_jobs():
     conn.close()
 
     return rows
-
 
 # -------------------------------
 # Run One Job (UNIVERSAL)
@@ -90,7 +93,6 @@ def run_job(job):
     finally:
         RUNNING_JOBS.discard(job_key)
 
-
 # -------------------------------
 # Check Every Minute
 # -------------------------------
@@ -111,7 +113,6 @@ def scheduler_tick():
         if is_time_match(now, schedule_time):
             run_job(job)
 
-
 # -------------------------------
 # Time Matching (1 min window)
 # -------------------------------
@@ -131,12 +132,17 @@ def is_time_match(now, target):
     except Exception:
         return False
 
-
 # -------------------------------
 # Start Scheduler
 # -------------------------------
 
 def start_scheduler():
+
+    global scheduler
+
+    if scheduler:
+        print("[SCHEDULER] Already running")
+        return
 
     scheduler = BackgroundScheduler(
         timezone="Asia/Kolkata"
@@ -154,9 +160,8 @@ def start_scheduler():
 
     print("[SCHEDULER] Universal Scheduler Started (1-min interval)")
 
-
 # -------------------------------
-# Main
+# Optional standalone run
 # -------------------------------
 
 if __name__ == "__main__":
