@@ -5986,6 +5986,239 @@ def amplitude_disconnect_proxy():
     r = proxy_get("/connectors/amplitude/disconnect")
     return jsonify(r.json()), r.status_code
 
+# SALESFORCE ROUTES
+@app.route("/connectors/salesforce")
+@require_login
+def salesforce_page():
+    return render_template("connectors/salesforce.html")
+
+
+@app.route("/connectors/salesforce/connect")
+@require_login
+def salesforce_connect_proxy():
+    r = proxy_get("/connectors/salesforce/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/salesforce/sync")
+@require_login
+def salesforce_sync_proxy():
+    r = connector_sync("salesforce")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/salesforce")
+@require_login
+def salesforce_status_proxy():
+    r = connector_status("salesforce")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/salesforce/job/get")
+@require_login
+def salesforce_job_get_proxy():
+    r = connector_job_get("salesforce")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/salesforce/job/save", methods=["POST"])
+@require_login
+def salesforce_job_save_proxy():
+    r = connector_job_save("salesforce")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/salesforce/save_app", methods=["POST"])
+@require_login
+def salesforce_save_app_proxy():
+    r = proxy_post("/connectors/salesforce/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/salesforce/disconnect")
+@require_login
+def salesforce_disconnect_proxy():
+    r = proxy_get("/connectors/salesforce/disconnect")
+    return jsonify(r.json()), r.status_code
+
+# JIRA ROUTES
+
+@app.route("/connectors/jira")
+@require_login
+def jira_page():
+    return render_template("connectors/jira.html")
+
+
+@app.route("/connectors/jira/connect")
+@require_login
+def jira_connect_proxy():
+    r = proxy_get("/connectors/jira/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/jira/sync")
+@require_login
+def jira_sync_proxy():
+    r = connector_sync("jira")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/jira")
+@require_login
+def jira_status_proxy():
+    r = connector_status("jira")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/jira/job/get")
+@require_login
+def jira_job_get_proxy():
+    r = connector_job_get("jira")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/jira/job/save", methods=["POST"])
+@require_login
+def jira_job_save_proxy():
+    r = connector_job_save("jira")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/jira/save_app", methods=["POST"])
+@require_login
+def jira_save_app_proxy():
+    r = proxy_post("/connectors/jira/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/jira/disconnect")
+@require_login
+def jira_disconnect_proxy():
+    r = proxy_get("/connectors/jira/disconnect")
+    return jsonify(r.json()), r.status_code
+
+# ZOHO CRM ROUTES
+@app.route("/connectors/zoho_crm")
+@require_login
+def zoho_crm_page():
+    return render_template("connectors/zoho_crm.html")
+
+
+@app.route("/connectors/zoho_crm/connect")
+@require_login
+def zoho_crm_connect_proxy():
+    r = proxy_get("/connectors/zoho_crm/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/zoho_crm/sync")
+@require_login
+def zoho_crm_sync_proxy():
+    r = connector_sync("zoho_crm")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/zoho_crm")
+@require_login
+def zoho_crm_status_proxy():
+    r = connector_status("zoho_crm")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/zoho_crm/job/get")
+@require_login
+def zoho_crm_job_get_proxy():
+    r = connector_job_get("zoho_crm")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/zoho_crm/job/save", methods=["POST"])
+@require_login
+def zoho_crm_job_save_proxy():
+    r = connector_job_save("zoho_crm")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/zoho_crm/save_app", methods=["POST"])
+@require_login
+def zoho_crm_save_app_proxy():
+    r = proxy_post("/connectors/zoho_crm/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/zoho_crm/disconnect")
+@require_login
+def zoho_crm_disconnect_proxy():
+    r = proxy_get("/connectors/zoho_crm/disconnect")
+    return jsonify(r.json()), r.status_code
+
+# PAYPAL ROUTES
+
+@app.route("/connectors/paypal")
+@require_login
+def paypal_page():
+    return render_template("connectors/paypal.html")
+
+
+@app.route("/connectors/paypal/connect")
+@require_login
+def paypal_connect_proxy():
+    r = proxy_get("/connectors/paypal/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/paypal/sync")
+@require_login
+def paypal_sync_proxy():
+    r = connector_sync("paypal")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/paypal")
+@require_login
+def paypal_status_proxy():
+    r = connector_status("paypal")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/paypal/job/get")
+@require_login
+def paypal_job_get_proxy():
+    r = connector_job_get("paypal")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/paypal/job/save", methods=["POST"])
+@require_login
+def paypal_job_save_proxy():
+    r = connector_job_save("paypal")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/paypal/save_app", methods=["POST"])
+@require_login
+def paypal_save_app_proxy():
+    r = proxy_post("/connectors/paypal/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/paypal/disconnect")
+@require_login
+def paypal_disconnect_proxy():
+    r = proxy_get("/connectors/paypal/disconnect")
+    return jsonify(r.json()), r.status_code
 # ================= MAIN ==========================
 
 if __name__ == "__main__":

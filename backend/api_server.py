@@ -226,6 +226,30 @@ from backend.connectors.amplitude import (
     disconnect_amplitude,
     save_config as save_amplitude_config,
 )
+from backend.connectors.salesforce import (
+    save_config as save_salesforce_config,
+    connect_salesforce,
+    sync_salesforce,
+    disconnect_salesforce,
+)
+from backend.connectors.jira import (
+    save_config as save_jira_config,
+    connect_jira,
+    sync_jira,
+    disconnect_jira,
+)
+from backend.connectors.zoho_crm import (
+    save_config as save_zoho_crm_config,
+    connect_zoho_crm,
+    sync_zoho_crm,
+    disconnect_zoho_crm,
+)
+from backend.connectors.paypal import (
+    save_config as save_paypal_config,
+    connect_paypal,
+    sync_paypal,
+    disconnect_paypal,
+)
 
 # ---------------- CONFIG ----------------
 load_dotenv()
@@ -17477,6 +17501,313 @@ def amplitude_job_save():
     con.close()
  
     return jsonify({"status": "job_saved"})
+
+# SALESFORCE
+@app.route("/connectors/salesforce/save_app", methods=["POST"])
+def salesforce_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    save_salesforce_config(uid, client_id=data.get("client_id", ""), 
+                          client_secret=data.get("client_secret", ""),
+                          instance_url=data.get("instance_url", ""))
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/salesforce/connect")
+def salesforce_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_salesforce(uid))
+
+@app.route("/connectors/salesforce/disconnect")
+def salesforce_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_salesforce(uid))
+
+@app.route("/connectors/salesforce/sync")
+def salesforce_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_salesforce(uid, sync_type))
+
+@app.route("/api/status/salesforce")
+def status_salesforce():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='salesforce' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='salesforce' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+@app.route("/connectors/salesforce/job/get")
+def salesforce_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='salesforce' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+
+@app.route("/connectors/salesforce/job/save", methods=["POST"])
+def salesforce_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'salesforce', ?, ?, ?)",
+                (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+
+
+# JIRA
+@app.route("/connectors/jira/save_app", methods=["POST"])
+def jira_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    save_jira_config(uid, email=data.get("email", ""), 
+                    api_token=data.get("api_token", ""),
+                    domain=data.get("domain", ""))
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/jira/connect")
+def jira_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_jira(uid))
+
+@app.route("/connectors/jira/disconnect")
+def jira_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_jira(uid))
+
+@app.route("/connectors/jira/sync")
+def jira_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_jira(uid, sync_type))
+
+@app.route("/api/status/jira")
+def status_jira():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='jira' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='jira' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+@app.route("/connectors/jira/job/get")
+def jira_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='jira' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+
+@app.route("/connectors/jira/job/save", methods=["POST"])
+def jira_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'jira', ?, ?, ?)",
+                (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+
+
+# ZOHO CRM
+@app.route("/connectors/zoho_crm/save_app", methods=["POST"])
+def zoho_crm_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    save_zoho_crm_config(uid, client_id=data.get("client_id", ""),
+                        client_secret=data.get("client_secret", ""),
+                        refresh_token=data.get("refresh_token", ""))
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/zoho_crm/connect")
+def zoho_crm_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_zoho_crm(uid))
+
+@app.route("/connectors/zoho_crm/disconnect")
+def zoho_crm_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_zoho_crm(uid))
+
+@app.route("/connectors/zoho_crm/sync")
+def zoho_crm_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_zoho_crm(uid, sync_type))
+
+@app.route("/api/status/zoho_crm")
+def status_zoho_crm():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='zoho_crm' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='zoho_crm' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+@app.route("/connectors/zoho_crm/job/get")
+def zoho_crm_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='zoho_crm' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+
+@app.route("/connectors/zoho_crm/job/save", methods=["POST"])
+def zoho_crm_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'zoho_crm', ?, ?, ?)",
+                (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+
+
+# PAYPAL
+@app.route("/connectors/paypal/save_app", methods=["POST"])
+def paypal_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    save_paypal_config(uid, client_id=data.get("client_id", ""),
+                      client_secret=data.get("client_secret", ""),
+                      use_sandbox=data.get("use_sandbox", False))
+    return jsonify({"status": "saved"})
+
+@app.route("/connectors/paypal/connect")
+def paypal_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_paypal(uid))
+
+@app.route("/connectors/paypal/disconnect")
+def paypal_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_paypal(uid))
+
+@app.route("/connectors/paypal/sync")
+def paypal_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_paypal(uid, sync_type))
+
+@app.route("/api/status/paypal")
+def status_paypal():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='paypal' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='paypal' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+@app.route("/connectors/paypal/job/get")
+def paypal_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='paypal' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+
+@app.route("/connectors/paypal/job/save", methods=["POST"])
+def paypal_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'paypal', ?, ?, ?)",
+                (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
 
 init_db()
 seed_test_user()
