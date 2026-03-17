@@ -1,6 +1,161 @@
 const CONNECTORS = [
 
   {
+    id: "salesforce",
+    name: "Salesforce",
+    categories: ["crm", "sales"],
+    logo: "/static/images/logos/salesforce.png",
+
+    auth_type: "oauth",
+    api_key_label: "Client ID & Secret",
+
+    connect_url: "/connectors/salesforce/connect",
+    sync_url: "/connectors/salesforce/sync",
+    disconnect_url: "/connectors/salesforce/disconnect",
+    status_api: "/api/status/salesforce",
+    save_app_url: "/connectors/salesforce/save_app",
+
+    models: [
+      { title: "Accounts", desc: "Organization and company records with industry and revenue data." },
+      { title: "Contacts", desc: "Individual contact records with email, phone, and job information." },
+      { title: "Leads", desc: "Sales lead records with status and conversion tracking." }
+    ],
+
+    tables: [
+      "salesforce_accounts",
+      "salesforce_contacts",
+      "salesforce_leads"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts CRM data from Salesforce including accounts, contacts, and leads.",
+
+    data: [
+      "Account records",
+      "Contact information",
+      "Lead tracking",
+      "Sales pipeline",
+      "Opportunity data"
+    ]
+  },
+
+  {
+    id: "jira",
+    name: "Jira",
+    categories: ["project_management", "productivity"],
+    logo: "https://cdn.simpleicons.org/jira/0052CC",
+
+    auth_type: "api_token",
+    api_key_label: "API Token",
+
+    connect_url: "/connectors/jira/connect",
+    sync_url: "/connectors/jira/sync",
+    disconnect_url: "/connectors/jira/disconnect",
+    status_api: "/api/status/jira",
+    save_app_url: "/connectors/jira/save_app",
+
+    models: [
+      { title: "Issues", desc: "Jira issue tracking records with status, priority, and assignee data." },
+      { title: "Projects", desc: "Project records with metadata, leads, and configuration." }
+    ],
+
+    tables: [
+      "jira_issues",
+      "jira_projects"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts project management data from Jira including issues and projects.",
+
+    data: [
+      "Issue tracking",
+      "Project metadata",
+      "Sprint data",
+      "Workflow states",
+      "Custom fields"
+    ]
+  },
+
+  {
+    id: "zoho_crm",
+    name: "Zoho CRM",
+    categories: ["crm", "sales"],
+    logo: "https://cdn.simpleicons.org/zoho/DE4B39",
+
+    auth_type: "oauth",
+    api_key_label: "Client ID & Secret",
+
+    connect_url: "/connectors/zoho_crm/connect",
+    sync_url: "/connectors/zoho_crm/sync",
+    disconnect_url: "/connectors/zoho_crm/disconnect",
+    status_api: "/api/status/zoho_crm",
+    save_app_url: "/connectors/zoho_crm/save_app",
+
+    models: [
+      { title: "Leads", desc: "Lead records with status, source, and qualification information." },
+      { title: "Contacts", desc: "Contact records linked to accounts with communication details." },
+      { title: "Deals", desc: "Sales opportunity records with amount, stage, and closing dates." }
+    ],
+
+    tables: [
+      "zoho_leads",
+      "zoho_contacts",
+      "zoho_deals"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts CRM data from Zoho including leads, contacts, and deals.",
+
+    data: [
+      "Lead management",
+      "Contact records",
+      "Deal tracking",
+      "Sales pipeline",
+      "Revenue forecasting"
+    ]
+  },
+
+  {
+    id: "paypal",
+    name: "PayPal",
+    categories: ["payments", "financial"],
+    logo: "https://cdn.simpleicons.org/paypal/003087",
+
+    auth_type: "oauth",
+    api_key_label: "Client ID & Secret",
+
+    connect_url: "/connectors/paypal/connect",
+    sync_url: "/connectors/paypal/sync",
+    disconnect_url: "/connectors/paypal/disconnect",
+    status_api: "/api/status/paypal",
+    save_app_url: "/connectors/paypal/save_app",
+
+    models: [
+      { title: "Transactions", desc: "Transaction history with amounts, fees, and status information." },
+      { title: "Payments", desc: "Payment records with payer details and transaction metadata." }
+    ],
+
+    tables: [
+      "paypal_transactions",
+      "paypal_payments"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts payment data from PayPal including transactions and payment history.",
+
+    data: [
+      "Transaction history",
+      "Payment records",
+      "Fee tracking",
+      "Payer information",
+      "Currency conversion"
+    ]
+  },
+  {
     id: "notion",
     name: "Notion",
     categories: ["productivity", "documentation"],
