@@ -752,9 +752,8 @@
       s1.innerHTML = "✓";
       s2.className = "w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
 
-      btn.innerText = "Authorize with Google";
+      btn.innerText = "Connect Salesforce";
       btn.className = "w-full py-5 bg-white text-blue-500 rounded-2xl font-black hover:bg-blue-500 hover:text-white transition-all shadow-lg text-xs uppercase tracking-widest mt-2 hover:shadow-blue-500/40";
-      btn.onclick = () => window.location.href = "/connectors/salesforce/connect";
     }
 
     if (step >= 3) {
@@ -1174,6 +1173,30 @@
       if (passInp) passInp.placeholder = "Password";
       if (nameInp) nameInp.placeholder = "Database Name";
     }
+  }
+  async function connectSalesforce() {
+    const btn = document.getElementById("saveCredsBtn");
+
+    btn.innerText = "CONNECTING...";
+    btn.disabled = true;
+
+    try {
+      const res = await fetch("/connectors/salesforce/connect");
+      const data = await res.json();
+
+      if (data.status === "success") {
+        alert("Salesforce connected successfully");
+        location.reload();
+      } else {
+        alert(data.message || "Connection failed");
+      }
+
+    } catch (e) {
+      alert("Connection error");
+    }
+
+    btn.innerText = "Connect Salesforce";
+    btn.disabled = false;
   }
 </script>
 
