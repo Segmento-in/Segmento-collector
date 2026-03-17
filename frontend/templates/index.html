@@ -65,18 +65,18 @@
   <div class="max-w-7xl mx-auto flex justify-start">
     <div class="relative ml-2 md:ml-3">
       <button id="integrationDiscoveryButton" type="button"
-        class="inline-flex items-center gap-3 rounded-2xl border border-slate-700/60 bg-slate-900/78 px-4 py-3 text-left text-sm font-semibold text-slate-100 backdrop-blur-xl transition-all hover:border-cyan-400/40 hover:bg-slate-800/90 hover:text-white">
+        class="inline-flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3 text-left text-sm font-semibold text-black shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-black">
         <span
-          class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 text-cyan-300">
+          class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-slate-900">
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h18M6 12h12m-9 8h6"></path>
           </svg>
         </span>
         <span class="flex flex-col items-start">
-          <span class="text-[11px] uppercase tracking-[0.25em] text-slate-400">Explore Integrations</span>
-          <span>Filter sources and destinations</span>
+          <span class="text-[11px] uppercase tracking-[0.25em] text-slate-500">Explore Integrations</span>
+          <span class="text-slate-900">Filter sources and destinations</span>
         </span>
-        <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-4 w-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
         </svg>
       </button>
@@ -133,7 +133,7 @@
         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
       </span>
-      63 connectors are in Live
+      71 connectors are in Live
     </div>
 
     <h1 data-aos="fade-up" class="text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-none">
@@ -442,20 +442,12 @@
   ];
 
   const UPCOMING_SOURCES = [
-    { id: "salesforce", name: "Salesforce", logo: "/static/images/logos/salesforce.png" },
-    { id: "jira", name: "Jira", logo: "https://cdn.simpleicons.org/jira/0052CC" },
     { id: "asana", name: "Asana", logo: "https://cdn.simpleicons.org/asana/F06A6A" },
     { id: "sendgrid", name: "SendGrid", logo: "/static/images/logos/sendgrid.png" },
-    { id: "zoho_crm", name: "Zoho CRM", logo: "https://cdn.simpleicons.org/zoho/DE4B39" },
-    { id: "pipedrive", name: "Pipedrive", logo: "/static/images/logos/pipedrive.png" },
     { id: "monday", name: "Monday.com", logo: "/static/images/logos/monday.png" },
     { id: "clickup", name: "ClickUp", logo: "https://cdn.simpleicons.org/clickup/7B68EE" },
-    { id: "freshdesk", name: "Freshdesk", logo: "/static/images/logos/freshdesk.png" },
     { id: "helpscout", name: "HelpScout", logo: "https://cdn.simpleicons.org/helpscout/1292EE" },
-    { id: "klaviyo", name: "Klaviyo", logo: "/static/images/logos/klaviyo.png" },
     { id: "mixpanel", name: "Mixpanel", logo: "https://cdn.simpleicons.org/mixpanel/7856FF" },
-    { id: "amplitude", name: "Amplitude", logo: "/static/images/logos/amplitude.png" },
-    { id: "paypal", name: "PayPal", logo: "https://cdn.simpleicons.org/paypal/003087" }
   ];
 
   const UPCOMING_DESTINATIONS = [
