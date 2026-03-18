@@ -6219,6 +6219,327 @@ def paypal_save_app_proxy():
 def paypal_disconnect_proxy():
     r = proxy_get("/connectors/paypal/disconnect")
     return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/asana")
+@require_login
+def asana_page():
+    return render_template("connectors/asana.html")
+
+
+@app.route("/connectors/asana/connect")
+@require_login
+def asana_connect_proxy():
+    r = proxy_get("/connectors/asana/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/asana/sync")
+@require_login
+def asana_sync_proxy():
+    r = connector_sync("asana")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/asana")
+@require_login
+def asana_status_proxy():
+    r = connector_status("asana")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/asana/job/get")
+@require_login
+def asana_job_get_proxy():
+    r = connector_job_get("asana")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/asana/job/save", methods=["POST"])
+@require_login
+def asana_job_save_proxy():
+    r = connector_job_save("asana")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/asana/save_app", methods=["POST"])
+@require_login
+def asana_save_app_proxy():
+    r = proxy_post("/connectors/asana/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/asana/disconnect")
+@require_login
+def asana_disconnect_proxy():
+    r = proxy_get("/connectors/asana/disconnect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/sendgrid")
+@require_login
+def sendgrid_page():
+    return render_template("connectors/sendgrid.html")
+
+
+@app.route("/connectors/sendgrid/connect")
+@require_login
+def sendgrid_connect_proxy():
+    r = proxy_get("/connectors/sendgrid/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/sendgrid/sync")
+@require_login
+def sendgrid_sync_proxy():
+    r = connector_sync("sendgrid")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/sendgrid")
+@require_login
+def sendgrid_status_proxy():
+    r = connector_status("sendgrid")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/sendgrid/job/get")
+@require_login
+def sendgrid_job_get_proxy():
+    r = connector_job_get("sendgrid")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/sendgrid/job/save", methods=["POST"])
+@require_login
+def sendgrid_job_save_proxy():
+    r = connector_job_save("sendgrid")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/sendgrid/save_app", methods=["POST"])
+@require_login
+def sendgrid_save_app_proxy():
+    r = proxy_post("/connectors/sendgrid/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/sendgrid/disconnect")
+@require_login
+def sendgrid_disconnect_proxy():
+    r = proxy_get("/connectors/sendgrid/disconnect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/mixpanel")
+@require_login
+def mixpanel_page():
+    return render_template("connectors/mixpanel.html")
+
+@app.route("/connectors/mixpanel/connect")
+@require_login
+def mixpanel_connect_proxy():
+    r = proxy_get("/connectors/mixpanel/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/mixpanel/sync")
+@require_login
+def mixpanel_sync_proxy():
+    r = connector_sync("mixpanel")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/mixpanel")
+@require_login
+def mixpanel_status_proxy():
+    r = connector_status("mixpanel")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/mixpanel/job/get")
+@require_login
+def mixpanel_job_get_proxy():
+    r = connector_job_get("mixpanel")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/mixpanel/job/save", methods=["POST"])
+@require_login
+def mixpanel_job_save_proxy():
+    r = connector_job_save("mixpanel")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/mixpanel/save_app", methods=["POST"])
+@require_login
+def mixpanel_save_app_proxy():
+    r = proxy_post("/connectors/mixpanel/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/mixpanel/disconnect")
+@require_login
+def mixpanel_disconnect_proxy():
+    r = proxy_get("/connectors/mixpanel/disconnect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/monday")
+@require_login
+def monday_page():
+    return render_template("connectors/monday.html")
+
+@app.route("/connectors/monday/connect")
+@require_login
+def monday_connect_proxy():
+    r = proxy_get("/connectors/monday/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/monday/sync")
+@require_login
+def monday_sync_proxy():
+    r = connector_sync("monday")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/monday")
+@require_login
+def monday_status_proxy():
+    r = connector_status("monday")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/monday/job/get")
+@require_login
+def monday_job_get_proxy():
+    r = connector_job_get("monday")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+@app.route("/connectors/monday/job/save", methods=["POST"])
+@require_login
+def monday_job_save_proxy():
+    r = connector_job_save("monday")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/monday/save_app", methods=["POST"])
+@require_login
+def monday_save_app_proxy():
+    r = proxy_post("/connectors/monday/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/monday/disconnect")
+@require_login
+def monday_disconnect_proxy():
+    r = proxy_get("/connectors/monday/disconnect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/clickup")
+@require_login
+def clickup_page():
+    return render_template("connectors/clickup.html")
+
+@app.route("/connectors/clickup/connect")
+@require_login
+def clickup_connect_proxy():
+    r = proxy_get("/connectors/clickup/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/clickup/sync")
+@require_login
+def clickup_sync_proxy():
+    r = connector_sync("clickup")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/clickup")
+@require_login
+def clickup_status_proxy():
+    r = connector_status("clickup")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/clickup/job/get")
+@require_login
+def clickup_job_get_proxy():
+    r = connector_job_get("clickup")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+@app.route("/connectors/clickup/job/save", methods=["POST"])
+@require_login
+def clickup_job_save_proxy():
+    r = connector_job_save("clickup")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/clickup/save_app", methods=["POST"])
+@require_login
+def clickup_save_app_proxy():
+    r = proxy_post("/connectors/clickup/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/clickup/disconnect")
+@require_login
+def clickup_disconnect_proxy():
+    r = proxy_get("/connectors/clickup/disconnect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/helpscout")
+@require_login
+def helpscout_page():
+    return render_template("connectors/helpscout.html")
+
+@app.route("/connectors/helpscout/connect")
+@require_login
+def helpscout_connect_proxy():
+    r = proxy_get("/connectors/helpscout/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/helpscout/sync")
+@require_login
+def helpscout_sync_proxy():
+    r = connector_sync("helpscout")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/helpscout")
+@require_login
+def helpscout_status_proxy():
+    r = connector_status("helpscout")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/helpscout/job/get")
+@require_login
+def helpscout_job_get_proxy():
+    r = connector_job_get("helpscout")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+@app.route("/connectors/helpscout/job/save", methods=["POST"])
+@require_login
+def helpscout_job_save_proxy():
+    r = connector_job_save("helpscout")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/helpscout/save_app", methods=["POST"])
+@require_login
+def helpscout_save_app_proxy():
+    r = proxy_post("/connectors/helpscout/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/helpscout/disconnect")
+@require_login
+def helpscout_disconnect_proxy():
+    r = proxy_get("/connectors/helpscout/disconnect")
+    return jsonify(r.json()), r.status_code
+
 # ================= MAIN ==========================
 
 if __name__ == "__main__":
