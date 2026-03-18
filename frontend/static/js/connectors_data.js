@@ -155,6 +155,241 @@ const CONNECTORS = [
       "Currency conversion"
     ]
   },
+
+  {
+    id: "asana",
+    name: "Asana",
+    categories: ["project_management", "productivity"],
+    logo: "https://cdn.simpleicons.org/asana/F06A6A",
+
+    auth_type: "api_token",
+    api_key_label: "Personal Access Token",
+
+    connect_url: "/connectors/asana/connect",
+    sync_url: "/connectors/asana/sync",
+    disconnect_url: "/connectors/asana/disconnect",
+    status_api: "/api/status/asana",
+    save_app_url: "/connectors/asana/save_app",
+
+    models: [
+      { title: "Tasks", desc: "Task records with completion status, assignee, and project information." },
+      { title: "Projects", desc: "Project records with workspace and archive status." }
+    ],
+
+    tables: [
+      "asana_tasks",
+      "asana_projects"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts tasks and projects from Asana workspaces.",
+
+    data: [
+      "Task tracking",
+      "Project metadata",
+      "Assignee information",
+      "Due dates",
+      "Completion status"
+    ]
+  },
+
+  {
+    id: "sendgrid",
+    name: "SendGrid",
+    categories: ["email", "marketing"],
+    logo: "/static/images/logos/sendgrid.png",
+
+    auth_type: "api_key",
+    api_key_label: "SendGrid API Key",
+
+    connect_url: "/connectors/sendgrid/connect",
+    sync_url: "/connectors/sendgrid/sync",
+    disconnect_url: "/connectors/sendgrid/disconnect",
+    status_api: "/api/status/sendgrid",
+    save_app_url: "/connectors/sendgrid/save_app",
+
+    models: [
+      { title: "Messages", desc: "Email message activity with opens, clicks, and delivery status." },
+      { title: "Stats", desc: "Email statistics aggregated by day with delivery metrics." }
+    ],
+
+    tables: [
+      "sendgrid_messages",
+      "sendgrid_stats"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts email messages and statistics from SendGrid.",
+
+    data: [
+      "Email activity",
+      "Delivery stats",
+      "Open rates",
+      "Click tracking",
+      "Bounce metrics"
+    ]
+  },
+
+  {
+    id: "mixpanel",
+    name: "Mixpanel",
+    categories: ["analytics", "product"],
+    logo: "https://cdn.simpleicons.org/mixpanel/7856FF",
+
+    auth_type: "api_secret",
+    api_key_label: "Mixpanel API Secret",
+
+    connect_url: "/connectors/mixpanel/connect",
+    sync_url: "/connectors/mixpanel/sync",
+    disconnect_url: "/connectors/mixpanel/disconnect",
+    status_api: "/api/status/mixpanel",
+    save_app_url: "/connectors/mixpanel/save_app",
+
+    models: [
+      { title: "Events", desc: "Product analytics events with user properties and device information." },
+      { title: "Users", desc: "User profiles with engagement and demographic data." }
+    ],
+
+    tables: [
+      "mixpanel_events",
+      "mixpanel_users"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts events and user profiles from Mixpanel analytics.",
+
+    data: [
+      "Event tracking",
+      "User profiles",
+      "Behavioral data",
+      "Device information",
+      "Geographic data"
+    ]
+  },
+
+  {
+    id: "monday",
+    name: "Monday.com",
+    categories: ["project_management", "productivity"],
+    logo: "/static/images/logos/monday.png",
+
+    auth_type: "api_token",
+    api_key_label: "API Token",
+
+    connect_url: "/connectors/monday/connect",
+    sync_url: "/connectors/monday/sync",
+    disconnect_url: "/connectors/monday/disconnect",
+    status_api: "/api/status/monday",
+    save_app_url: "/connectors/monday/save_app",
+
+    models: [
+      { title: "Boards", desc: "Board records with metadata, state, and configuration." },
+      { title: "Items", desc: "Work items with column values, state, and creator information." },
+      { title: "Users", desc: "User records with roles and permissions." }
+    ],
+
+    tables: [
+      "monday_boards",
+      "monday_items",
+      "monday_users"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts boards, items, and users from Monday.com workspaces.",
+
+    data: [
+      "Board metadata",
+      "Work items",
+      "Column values",
+      "User information",
+      "Workflow state"
+    ]
+  },
+
+  {
+    id: "clickup",
+    name: "ClickUp",
+    categories: ["project_management", "productivity"],
+    logo: "https://cdn.simpleicons.org/clickup/7B68EE",
+
+    auth_type: "api_token",
+    api_key_label: "API Token",
+
+    connect_url: "/connectors/clickup/connect",
+    sync_url: "/connectors/clickup/sync",
+    disconnect_url: "/connectors/clickup/disconnect",
+    status_api: "/api/status/clickup",
+    save_app_url: "/connectors/clickup/save_app",
+
+    models: [
+      { title: "Teams", desc: "Workspace teams with configuration and members." },
+      { title: "Lists", desc: "Task lists with hierarchy and metadata." },
+      { title: "Tasks", desc: "Task records with status, priority, and assignments." }
+    ],
+
+    tables: [
+      "clickup_teams",
+      "clickup_lists",
+      "clickup_tasks"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts tasks, lists, and teams from ClickUp workspaces.",
+
+    data: [
+      "Task tracking",
+      "List hierarchy",
+      "Team metadata",
+      "Task status and priority",
+      "Due dates and assignments"
+    ]
+  },
+
+  {
+    id: "helpscout",
+    name: "Help Scout",
+    categories: ["support", "customer_service"],
+    logo: "https://cdn.simpleicons.org/helpscout/1292EE",
+
+    auth_type: "api_key",
+    api_key_label: "API Key",
+
+    connect_url: "/connectors/helpscout/connect",
+    sync_url: "/connectors/helpscout/sync",
+    disconnect_url: "/connectors/helpscout/disconnect",
+    status_api: "/api/status/helpscout",
+    save_app_url: "/connectors/helpscout/save_app",
+
+    models: [
+      { title: "Mailboxes", desc: "Support mailboxes with email addresses and settings." },
+      { title: "Conversations", desc: "Customer conversations with status and metadata." },
+      { title: "Customers", desc: "Customer records with contact information." }
+    ],
+
+    tables: [
+      "helpscout_mailboxes",
+      "helpscout_conversations",
+      "helpscout_customers"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts conversations, customers, and mailboxes from HelpScout.",
+
+    data: [
+      "Conversation history",
+      "Customer records",
+      "Mailbox configuration",
+      "Support metrics",
+      "Ticket status"
+    ]
+  },
+
   {
     id: "notion",
     name: "Notion",
