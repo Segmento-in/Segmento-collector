@@ -6544,3 +6544,403 @@ def helpscout_disconnect_proxy():
 
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
+
+# ================= LOOKER =================
+
+@app.route("/connectors/looker")
+@require_login
+def looker_page():
+    return render_template("connectors/looker.html")
+
+@app.route("/connectors/looker/connect")
+@require_login
+def looker_connect():
+    r = proxy_get("/connectors/looker/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/looker/sync")
+@require_login
+def looker_sync():
+    r = connector_sync("looker")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/looker")
+@require_login
+def looker_status_proxy():
+    r = connector_status("looker")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/looker/job/get")
+@require_login
+def looker_job_get_proxy():
+    r = connector_job_get("looker")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/looker/job/save", methods=["POST"])
+@require_login
+def looker_job_save_proxy():
+    r = connector_job_save("looker")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/looker/save_app", methods=["POST"])
+@require_login
+def looker_save_app_proxy():
+    r = proxy_post("/connectors/looker/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/looker/disconnect")
+@require_login
+def looker_disconnect():
+    r = connector_disconnect("looker")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= SUPERSET =================
+
+@app.route("/connectors/superset")
+@require_login
+def superset_page():
+    return render_template("connectors/superset.html")
+
+@app.route("/connectors/superset/connect")
+@require_login
+def superset_connect():
+    r = proxy_get("/connectors/superset/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/superset/sync")
+@require_login
+def superset_sync():
+    r = connector_sync("superset")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/superset")
+@require_login
+def superset_status_proxy():
+    r = connector_status("superset")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/superset/job/get")
+@require_login
+def superset_job_get_proxy():
+    r = connector_job_get("superset")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/superset/job/save", methods=["POST"])
+@require_login
+def superset_job_save_proxy():
+    r = connector_job_save("superset")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/superset/save_app", methods=["POST"])
+@require_login
+def superset_save_app_proxy():
+    r = proxy_post("/connectors/superset/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/superset/disconnect")
+@require_login
+def superset_disconnect():
+    r = connector_disconnect("superset")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= AZURE_BLOB =================
+
+@app.route("/connectors/azure_blob")
+@require_login
+def azure_blob_page():
+    return render_template("connectors/azure_blob.html")
+
+@app.route("/connectors/azure_blob/connect")
+@require_login
+def azure_blob_connect():
+    r = proxy_get("/connectors/azure_blob/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/azure_blob/sync")
+@require_login
+def azure_blob_sync():
+    r = connector_sync("azure_blob")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/azure_blob")
+@require_login
+def azure_blob_status_proxy():
+    r = connector_status("azure_blob")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/azure_blob/job/get")
+@require_login
+def azure_blob_job_get_proxy():
+    r = connector_job_get("azure_blob")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/azure_blob/job/save", methods=["POST"])
+@require_login
+def azure_blob_job_save_proxy():
+    r = connector_job_save("azure_blob")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/azure_blob/save_app", methods=["POST"])
+@require_login
+def azure_blob_save_app_proxy():
+    r = proxy_post("/connectors/azure_blob/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/azure_blob/disconnect")
+@require_login
+def azure_blob_disconnect():
+    r = connector_disconnect("azure_blob")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= DATADOG =================
+
+@app.route("/connectors/datadog")
+@require_login
+def datadog_page():
+    return render_template("connectors/datadog.html")
+
+@app.route("/connectors/datadog/connect")
+@require_login
+def datadog_connect():
+    r = proxy_get("/connectors/datadog/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/datadog/sync")
+@require_login
+def datadog_sync():
+    r = connector_sync("datadog")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/datadog")
+@require_login
+def datadog_status_proxy():
+    r = connector_status("datadog")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/datadog/job/get")
+@require_login
+def datadog_job_get_proxy():
+    r = connector_job_get("datadog")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/datadog/job/save", methods=["POST"])
+@require_login
+def datadog_job_save_proxy():
+    r = connector_job_save("datadog")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/datadog/save_app", methods=["POST"])
+@require_login
+def datadog_save_app_proxy():
+    r = proxy_post("/connectors/datadog/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/datadog/disconnect")
+@require_login
+def datadog_disconnect():
+    r = connector_disconnect("datadog")
+    return jsonify(r.json()), r.status_code
+
+
+
+# ================= OKTA =================
+
+@app.route("/connectors/okta")
+@require_login
+def okta_page():
+    return render_template("connectors/okta.html")
+
+@app.route("/connectors/okta/connect")
+@require_login
+def okta_connect():
+    r = proxy_get("/connectors/okta/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/okta/sync")
+@require_login
+def okta_sync():
+    r = connector_sync("okta")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/okta")
+@require_login
+def okta_status_proxy():
+    r = connector_status("okta")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/okta/job/get")
+@require_login
+def okta_job_get_proxy():
+    r = connector_job_get("okta")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/okta/job/save", methods=["POST"])
+@require_login
+def okta_job_save_proxy():
+    r = connector_job_save("okta")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/okta/save_app", methods=["POST"])
+@require_login
+def okta_save_app_proxy():
+    r = proxy_post("/connectors/okta/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/okta/disconnect")
+@require_login
+def okta_disconnect():
+    r = connector_disconnect("okta")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= AUTH0 =================
+
+@app.route("/connectors/auth0")
+@require_login
+def auth0_page():
+    return render_template("connectors/auth0.html")
+
+@app.route("/connectors/auth0/connect")
+@require_login
+def auth0_connect():
+    r = proxy_get("/connectors/auth0/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/auth0/sync")
+@require_login
+def auth0_sync():
+    r = connector_sync("auth0")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/auth0")
+@require_login
+def auth0_status_proxy():
+    r = connector_status("auth0")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/auth0/job/get")
+@require_login
+def auth0_job_get_proxy():
+    r = connector_job_get("auth0")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/auth0/job/save", methods=["POST"])
+@require_login
+def auth0_job_save_proxy():
+    r = connector_job_save("auth0")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/auth0/save_app", methods=["POST"])
+@require_login
+def auth0_save_app_proxy():
+    r = proxy_post("/connectors/auth0/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/auth0/disconnect")
+@require_login
+def auth0_disconnect():
+    r = connector_disconnect("auth0")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= CLOUDFLARE =================
+
+@app.route("/connectors/cloudflare")
+@require_login
+def cloudflare_page():
+    return render_template("connectors/cloudflare.html")
+
+@app.route("/connectors/cloudflare/connect")
+@require_login
+def cloudflare_connect():
+    r = proxy_get("/connectors/cloudflare/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/cloudflare/sync")
+@require_login
+def cloudflare_sync():
+    r = connector_sync("cloudflare")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/cloudflare")
+@require_login
+def cloudflare_status_proxy():
+    r = connector_status("cloudflare")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/cloudflare/job/get")
+@require_login
+def cloudflare_job_get_proxy():
+    r = connector_job_get("cloudflare")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/cloudflare/job/save", methods=["POST"])
+@require_login
+def cloudflare_job_save_proxy():
+    r = connector_job_save("cloudflare")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/cloudflare/save_app", methods=["POST"])
+@require_login
+def cloudflare_save_app_proxy():
+    r = proxy_post("/connectors/cloudflare/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/cloudflare/disconnect")
+@require_login
+def cloudflare_disconnect():
+    r = connector_disconnect("cloudflare")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= SENTRY =================
+
+@app.route("/connectors/sentry")
+@require_login
+def sentry_page():
+    return render_template("connectors/sentry.html")
+
+@app.route("/connectors/sentry/connect")
+@require_login
+def sentry_connect():
+    r = proxy_get("/connectors/sentry/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/sentry/sync")
+@require_login
+def sentry_sync():
+    r = connector_sync("sentry")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/sentry")
+@require_login
+def sentry_status_proxy():
+    r = connector_status("sentry")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/sentry/job/get")
+@require_login
+def sentry_job_get_proxy():
+    r = connector_job_get("sentry")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/sentry/job/save", methods=["POST"])
+@require_login
+def sentry_job_save_proxy():
+    r = connector_job_save("sentry")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/sentry/save_app", methods=["POST"])
+@require_login
+def sentry_save_app_proxy():
+    r = proxy_post("/connectors/sentry/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/sentry/disconnect")
+@require_login
+def sentry_disconnect():
+    r = connector_disconnect("sentry")
+    return jsonify(r.json()), r.status_code

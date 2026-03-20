@@ -1,4 +1,13 @@
 import os
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.DEBUG)
+
 os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
 
 import time
@@ -154,6 +163,12 @@ from backend.connectors.slack import (
     disconnect_slack,
     save_config as save_slack_config,
 )
+
+from backend.connectors.looker import connect_looker, sync_looker, disconnect_looker, save_config as save_looker_config
+from backend.connectors.superset import connect_superset, sync_superset, disconnect_superset, save_config as save_superset_config
+from backend.connectors.azure_blob import connect_azure_blob, sync_azure_blob, disconnect_azure_blob, save_config as save_azure_blob_config
+from backend.connectors.datadog import connect_datadog, sync_datadog, disconnect_datadog, save_config as save_datadog_config
+
 from backend.connectors.notion import (
     connect_notion,
     sync_notion,
@@ -286,6 +301,30 @@ from backend.connectors.helpscout import (
     sync_helpscout,
     disconnect_helpscout,
 )
+from backend.connectors.okta import (
+    save_config as save_okta_config,
+    connect_okta,
+    sync_okta,
+    disconnect_okta,
+)
+from backend.connectors.auth0 import (
+    save_config as save_auth0_config,
+    connect_auth0,
+    sync_auth0,
+    disconnect_auth0,
+)
+from backend.connectors.cloudflare import (
+    save_config as save_cloudflare_config,
+    connect_cloudflare,
+    sync_cloudflare,
+    disconnect_cloudflare,
+)
+from backend.connectors.sentry import (
+    save_config as save_sentry_config,
+    connect_sentry,
+    sync_sentry,
+    disconnect_sentry,
+)
 
 # ---------------- CONFIG ----------------
 load_dotenv()
@@ -362,10 +401,10 @@ def usage_sync_start():
             mode
         )
 
-        print(f"[USAGE] Sync START → {source} ({mode})")
+        print(f"[USAGE] Sync START → {source} ({mode})", flush=True)
 
     except Exception as e:
-        print("[USAGE START ERROR]", e)
+        print("[USAGE START ERROR]", e, flush=True)
 
 # ---------------- API USAGE LOGGER ----------------
 
@@ -409,7 +448,7 @@ def log_api_usage():
         con.close()
 
     except Exception as e:
-        print("[API LOG ERROR]", e)
+        print("[API LOG ERROR]", e, flush=True)
 
 @app.after_request
 def usage_sync_finish(response):
@@ -427,10 +466,10 @@ def usage_sync_finish(response):
             status
         )
 
-        print("[USAGE] Sync FINISHED")
+        print("[USAGE] Sync FINISHED", flush=True)
 
     except Exception as e:
-        print("[USAGE FINISH ERROR]", e)
+        print("[USAGE FINISH ERROR]", e, flush=True)
 
     return response
 
@@ -4185,7 +4224,7 @@ def google_ga4_sync():
 
     except Exception as e:
 
-        print("[GA4 SYNC ERROR]", str(e))
+        print("[GA4 SYNC ERROR]", str(e), flush=True)
 
         return jsonify({
             "status": "error",
@@ -4873,7 +4912,7 @@ def google_disconnect_gmail():
 
     uid = getattr(g, "user_id", None)
     source = "gmail"
-    print("DISCONNECT USER:", g.user_id)
+    print("DISCONNECT USER:", g.user_id, flush=True)
     con = get_db()
     cur = con.cursor()
 
@@ -5070,7 +5109,7 @@ def disconnect_tasks():
 @app.route("/google/disconnect/<source>")
 def google_disconnect(source):
 
-    print("DISCONNECT CALLED:", source)
+    print("DISCONNECT CALLED:", source, flush=True)
 
     con = sqlite3.connect(DB)
     cur = con.cursor()
@@ -5333,7 +5372,7 @@ def tasks_job_save():
 
 @app.route("/google/sync/contacts")
 def sync_contacts_api():
-    print("[SERVER] Triggering contacts sync")
+    print("[SERVER] Triggering contacts sync", flush=True)
     return jsonify(sync_contacts())
 
 # ---------------- CONTACTS SAVE APP ----------------
@@ -6259,9 +6298,9 @@ def reddit_sync_universal():
     if post_rows:
         pushed += push_to_destination(dest, "reddit_posts", post_rows)
 
-    print(f"[REDDIT] Sync type: {sync_type}")
-    print(f"[REDDIT] Posts fetched: {len(post_rows)}")
-    print(f"[REDDIT] Rows pushed: {pushed}")
+    print(f"[REDDIT] Sync type: {sync_type}", flush=True)
+    print(f"[REDDIT] Posts fetched: {len(post_rows)}", flush=True)
+    print(f"[REDDIT] Rows pushed: {pushed}", flush=True)
 
     return jsonify({
         "posts": len(post_rows),
@@ -7256,7 +7295,7 @@ def discord_sync_universal():
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
-    print("SYNC UID:", uid)
+    print("SYNC UID:", uid, flush=True)
 
     con = get_db()
     cur = con.cursor()
@@ -7324,7 +7363,7 @@ def discord_sync_universal():
                 all_rows.extend(res.get("rows", []))
 
             except Exception as e:
-                print("Channel error:", channel_id, str(e))
+                print("Channel error:", channel_id, str(e), flush=True)
                 continue
 
         if total_messages >= max_global_messages:
@@ -7363,9 +7402,9 @@ def discord_sync_universal():
     if all_rows:
         pushed = push_to_destination(dest, "discord_messages", all_rows)
 
-    print(f"[DISCORD] Sync type: {sync_type}")
-    print(f"[DISCORD] Messages inserted: {total_messages}")
-    print(f"[DISCORD] Rows pushed: {pushed}")
+    print(f"[DISCORD] Sync type: {sync_type}", flush=True)
+    print(f"[DISCORD] Messages inserted: {total_messages}", flush=True)
+    print(f"[DISCORD] Rows pushed: {pushed}", flush=True)
 
     return jsonify({
         "messages": total_messages,
@@ -8004,7 +8043,7 @@ def trends_sync():
     if not keyword:
         return jsonify({"status": "error", "message": "Keyword required"})
 
-    print("CALLING SYNC TRENDS NOW")
+    print("CALLING SYNC TRENDS NOW", flush=True)
     result = sync_trends(uid, keyword, sync_type)
 
     return jsonify(result)
@@ -8373,10 +8412,10 @@ def devto_sync_universal():
     if tag_rows:
         pushed += push_to_destination(dest, "devto_tags", tag_rows)
 
-    print(f"[DEVTO] Sync type: {sync_type}")
-    print(f"[DEVTO] Articles found: {len(article_rows)}")
-    print(f"[DEVTO] Tags found: {len(tag_rows)}")
-    print(f"[DEVTO] Rows pushed: {pushed}")
+    print(f"[DEVTO] Sync type: {sync_type}", flush=True)
+    print(f"[DEVTO] Articles found: {len(article_rows)}", flush=True)
+    print(f"[DEVTO] Tags found: {len(tag_rows)}", flush=True)
+    print(f"[DEVTO] Rows pushed: {pushed}", flush=True)
 
     return jsonify({
         "articles": len(article_rows),
@@ -9626,7 +9665,8 @@ def bigquery_status():
             project_id = cfg.get("project_id")
             dataset_id = cfg.get("dataset_id")
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
 
     return jsonify({
         "has_credentials": bool(cfg_row),
@@ -10410,9 +10450,9 @@ def gitlab_sync_universal():
     else:
         pushed = 0
 
-    print(f"[GITLAB] Sync type: {sync_type}")
-    print(f"[GITLAB] New rows found: {len(new_rows)}")
-    print(f"[GITLAB] Rows pushed: {pushed}")
+    print(f"[GITLAB] Sync type: {sync_type}", flush=True)
+    print(f"[GITLAB] New rows found: {len(new_rows)}", flush=True)
+    print(f"[GITLAB] Rows pushed: {pushed}", flush=True)
 
     return jsonify({
         "projects": len(project_ids),
@@ -10660,11 +10700,11 @@ def stackoverflow_sync_universal():
     if u_rows:
         pushed += push_to_destination(dest, "stack_users", u_rows)
 
-    print(f"[STACK] Sync type: {sync_type}")
-    print(f"[STACK] Questions: {len(q_rows)}")
-    print(f"[STACK] Answers: {len(a_rows)}")
-    print(f"[STACK] Users: {len(u_rows)}")
-    print(f"[STACK] Rows pushed: {pushed}")
+    print(f"[STACK] Sync type: {sync_type}", flush=True)
+    print(f"[STACK] Questions: {len(q_rows)}", flush=True)
+    print(f"[STACK] Answers: {len(a_rows)}", flush=True)
+    print(f"[STACK] Users: {len(u_rows)}", flush=True)
+    print(f"[STACK] Rows pushed: {pushed}", flush=True)
 
     return jsonify({
         "questions": len(q_rows),
@@ -10798,9 +10838,9 @@ def hackernews_sync_universal():
     if rows:
         pushed = push_to_destination(dest, "hackernews_stories", rows)
 
-    print(f"[HN] Sync type: {sync_type}")
-    print(f"[HN] Stories: {len(rows)}")
-    print(f"[HN] Rows pushed: {pushed}")
+    print(f"[HN] Sync type: {sync_type}", flush=True)
+    print(f"[HN] Stories: {len(rows)}", flush=True)
+    print(f"[HN] Rows pushed: {pushed}", flush=True)
 
     return jsonify({
         "stories": len(rows),
@@ -12447,9 +12487,9 @@ def nvd_sync_universal():
     if rows:
         pushed += push_to_destination(dest, "nvd_cves", rows)
 
-    print(f"[NVD] Sync type: {sync_type}")
-    print(f"[NVD] CVEs: {len(rows)}")
-    print(f"[NVD] Rows pushed: {pushed}")
+    print(f"[NVD] Sync type: {sync_type}", flush=True)
+    print(f"[NVD] CVEs: {len(rows)}", flush=True)
+    print(f"[NVD] Rows pushed: {pushed}", flush=True)
 
     return jsonify({
         "cves": len(rows),
@@ -12831,7 +12871,7 @@ def facebook_save_app():
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
-    print("SAVE UID:", uid)
+    print("SAVE UID:", uid, flush=True)
     data = request.get_json()
 
     app_id = data.get("app_id")
@@ -12896,7 +12936,7 @@ def facebook_test_save():
 
 @app.route("/connectors/facebook/connect", methods=["GET"])
 def facebook_connect():
-    print("CONNECT UID:", uid)
+    print("CONNECT UID:", uid, flush=True)
     uid = getattr(g, "user_id", None)
 
     if not uid:
@@ -13088,7 +13128,8 @@ def facebook_sync():
         if job_data.get("exists"):
             sync_type = job_data.get("sync_type", "historical")
     except:
-        pass
+        import traceback; traceback.print_exc()
+        print('Exception caught', flush=True)
 
     result = sync_facebook_pages(uid, sync_type)
 
@@ -13188,7 +13229,7 @@ def facebook_status():
 @app.route("/connectors/<source>/disconnect")
 def connector_disconnect(source):
 
-    print("DISCONNECT CALLED:", source)
+    print("DISCONNECT CALLED:", source, flush=True)
 
     con = sqlite3.connect(DB)
     cur = con.cursor()
@@ -13213,7 +13254,7 @@ def facebook_ads_connect():
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
-    print("ADS CONNECT UID:", uid)
+    print("ADS CONNECT UID:", uid, flush=True)
 
     con = get_db()
     cur = con.cursor()
@@ -13500,7 +13541,8 @@ def facebook_ads_sync():
         if job_data.get("exists"):
             sync_type = job_data.get("sync_type", "historical")
     except:
-        pass
+        import traceback; traceback.print_exc()
+        print('Exception caught', flush=True)
 
     result = sync_facebook_ads(uid, sync_type)
 
@@ -14313,7 +14355,7 @@ def universal_sync(source):
         if not sync_func:
             raise Exception(f"No sync function found for source: {source}")
 
-        print(f"[UNIVERSAL SYNC] Running {source} ({mode})")
+        print(f"[UNIVERSAL SYNC] Running {source} ({mode})", flush=True)
 
         # CALL WITHOUT ARGUMENTS
         result = sync_func()
@@ -14329,7 +14371,7 @@ def universal_sync(source):
 
     except Exception as e:
 
-        print("[SYNC ERROR]", str(e))
+        print("[SYNC ERROR]", str(e), flush=True)
 
         log_sync_finish(run_id, 0, "failed", str(e))
 
@@ -14532,7 +14574,7 @@ def wrap_sync_function(func_name, func):
 
                 run_id = log_sync_start(uid, source, mode)
 
-            print(f"[USAGE] Sync started → {source}")
+            print(f"[USAGE] Sync started → {source}", flush=True)
 
             # SAFE CALL
             result = func()
@@ -14558,7 +14600,7 @@ def auto_wrap_all_syncs():
     Disabled auto wrapping.
     Middleware logging replaces this safely.
     """
-    print("[USAGE] Sync auto-wrapper disabled (middleware active)")
+    print("[USAGE] Sync auto-wrapper disabled (middleware active)", flush=True)
 
 # DO NOT WRAP FUNCTIONS ANYMORE
 auto_wrap_all_syncs()
@@ -14889,9 +14931,9 @@ def seed_test_user():
             datetime.datetime.utcnow().isoformat()
         ))
         con.commit()
-        print("Seeded test user: test@example.com / testpassword")
+        print("Seeded test user: test@example.com / testpassword", flush=True)
     except Exception as e:
-        print("Failed to seed test user:", e)
+        print("Failed to seed test user:", e, flush=True)
     finally:
         con.close()
 
@@ -15629,7 +15671,8 @@ def aws_rds_status():
             engine = cfg.get("engine")
             host   = cfg.get("host")
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
 
     return jsonify({
         "has_credentials": bool(cfg_row),
@@ -15804,7 +15847,8 @@ def dynamodb_status():
             if raw_access_key:
                 access_key = f"{raw_access_key[:4]}{'*' * max(len(raw_access_key) - 8, 4)}{raw_access_key[-4:]}"
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
 
     return jsonify({
         "has_credentials": bool(cfg_row),
@@ -15972,7 +16016,8 @@ def _notion_status():
             if raw_token:
                 access_token = f"{raw_token[:4]}{'*' * max(len(raw_token) - 8, 4)}{raw_token[-4:]}"
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
 
     return jsonify(
         {
@@ -16141,7 +16186,8 @@ def hubspot_status():
             if raw_token:
                 access_token = f"{raw_token[:4]}{'*' * max(len(raw_token) - 8, 4)}{raw_token[-4:]}"
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
 
     return jsonify(
         {
@@ -16780,7 +16826,8 @@ def airtable_status():
             if raw_token:
                 access_token = f"{raw_token[:4]}{'*' * max(len(raw_token) - 8, 4)}{raw_token[-4:]}"
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
 
     return jsonify(
         {
@@ -16951,7 +16998,8 @@ def pipedrive_status():
             if raw_token:
                 api_token = f"{raw_token[:4]}{'*' * max(len(raw_token) - 8, 4)}{raw_token[-4:]}"
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
  
     return jsonify(
         {
@@ -17124,7 +17172,8 @@ def freshdesk_status():
             if raw_key:
                 api_key = f"{raw_key[:4]}{'*' * max(len(raw_key) - 8, 4)}{raw_key[-4:]}"
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
  
     return jsonify(
         {
@@ -17295,7 +17344,8 @@ def klaviyo_status():
             if raw_key:
                 api_key = f"{raw_key[:4]}{'*' * max(len(raw_key) - 8, 4)}{raw_key[-4:]}"
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
  
     return jsonify(
         {
@@ -17470,7 +17520,8 @@ def amplitude_status():
             if raw_secret_key:
                 secret_key = f"{raw_secret_key[:4]}{'*' * max(len(raw_secret_key) - 8, 4)}{raw_secret_key[-4:]}"
         except Exception:
-            pass
+            import traceback; traceback.print_exc()
+            print('Exception caught', flush=True)
  
     return jsonify(
         {
@@ -18298,3 +18349,289 @@ seed_test_user()
 
 if __name__=="__main__":
     app.run(port=4000,debug=True,host="0.0.0.0",use_reloader=False)
+# ================= LOOKER =================
+
+@app.route("/connectors/looker/connect")
+def looker_connect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(connect_looker(uid))
+
+@app.route("/connectors/looker/disconnect")
+def looker_disconnect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(disconnect_looker(uid))
+
+@app.route("/connectors/looker/sync")
+def looker_sync_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_looker(uid, sync_type))
+
+@app.route("/connectors/looker/save_app", methods=["POST"])
+def looker_save_app_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    save_looker_config(uid, request.json)
+    return jsonify({"status":"success"})
+
+
+# ================= SUPERSET =================
+
+@app.route("/connectors/superset/connect")
+def superset_connect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(connect_superset(uid))
+
+@app.route("/connectors/superset/disconnect")
+def superset_disconnect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(disconnect_superset(uid))
+
+@app.route("/connectors/superset/sync")
+def superset_sync_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_superset(uid, sync_type))
+
+@app.route("/connectors/superset/save_app", methods=["POST"])
+def superset_save_app_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    save_superset_config(uid, request.json)
+    return jsonify({"status":"success"})
+
+
+# ================= AZURE_BLOB =================
+
+@app.route("/connectors/azure_blob/connect")
+def azure_blob_connect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(connect_azure_blob(uid))
+
+@app.route("/connectors/azure_blob/disconnect")
+def azure_blob_disconnect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(disconnect_azure_blob(uid))
+
+@app.route("/connectors/azure_blob/sync")
+def azure_blob_sync_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_azure_blob(uid, sync_type))
+
+@app.route("/connectors/azure_blob/save_app", methods=["POST"])
+def azure_blob_save_app_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    save_azure_blob_config(uid, request.json)
+    return jsonify({"status":"success"})
+
+
+# ================= DATADOG =================
+
+@app.route("/connectors/datadog/connect")
+def datadog_connect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(connect_datadog(uid))
+
+@app.route("/connectors/datadog/disconnect")
+def datadog_disconnect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(disconnect_datadog(uid))
+
+@app.route("/connectors/datadog/sync")
+def datadog_sync_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_datadog(uid, sync_type))
+
+@app.route("/connectors/datadog/save_app", methods=["POST"])
+def datadog_save_app_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    save_datadog_config(uid, request.json)
+    return jsonify({"status":"success"})
+
+
+# ================= OKTA =================
+
+@app.route("/connectors/okta/connect")
+def okta_connect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(connect_okta(uid))
+
+@app.route("/connectors/okta/disconnect")
+def okta_disconnect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(disconnect_okta(uid))
+
+@app.route("/connectors/okta/sync")
+def okta_sync_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_okta(uid, sync_type))
+
+@app.route("/connectors/okta/save_app", methods=["POST"])
+def okta_save_app_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    save_okta_config(uid, request.json)
+    return jsonify({"status":"success"})
+
+@app.route("/api/status/okta")
+def okta_status_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT status, config_json FROM connector_configs WHERE uid=? AND connector='okta' LIMIT 1", (uid,))
+    row = cur.fetchone()
+    con.close()
+    if not row:
+        return jsonify({"connected": False, "has_credentials": False})
+    status, config_json = row
+    return jsonify({"connected": status == "connected", "has_credentials": bool(config_json), "status": status})
+
+
+# ================= AUTH0 =================
+
+@app.route("/connectors/auth0/connect")
+def auth0_connect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(connect_auth0(uid))
+
+@app.route("/connectors/auth0/disconnect")
+def auth0_disconnect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(disconnect_auth0(uid))
+
+@app.route("/connectors/auth0/sync")
+def auth0_sync_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_auth0(uid, sync_type))
+
+@app.route("/connectors/auth0/save_app", methods=["POST"])
+def auth0_save_app_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    save_auth0_config(uid, request.json)
+    return jsonify({"status":"success"})
+
+@app.route("/api/status/auth0")
+def auth0_status_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT status, config_json FROM connector_configs WHERE uid=? AND connector='auth0' LIMIT 1", (uid,))
+    row = cur.fetchone()
+    con.close()
+    if not row:
+        return jsonify({"connected": False, "has_credentials": False})
+    status, config_json = row
+    return jsonify({"connected": status == "connected", "has_credentials": bool(config_json), "status": status})
+
+
+# ================= CLOUDFLARE =================
+
+@app.route("/connectors/cloudflare/connect")
+def cloudflare_connect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(connect_cloudflare(uid))
+
+@app.route("/connectors/cloudflare/disconnect")
+def cloudflare_disconnect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(disconnect_cloudflare(uid))
+
+@app.route("/connectors/cloudflare/sync")
+def cloudflare_sync_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_cloudflare(uid, sync_type))
+
+@app.route("/connectors/cloudflare/save_app", methods=["POST"])
+def cloudflare_save_app_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    save_cloudflare_config(uid, request.json)
+    return jsonify({"status":"success"})
+
+@app.route("/api/status/cloudflare")
+def cloudflare_status_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT status, config_json FROM connector_configs WHERE uid=? AND connector='cloudflare' LIMIT 1", (uid,))
+    row = cur.fetchone()
+    con.close()
+    if not row:
+        return jsonify({"connected": False, "has_credentials": False})
+    status, config_json = row
+    return jsonify({"connected": status == "connected", "has_credentials": bool(config_json), "status": status})
+
+
+# ================= SENTRY =================
+
+@app.route("/connectors/sentry/connect")
+def sentry_connect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(connect_sentry(uid))
+
+@app.route("/connectors/sentry/disconnect")
+def sentry_disconnect_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    return jsonify(disconnect_sentry(uid))
+
+@app.route("/connectors/sentry/sync")
+def sentry_sync_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_sentry(uid, sync_type))
+
+@app.route("/connectors/sentry/save_app", methods=["POST"])
+def sentry_save_app_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    save_sentry_config(uid, request.json)
+    return jsonify({"status":"success"})
+
+@app.route("/api/status/sentry")
+def sentry_status_api():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT status, config_json FROM connector_configs WHERE uid=? AND connector='sentry' LIMIT 1", (uid,))
+    row = cur.fetchone()
+    con.close()
+    if not row:
+        return jsonify({"connected": False, "has_credentials": False})
+    status, config_json = row
+    return jsonify({"connected": status == "connected", "has_credentials": bool(config_json), "status": status})

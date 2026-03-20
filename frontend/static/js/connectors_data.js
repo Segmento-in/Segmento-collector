@@ -3206,4 +3206,261 @@ data into your configured warehouse destination.
       "Incremental and historical sync modes"
     ]
   },
+
+  {
+    id: "looker",
+    name: "Looker",
+    categories: ["analytics", "bi"],
+    logo: "https://cdn.simpleicons.org/looker/4285F4",
+
+    auth_type: "api_key",
+    api_key_label: "Looker API3 Credentials",
+
+    connect_url: "/connectors/looker/connect",
+    sync_url: "/connectors/looker/sync",
+    disconnect_url: "/connectors/looker/disconnect",
+    status_api: "/api/status/looker",
+    save_app_url: "/connectors/looker/save_app",
+
+    models: [{ title: "Users", desc: "User records" }, { title: "Dashboards", desc: "Dashboards" }, { title: "Looks", desc: "Saved looks" }],
+
+    tables: [
+      "looker_users",
+      "looker_dashboards",
+      "looker_looks"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect your Looker instance to extract users, dashboards, and looks into your destination warehouse.",
+
+    data: ["Dashboards", "Looks", "User records"]
+  },
+
+  {
+    id: "superset",
+    name: "Apache Superset",
+    categories: ["analytics", "bi"],
+    logo: "https://cdn.simpleicons.org/apachesuperset/20A7C9",
+
+    auth_type: "api_key",
+    api_key_label: "Superset Credentials",
+
+    connect_url: "/connectors/superset/connect",
+    sync_url: "/connectors/superset/sync",
+    disconnect_url: "/connectors/superset/disconnect",
+    status_api: "/api/status/superset",
+    save_app_url: "/connectors/superset/save_app",
+
+    models: [{ title: "Dashboards", desc: "Dashboards" }, { title: "Charts", desc: "Charts" }, { title: "Datasets", desc: "Datasets" }],
+
+    tables: [
+      "superset_dashboards",
+      "superset_charts",
+      "superset_datasets"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect your Superset instance to extract dashboards, charts, and datasets into your destination warehouse.",
+
+    data: ["Dashboards", "Charts", "Datasets"]
+  },
+
+  {
+    id: "azure_blob",
+    name: "Azure Blob Storage",
+    categories: ["storage", "data"],
+    logo: "/static/images/logos/azureblob.png",
+
+    auth_type: "api_key",
+    api_key_label: "Azure Connection String",
+
+    connect_url: "/connectors/azure_blob/connect",
+    sync_url: "/connectors/azure_blob/sync",
+    disconnect_url: "/connectors/azure_blob/disconnect",
+    status_api: "/api/status/azure_blob",
+    save_app_url: "/connectors/azure_blob/save_app",
+
+    models: [{ title: "Files", desc: "Blob files" }],
+
+    tables: [
+      "azure_blob_files"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect Azure Blob Storage to map and extract file metadata.",
+
+    data: ["Blob files", "File sizes", "Timestamps"]
+  },
+
+  {
+    id: "datadog",
+    name: "Datadog",
+    categories: ["monitoring", "analytics"],
+    logo: "https://cdn.simpleicons.org/datadog/632CA6",
+
+    auth_type: "api_key",
+    api_key_label: "Datadog API and App Keys",
+
+    connect_url: "/connectors/datadog/connect",
+    sync_url: "/connectors/datadog/sync",
+    disconnect_url: "/connectors/datadog/disconnect",
+    status_api: "/api/status/datadog",
+    save_app_url: "/connectors/datadog/save_app",
+
+    models: [{ title: "Events", desc: "Datadog events" }],
+
+    tables: [
+      "datadog_events"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect to your Datadog instance to extract events, metrics, and logs into your destination warehouse.",
+
+    data: ["Events", "Logs", "Metrics"]
+  },
+
+  {
+    id: "okta",
+    name: "Okta",
+    categories: ["security", "identity"],
+    logo: "https://cdn.simpleicons.org/okta/007DC1",
+
+    auth_type: "api_key",
+    api_key_label: "Okta API Token",
+
+    route: "/connectors/okta",
+    connect_url: "/connectors/okta/connect",
+    sync_url: "/connectors/okta/sync",
+    disconnect_url: "/connectors/okta/disconnect",
+    status_api: "/api/status/okta",
+    save_app_url: "/connectors/okta/save_app",
+
+    models: [
+      {title: "Users", desc: "Okta user accounts and profile data"},
+      {title: "Groups", desc: "Okta groups and memberships"},
+      {title: "Apps", desc: "Integrated application assignments"}
+    ],
+
+    tables: [
+      "okta_users",
+      "okta_groups",
+      "okta_apps"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect your Okta tenant to extract users, groups, and application data for identity analytics and compliance reporting.",
+
+    data: ["Users", "Groups", "Apps", "Login metadata", "Profile attributes"]
+  },
+
+  {
+    id: "auth0",
+    name: "Auth0",
+    categories: ["security", "identity"],
+    logo: "https://cdn.simpleicons.org/auth0/EB5424",
+
+    auth_type: "api_key",
+    api_key_label: "Auth0 Management API Token",
+
+    route: "/connectors/auth0",
+    connect_url: "/connectors/auth0/connect",
+    sync_url: "/connectors/auth0/sync",
+    disconnect_url: "/connectors/auth0/disconnect",
+    status_api: "/api/status/auth0",
+    save_app_url: "/connectors/auth0/save_app",
+
+    models: [
+      {title: "Users", desc: "Auth0 user accounts and profile data"},
+      {title: "Roles", desc: "Authentication roles and permissions"},
+      {title: "Logs", desc: "Authentication event logs"}
+    ],
+
+    tables: [
+      "auth0_users",
+      "auth0_roles",
+      "auth0_logs"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect your Auth0 tenant to extract user accounts, roles, and authentication logs into your destination warehouse.",
+
+    data: ["Users", "Roles", "Logs", "Login counts", "Last login timestamps"]
+  },
+
+  {
+    id: "cloudflare",
+    name: "Cloudflare",
+    categories: ["infrastructure", "networking"],
+    logo: "https://cdn.simpleicons.org/cloudflare/F38020",
+
+    auth_type: "api_key",
+    api_key_label: "Cloudflare API Token",
+
+    route: "/connectors/cloudflare",
+    connect_url: "/connectors/cloudflare/connect",
+    sync_url: "/connectors/cloudflare/sync",
+    disconnect_url: "/connectors/cloudflare/disconnect",
+    status_api: "/api/status/cloudflare",
+    save_app_url: "/connectors/cloudflare/save_app",
+
+    models: [
+      {title: "Zones", desc: "Cloudflare DNS zones and domains"},
+      {title: "DNS Records", desc: "DNS record entries across all zones"},
+      {title: "Analytics", desc: "Web traffic and analytics data"}
+    ],
+
+    tables: [
+      "cloudflare_zones",
+      "cloudflare_dns_records",
+      "cloudflare_analytics"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect your Cloudflare account to extract zones, DNS records, and web analytics into your destination warehouse.",
+
+    data: ["Zones", "DNS Records", "Traffic Analytics", "Threat counts", "Bandwidth metrics"]
+  },
+
+  {
+    id: "sentry",
+    name: "Sentry",
+    categories: ["monitoring", "engineering"],
+    logo: "https://cdn.simpleicons.org/sentry/362D59",
+
+    auth_type: "api_key",
+    api_key_label: "Sentry Auth Token",
+
+    route: "/connectors/sentry",
+    connect_url: "/connectors/sentry/connect",
+    sync_url: "/connectors/sentry/sync",
+    disconnect_url: "/connectors/sentry/disconnect",
+    status_api: "/api/status/sentry",
+    save_app_url: "/connectors/sentry/save_app",
+
+    models: [
+      {title: "Projects", desc: "Sentry monitored projects"},
+      {title: "Issues", desc: "Error issues and exceptions"},
+      {title: "Events", desc: "Individual error event occurrences"}
+    ],
+
+    tables: [
+      "sentry_projects",
+      "sentry_issues",
+      "sentry_events"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect your Sentry organization to extract projects, issues, and error events for engineering analytics and release quality tracking.",
+
+    data: ["Projects", "Issues", "Events", "Error levels", "Stack traces"]
+  },
+
 ];
