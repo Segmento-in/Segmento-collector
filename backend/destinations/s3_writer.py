@@ -1,4 +1,4 @@
-print("### S3 FORMAT-AWARE WRITER LOADED ###")
+print("### S3 FORMAT-AWARE WRITER LOADED ###", flush=True)
 
 import json
 import tempfile
@@ -16,7 +16,7 @@ def push_s3(dest, source, rows):
         return 0
 
     fmt = (dest.get("format") or "parquet").lower()
-    print(f"[S3] Upload format: {fmt}")
+    print(f"[S3] Upload format: {fmt}", flush=True)
 
     aws_access_key = dest["username"]
     aws_secret_key = dest["password"]
@@ -87,13 +87,13 @@ def push_s3(dest, source, rows):
         f"{source}_{int(time.time())}.{extension}"
     )
 
-    print("[S3] Uploading:", key)
+    print("[S3] Uploading:", key, flush=True)
 
     s3.upload_file(file_path, bucket_name, key)
 
     os.unlink(file_path)
 
-    print(f"[S3] Uploaded {len(rows)} rows → s3://{bucket_name}/{key}")
+    print(f"[S3] Uploaded {len(rows)} rows → s3://{bucket_name}/{key}", flush=True)
 
     if fmt in ("iceberg", "hudi"):
 

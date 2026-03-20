@@ -25,7 +25,7 @@ def get_db():
 
 
 def _log(message: str):
-    print(f"[MONDAY] {message}")
+    print(f"[MONDAY] {message}", flush=True)
 
 
 def _mask_token(token: str | None) -> str | None:

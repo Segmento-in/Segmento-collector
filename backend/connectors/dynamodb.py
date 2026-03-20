@@ -25,7 +25,7 @@ def get_db():
 
 
 def _log(message: str):
-    print(f"[DYNAMODB] {message}")
+    print(f"[DYNAMODB] {message}", flush=True)
 
 
 def _mask_access_key(access_key: str | None) -> str | None:

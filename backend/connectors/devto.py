@@ -185,8 +185,8 @@ def sync_articles(uid, sync_type="historical", limit=200):
 
     con.close()
 
-    print(f"[DEVTO] Sync type: {sync_type}")
-    print(f"[DEVTO] New rows found: {len(new_rows)}")
+    print(f"[DEVTO] Sync type: {sync_type}", flush=True)
+    print(f"[DEVTO] New rows found: {len(new_rows)}", flush=True)
 
     return {
         "articles": len(new_rows),
@@ -232,7 +232,7 @@ def sync_tags(uid):
     con.commit()
     con.close()
 
-    print(f"[DEVTO] New tags: {len(new_rows)}")
+    print(f"[DEVTO] New tags: {len(new_rows)}", flush=True)
 
     return {
         "tags": len(new_rows),

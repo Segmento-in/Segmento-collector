@@ -167,11 +167,11 @@ def safe_get(headers, params):
             return r.json()
 
         if r.status_code == 429:
-            print("[NVD] Rate limited → sleeping")
+            print("[NVD] Rate limited → sleeping", flush=True)
             time.sleep(60)
 
     except Exception as e:
-        print("[NVD ERROR]", e)
+        print("[NVD ERROR]", e, flush=True)
         time.sleep(5)
 
     return None
@@ -190,7 +190,7 @@ def sync_nvd(uid, sync_type="incremental"):
         "X-Api-Key": api_key
     }
 
-    print("NVD KEY:", api_key[:10])
+    print("NVD KEY:", api_key[:10], flush=True)
 
     # ---------------- Time Window ----------------
 
@@ -253,7 +253,7 @@ def sync_nvd(uid, sync_type="incremental"):
         insert_cves(uid, collected)
         save_last_modified(uid, newest)
 
-    print(f"[NVD] CVEs collected: {len(collected)}")
+    print(f"[NVD] CVEs collected: {len(collected)}", flush=True)
 
     return {
         "rows": collected,

@@ -25,7 +25,7 @@ def get_db():
 
 
 def _log(message):
-    print(f"[SIMILARWEB] {message}")
+    print(f"[SIMILARWEB] {message}", flush=True)
 
 
 def _as_text(value):

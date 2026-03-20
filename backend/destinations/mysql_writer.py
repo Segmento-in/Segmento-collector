@@ -81,11 +81,11 @@ def push_to_mysql(dest, source, rows):
             count += 1
 
         except Exception as e:
-            print("[MYSQL] Insert error:", e)
+            print("[MYSQL] Insert error:", e, flush=True)
 
     conn.commit()
     conn.close()
 
-    print(f"[DEST] Pushed {count} rows to MySQL ({table})")
+    print(f"[DEST] Pushed {count} rows to MySQL ({table})", flush=True)
 
     return count

@@ -38,6 +38,6 @@ def push_mongodb(dest, source, rows):
 
     client.close()
 
-    print(f"[DEST] Pushed {count} rows to MongoDB ({db_name}.{collection_name})")
+    print(f"[DEST] Pushed {count} rows to MongoDB ({db_name}.{collection_name})", flush=True)
 
     return count

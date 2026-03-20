@@ -36,14 +36,14 @@ def decrypt_value(value):
         return value
 
     try:
-        print("TRY DECRYPT:", value[:20])
+        print("TRY DECRYPT:", value[:20], flush=True)
 
         decrypted = fernet.decrypt(value.encode()).decode()
 
-        print("DECRYPTED OK")
+        print("DECRYPTED OK", flush=True)
 
         return decrypted
 
     except Exception as e:
-        print("DECRYPT FAILED:", e)
+        print("DECRYPT FAILED:", e, flush=True)
         return value

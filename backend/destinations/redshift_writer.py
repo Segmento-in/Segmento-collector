@@ -69,7 +69,7 @@ def push_redshift(dest, source, rows):
             )
 
         conn.commit()
-        print(f"[REDSHIFT] Inserted {len(rows)} rows into {full_table}")
+        print(f"[REDSHIFT] Inserted {len(rows)} rows into {full_table}", flush=True)
         return len(rows)
 
     finally:

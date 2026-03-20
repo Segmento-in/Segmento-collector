@@ -22,7 +22,7 @@ def get_db():
     return con
 
 def _log(message: str):
-    print(f"[TWILIO] {message}")
+    print(f"[TWILIO] {message}", flush=True)
 
 def _iso_now() -> str:
     return datetime.datetime.now(datetime.UTC).isoformat()

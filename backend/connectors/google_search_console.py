@@ -214,7 +214,7 @@ def fetch_gsc_data(service, site_url, start, end):
 
 def sync_search_console(site_url, sync_type="incremental"):
 
-    print("[GSC] Sync started...")
+    print("[GSC] Sync started...", flush=True)
 
     uid, creds = get_creds()
 
@@ -257,7 +257,7 @@ def sync_search_console(site_url, sync_type="incremental"):
         "last_sync": end.isoformat()
     })
 
-    print("[GSC] Sync complete:", pushed)
+    print("[GSC] Sync complete:", pushed, flush=True)
 
     return {
         "status": "success",

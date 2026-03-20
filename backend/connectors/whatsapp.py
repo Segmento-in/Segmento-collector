@@ -94,7 +94,7 @@ def _safe_get(url, params):
 
 def sync_whatsapp(uid=None, sync_type="historical"):
     # If uid is not passed (internal call), try to get from global g
-    print(f"[WHATSAPP] Sync started for UID {uid}")
+    print(f"[WHATSAPP] Sync started for UID {uid}", flush=True)
 
     if uid is None:
         from flask import g
@@ -213,7 +213,7 @@ def sync_whatsapp(uid=None, sync_type="historical"):
     try:
         url = f"{GRAPH_BASE}/{phone_number_id}/conversations"
     except Exception as e:
-        print("[WHATSAPP] Conversation analytics unavailable:", e)
+        print("[WHATSAPP] Conversation analytics unavailable:", e, flush=True)
 
     params = {
         "access_token": access_token,

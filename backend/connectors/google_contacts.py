@@ -200,21 +200,21 @@ def fetch_contacts(service):
 
 def sync_contacts():
 
-    print("[CONTACTS] Starting sync...")
+    print("[CONTACTS] Starting sync...", flush=True)
 
 
     # -------- AUTH --------
     uid, creds = get_creds()
 
     if not uid:
-        print("[CONTACTS] Not connected")
+        print("[CONTACTS] Not connected", flush=True)
         return {
             "status": "error",
             "message": "Contacts not connected"
         }
 
 
-    print(f"[CONTACTS] Connected as {uid}")
+    print(f"[CONTACTS] Connected as {uid}", flush=True)
 
 
     # -------- JOB --------
@@ -233,30 +233,30 @@ def sync_contacts():
 
     sync_type = row[0] if row else "delta"
 
-    print(f"[CONTACTS] Sync type: {sync_type}")
+    print(f"[CONTACTS] Sync type: {sync_type}", flush=True)
 
 
     # -------- DEST --------
     dest_cfg = get_active_destination(uid)
 
     if not dest_cfg:
-        print("[CONTACTS] No destination")
+        print("[CONTACTS] No destination", flush=True)
         return {
             "status": "error",
             "message": "No destination"
         }
 
 
-    print(f"[CONTACTS] Destination: {dest_cfg['type']}")
+    print(f"[CONTACTS] Destination: {dest_cfg['type']}", flush=True)
 
 
     # -------- STATE --------
     state = get_state(uid)
 
     if state and sync_type in ("delta", "incremental"):
-        print(f"[CONTACTS] Incremental from {state.get('last_updated')}")
+        print(f"[CONTACTS] Incremental from {state.get('last_updated')}", flush=True)
     else:
-        print("[CONTACTS] Full sync")
+        print("[CONTACTS] Full sync", flush=True)
 
 
     # -------- API --------
@@ -273,7 +273,7 @@ def sync_contacts():
         people = fetch_contacts(service)
 
     except HttpError as e:
-        print("[CONTACTS] API Error:", e)
+        print("[CONTACTS] API Error:", e, flush=True)
         raise
 
 
@@ -298,7 +298,7 @@ def sync_contacts():
         })
 
 
-    print(f"[CONTACTS] Found {len(rows)} contacts")
+    print(f"[CONTACTS] Found {len(rows)} contacts", flush=True)
 
 
     if not rows:
@@ -309,11 +309,11 @@ def sync_contacts():
 
 
     # -------- ROUTER --------
-    print("[CONTACTS] Pushing...")
+    print("[CONTACTS] Pushing...", flush=True)
 
     push_to_destination(dest_cfg, SOURCE, rows)
 
-    print(f"[CONTACTS] Pushed {len(rows)} rows")
+    print(f"[CONTACTS] Pushed {len(rows)} rows", flush=True)
 
 
     # -------- STATE SAVE --------
@@ -322,7 +322,7 @@ def sync_contacts():
     })
 
 
-    print("[CONTACTS] State updated")
+    print("[CONTACTS] State updated", flush=True)
 
 
     return {

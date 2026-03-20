@@ -28,7 +28,7 @@ def get_db():
 
 
 def _log(message):
-    print(f"[OUTBRAIN] {message}")
+    print(f"[OUTBRAIN] {message}", flush=True)
 
 
 def _parse_dt(value):

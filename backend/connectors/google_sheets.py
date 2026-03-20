@@ -212,20 +212,20 @@ def fetch_sheets(service, modified_after=None):
 
 def sync_sheets_files():
 
-    print("[SHEETS] Starting sync...")
+    print("[SHEETS] Starting sync...", flush=True)
 
 
     # -------- AUTH --------
     uid, creds = get_creds()
 
     if not uid:
-        print("[SHEETS] Not connected")
+        print("[SHEETS] Not connected", flush=True)
         return {
             "status": "error",
             "message": "Sheets not connected"
         }
 
-    print(f"[SHEETS] Connected as {uid}")
+    print(f"[SHEETS] Connected as {uid}", flush=True)
 
 
     # -------- JOB --------
@@ -244,20 +244,20 @@ def sync_sheets_files():
 
     sync_type = job[0] if job else "delta"
 
-    print(f"[SHEETS] Sync type: {sync_type}")
+    print(f"[SHEETS] Sync type: {sync_type}", flush=True)
 
 
     # -------- DEST --------
     dest_cfg = get_active_destination(uid)
 
     if not dest_cfg:
-        print("[SHEETS] No destination")
+        print("[SHEETS] No destination", flush=True)
         return {
             "status": "error",
             "message": "No destination"
         }
 
-    print(f"[SHEETS] Destination: {dest_cfg['type']}")
+    print(f"[SHEETS] Destination: {dest_cfg['type']}", flush=True)
 
 
     # -------- STATE --------
@@ -267,9 +267,9 @@ def sync_sheets_files():
 
     if state and sync_type in ("delta", "incremental"):
         modified_after = state.get("last_modified")
-        print(f"[SHEETS] Incremental from {modified_after}")
+        print(f"[SHEETS] Incremental from {modified_after}", flush=True)
     else:
-        print("[SHEETS] Full sync")
+        print("[SHEETS] Full sync", flush=True)
 
 
     # -------- API --------
@@ -279,7 +279,7 @@ def sync_sheets_files():
     # -------- FETCH --------
     rows = fetch_sheets(drive, modified_after)
 
-    print(f"[SHEETS] Found {len(rows)} sheets")
+    print(f"[SHEETS] Found {len(rows)} sheets", flush=True)
 
 
     if not rows:
@@ -291,11 +291,11 @@ def sync_sheets_files():
 
 
     # -------- ROUTER --------
-    print("[SHEETS] Pushing...")
+    print("[SHEETS] Pushing...", flush=True)
 
     push_to_destination(dest_cfg, SOURCE, rows)
 
-    print(f"[SHEETS] Pushed {len(rows)} rows")
+    print(f"[SHEETS] Pushed {len(rows)} rows", flush=True)
 
 
     # -------- STATE SAVE --------
@@ -309,7 +309,7 @@ def sync_sheets_files():
         "last_modified": newest
     })
 
-    print(f"[SHEETS] State updated to {newest}")
+    print(f"[SHEETS] State updated to {newest}", flush=True)
 
 
     return {

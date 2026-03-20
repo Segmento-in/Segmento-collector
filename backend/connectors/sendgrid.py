@@ -24,7 +24,7 @@ def get_db():
 
 
 def _log(message: str):
-    print(f"[SENDGRID] {message}")
+    print(f"[SENDGRID] {message}", flush=True)
 
 
 def _mask_token(token: str | None) -> str | None:

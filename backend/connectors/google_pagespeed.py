@@ -118,7 +118,7 @@ def fetch_pagespeed(url, strategy, categories, api_key):
 
             if r.status_code == 429:
                 wait = 5 * (attempt + 1)
-                print(f"[PageSpeed] Rate limited → retry {wait}s")
+                print(f"[PageSpeed] Rate limited → retry {wait}s", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -126,7 +126,7 @@ def fetch_pagespeed(url, strategy, categories, api_key):
 
         except Exception as e:
 
-            print("[PageSpeed ERROR]", e)
+            print("[PageSpeed ERROR]", e, flush=True)
 
             if attempt == 4:
                 raise e
@@ -191,7 +191,7 @@ def sync_pagespeed(url, sync_type="incremental"):
 
     for strategy in strategies:
 
-        print(f"[PageSpeed] Fetching {url} ({strategy})")
+        print(f"[PageSpeed] Fetching {url} ({strategy})", flush=True)
 
         data = fetch_pagespeed(
             url,

@@ -101,12 +101,12 @@ def run_job(job):
 
     # Prevent parallel runs
     if job_key in RUNNING_JOBS:
-        print(f"[SCHEDULER] Skipping {job_key} (already running)")
+        print(f"[SCHEDULER] Skipping {job_key} (already running)", flush=True)
         return
 
     RUNNING_JOBS.add(job_key)
 
-    print(f"[SCHEDULER] Running {source} ({sync_type}) for {uid}")
+    print(f"[SCHEDULER] Running {source} ({sync_type}) for {uid}", flush=True)
 
     try:
 
@@ -126,13 +126,13 @@ def run_job(job):
         )
 
         if r.status_code == 200:
-            print(f"[SCHEDULER] {source} sync OK →", r.json())
+            print(f"[SCHEDULER] {source} sync OK →", r.json(), flush=True)
             mark_job_run(uid, source)
         else:
-            print(f"[SCHEDULER] {source} sync FAILED:", r.text)
+            print(f"[SCHEDULER] {source} sync FAILED:", r.text, flush=True)
 
     except Exception as e:
-        print(f"[SCHEDULER] Error running {source}:", str(e))
+        print(f"[SCHEDULER] Error running {source}:", str(e), flush=True)
 
     finally:
         RUNNING_JOBS.discard(job_key)
@@ -188,7 +188,7 @@ def start_scheduler():
     global scheduler
 
     if scheduler:
-        print("[SCHEDULER] Already running")
+        print("[SCHEDULER] Already running", flush=True)
         return
 
     scheduler = BackgroundScheduler(
@@ -205,7 +205,7 @@ def start_scheduler():
 
     scheduler.start()
 
-    print("[SCHEDULER] Universal Scheduler Started (1-min interval)")
+    print("[SCHEDULER] Universal Scheduler Started (1-min interval)", flush=True)
 
 # -------------------------------
 # Optional standalone run
@@ -219,4 +219,4 @@ if __name__ == "__main__":
         while True:
             time.sleep(10)
     except KeyboardInterrupt:
-        print("\n[SCHEDULER] Stopped")
+        print("\n[SCHEDULER] Stopped", flush=True)

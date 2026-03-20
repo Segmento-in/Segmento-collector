@@ -22,7 +22,7 @@ def get_db():
     return con
 
 def _log(message: str):
-    print(f"[INTERCOM] {message}")
+    print(f"[INTERCOM] {message}", flush=True)
 
 def _iso_now() -> str:
     return datetime.datetime.now(datetime.UTC).isoformat()

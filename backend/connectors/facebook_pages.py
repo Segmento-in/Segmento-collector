@@ -255,7 +255,8 @@ def sync_facebook_pages(uid, sync_type="historical"):
                 })
 
     except:
-        pass
+        import traceback; traceback.print_exc()
+        print('Exception caught', flush=True)
 
     insert_insights(uid, insights)
 

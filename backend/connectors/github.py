@@ -274,7 +274,7 @@ def sync_github(uid):
 
     sync_type = row[0] if row else "historical"
 
-    print(f"[GITHUB] Sync type: {sync_type}")
+    print(f"[GITHUB] Sync type: {sync_type}", flush=True)
 
     repos = gh_get(uid, "/user/repos", {"per_page": 100})
 
@@ -307,7 +307,7 @@ def sync_github(uid):
                 {"per_page": 100}
             )
         except Exception as e:
-            print(f"[GITHUB] Skipping repo {repo_full}: {e}")
+            print(f"[GITHUB] Skipping repo {repo_full}: {e}", flush=True)
             continue
 
         repo_new_commits = []
@@ -357,8 +357,8 @@ def sync_github(uid):
 
     inserted = push_to_destination(dest_cfg, SOURCE, all_rows)
 
-    print(f"[GITHUB] New rows found: {total_new}")
-    print(f"[GITHUB] Rows pushed: {inserted}")
+    print(f"[GITHUB] New rows found: {total_new}", flush=True)
+    print(f"[GITHUB] Rows pushed: {inserted}", flush=True)
 
     return {
         "status": "success",

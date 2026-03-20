@@ -53,7 +53,7 @@ def safe_get(url, params=None):
             time.sleep(60)
 
     except Exception as e:
-        print("OSM ERROR:", e)
+        print("OSM ERROR:", e, flush=True)
         time.sleep(5)
 
     return None

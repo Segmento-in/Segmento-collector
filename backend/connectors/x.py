@@ -28,7 +28,7 @@ def get_db():
 
 
 def _log(msg):
-    print(f"[X] {msg}")
+    print(f"[X] {msg}", flush=True)
 
 
 def _parse_dt(value):

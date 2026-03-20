@@ -70,7 +70,7 @@ def push_duckdb(dest, source, rows):
                  conn.execute(f"INSERT INTO {table_name} SELECT * FROM read_json_auto(?)", [file_path])
 
         count = len(rows)
-        print(f"[DEST] Pushed {count} rows to DuckDB ({db_path}, table: {table_name})")
+        print(f"[DEST] Pushed {count} rows to DuckDB ({db_path}, table: {table_name})", flush=True)
 
     finally:
         if os.path.exists(file_path):

@@ -69,7 +69,7 @@ def fetch(instance, path, params=None):
                 return data.get("data", [])
 
     except Exception as e:
-        print("PEERTUBE ERROR:", e)
+        print("PEERTUBE ERROR:", e, flush=True)
 
     return []
 

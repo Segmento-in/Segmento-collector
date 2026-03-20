@@ -119,7 +119,7 @@ def exchange_code(uid, code):
     )
 
     data = r.json()
-    print("GITLAB TOKEN:", data)
+    print("GITLAB TOKEN:", data, flush=True)
 
     if "access_token" not in data:
         raise Exception(f"GitLab OAuth failed: {data}")

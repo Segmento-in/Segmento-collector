@@ -78,7 +78,7 @@ def safe_get(uid, path):
             time.sleep(60)
 
     except Exception as e:
-        print("DISCOURSE ERROR:", e)
+        print("DISCOURSE ERROR:", e, flush=True)
         time.sleep(5)
 
     return None

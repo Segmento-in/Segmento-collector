@@ -21,7 +21,7 @@ def get_db():
     return con
 
 def _log(message: str):
-    print(f"[SHOPIFY] {message}")
+    print(f"[SHOPIFY] {message}", flush=True)
 
 def _mask_token(token: str | None) -> str | None:
     if not token:

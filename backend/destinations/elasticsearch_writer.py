@@ -49,6 +49,6 @@ def push_elasticsearch(dest, source, rows):
 
     success, failed = helpers.bulk(es, actions)
     
-    print(f"[DEST] Pushed {success} rows to Elasticsearch (index: {index_name}). Failed: {len(failed) if isinstance(failed, list) else failed}")
+    print(f"[DEST] Pushed {success} rows to Elasticsearch (index: {index_name}). Failed: {len(failed) if isinstance(failed, list) else failed}", flush=True)
 
     return success

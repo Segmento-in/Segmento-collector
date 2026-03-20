@@ -40,7 +40,7 @@ def push_databricks(dest, source, rows):
 
         if fmt == "iceberg":
             from backend.destinations.lakehouse_writer import push_iceberg
-            print("[DATABRICKS] Writing Iceberg table")
+            print("[DATABRICKS] Writing Iceberg table", flush=True)
             return push_iceberg(dest, source, rows)
         
         # Databricks SQL doesn't have a PARSE_JSON equivalent directly for inserts from string literals in the same way Snowflake does,
@@ -63,10 +63,10 @@ def push_databricks(dest, source, rows):
         cursor.close()
         connection.close()
 
-        print(f"[DEST] Batch pushed {len(rows)} rows to Databricks")
+        print(f"[DEST] Batch pushed {len(rows)} rows to Databricks", flush=True)
 
         return len(rows)
 
     except Exception as e:
-        print("[DATABRICKS ERROR]", e)
+        print("[DATABRICKS ERROR]", e, flush=True)
         raise e

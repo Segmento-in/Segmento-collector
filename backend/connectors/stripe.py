@@ -24,7 +24,7 @@ def get_db():
 
 
 def _log(message):
-    print(f"[STRIPE] {message}")
+    print(f"[STRIPE] {message}", flush=True)
 
 
 def _request(method, path, secret_key, params=None, retries=4):

@@ -27,7 +27,7 @@ def get_db():
 
 
 def _log(msg):
-    print(f"[TIKTOK] {msg}")
+    print(f"[TIKTOK] {msg}", flush=True)
 
 
 def _request_with_retry(method, url, retries=3, timeout=30, **kwargs):

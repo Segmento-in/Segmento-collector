@@ -148,7 +148,7 @@ def _cb_get(api_key, path, params=None, retries=3):
 
             if r.status_code == 429:
                 wait = 2 ** attempt
-                print(f"[CHARTBEAT] Rate limited. Waiting {wait}s…")
+                print(f"[CHARTBEAT] Rate limited. Waiting {wait}s…", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -159,7 +159,7 @@ def _cb_get(api_key, path, params=None, retries=3):
 
             if r.status_code >= 500:
                 wait = 2 ** attempt
-                print(f"[CHARTBEAT] Server error {r.status_code}. Retry in {wait}s…")
+                print(f"[CHARTBEAT] Server error {r.status_code}. Retry in {wait}s…", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -191,7 +191,7 @@ def _cb_post(api_key, path, payload=None, retries=3):
 
             if r.status_code == 429:
                 wait = 2 ** attempt
-                print(f"[CHARTBEAT] Rate limited. Waiting {wait}s…")
+                print(f"[CHARTBEAT] Rate limited. Waiting {wait}s…", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -202,7 +202,7 @@ def _cb_post(api_key, path, payload=None, retries=3):
 
             if r.status_code >= 500:
                 wait = 2 ** attempt
-                print(f"[CHARTBEAT] Server error {r.status_code}. Retry in {wait}s…")
+                print(f"[CHARTBEAT] Server error {r.status_code}. Retry in {wait}s…", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -359,7 +359,7 @@ def _fetch_page_engagement(api_key, host, start_date, end_date):
     try:
         data = _cb_post(api_key, "/query/v2/submit/page/", payload=payload)
     except Exception as e:
-        print(f"[CHARTBEAT] Page engagement query failed: {e}")
+        print(f"[CHARTBEAT] Page engagement query failed: {e}", flush=True)
         return []
 
     rows = []
@@ -393,7 +393,7 @@ def _fetch_recurring(api_key, host, query_id):
             params={"host": host, "query_id": query_id},
         )
     except Exception as e:
-        print(f"[CHARTBEAT] Recurring query fetch failed: {e}")
+        print(f"[CHARTBEAT] Recurring query fetch failed: {e}", flush=True)
         return []
 
     rows = []
@@ -427,7 +427,7 @@ def _fetch_video_engagement(api_key, video_host):
             params={"host": video_host},
         )
     except Exception as e:
-        print(f"[CHARTBEAT] Video engagement fetch failed: {e}")
+        print(f"[CHARTBEAT] Video engagement fetch failed: {e}", flush=True)
         return []
 
     rows = []
@@ -498,7 +498,7 @@ def sync_chartbeat(uid, sync_type="historical"):
     top_pages = _fetch_top_pages(api_key, host)
     _insert_top_pages(uid, top_pages)
     all_rows.extend(top_pages)
-    print(f"[CHARTBEAT] Top pages fetched: {len(top_pages)}")
+    print(f"[CHARTBEAT] Top pages fetched: {len(top_pages)}", flush=True)
 
     # ── 2. Historical page engagement ──────────────────────────
     engagement_rows = []
@@ -518,7 +518,7 @@ def sync_chartbeat(uid, sync_type="historical"):
         )
         _insert_page_engagement(uid, engagement_rows)
         all_rows.extend(engagement_rows)
-        print(f"[CHARTBEAT] Page engagement rows: {len(engagement_rows)}")
+        print(f"[CHARTBEAT] Page engagement rows: {len(engagement_rows)}", flush=True)
 
     # ── 3. Recurring historical queries ────────────────────────
     recurring_rows = []
@@ -528,7 +528,7 @@ def sync_chartbeat(uid, sync_type="historical"):
         recurring_rows = _fetch_recurring(api_key, host, effective_query_id)
         _insert_page_engagement(uid, recurring_rows)
         all_rows.extend(recurring_rows)
-        print(f"[CHARTBEAT] Recurring rows: {len(recurring_rows)}")
+        print(f"[CHARTBEAT] Recurring rows: {len(recurring_rows)}", flush=True)
 
     # ── 4. Video engagement (if video host format detected) ─────
     video_rows = []
@@ -538,7 +538,7 @@ def sync_chartbeat(uid, sync_type="historical"):
     if video_rows:
         _insert_video_engagement(uid, video_rows)
         all_rows.extend(video_rows)
-        print(f"[CHARTBEAT] Video rows: {len(video_rows)}")
+        print(f"[CHARTBEAT] Video rows: {len(video_rows)}", flush=True)
 
     # ── Push to destination ─────────────────────────────────────
     dest_cfg = get_active_destination(uid)
@@ -547,7 +547,7 @@ def sync_chartbeat(uid, sync_type="historical"):
     if dest_cfg and all_rows:
         rows_pushed = push_to_destination(dest_cfg, SOURCE, all_rows)
     elif not dest_cfg:
-        print("[CHARTBEAT] No active destination configured.")
+        print("[CHARTBEAT] No active destination configured.", flush=True)
 
     # ── Update state ────────────────────────────────────────────
     state["last_sync_date"] = today_str

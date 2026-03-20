@@ -60,7 +60,7 @@ def get_db():
 
 
 def _log(message: str):
-    print(f"[HUBSPOT] {message}")
+    print(f"[HUBSPOT] {message}", flush=True)
 
 
 def _iso_now() -> str:

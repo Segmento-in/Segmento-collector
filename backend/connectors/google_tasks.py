@@ -238,20 +238,20 @@ def fetch_tasks(service, updated_after=None):
 
 def sync_tasks():
 
-    print("[TASKS] Starting sync...")
+    print("[TASKS] Starting sync...", flush=True)
 
 
     # -------- AUTH --------
     uid, creds = get_creds()
 
     if not uid:
-        print("[TASKS] Not connected")
+        print("[TASKS] Not connected", flush=True)
         return {
             "status": "error",
             "message": "Tasks not connected"
         }
 
-    print(f"[TASKS] Connected as {uid}")
+    print(f"[TASKS] Connected as {uid}", flush=True)
 
 
     # -------- JOB --------
@@ -270,20 +270,20 @@ def sync_tasks():
 
     sync_type = job[0] if job else "delta"
 
-    print(f"[TASKS] Sync type: {sync_type}")
+    print(f"[TASKS] Sync type: {sync_type}", flush=True)
 
 
     # -------- DEST --------
     dest_cfg = get_active_destination(uid)
 
     if not dest_cfg:
-        print("[TASKS] No destination")
+        print("[TASKS] No destination", flush=True)
         return {
             "status": "error",
             "message": "No destination"
         }
 
-    print(f"[TASKS] Destination: {dest_cfg['type']}")
+    print(f"[TASKS] Destination: {dest_cfg['type']}", flush=True)
 
 
     # -------- STATE --------
@@ -293,9 +293,9 @@ def sync_tasks():
 
     if state and sync_type in ("delta", "incremental"):
         updated_after = state.get("last_updated")
-        print(f"[TASKS] Incremental from {updated_after}")
+        print(f"[TASKS] Incremental from {updated_after}", flush=True)
     else:
-        print("[TASKS] Full sync")
+        print("[TASKS] Full sync", flush=True)
 
 
     # -------- API --------
@@ -305,7 +305,7 @@ def sync_tasks():
     # -------- FETCH --------
     rows = fetch_tasks(service, updated_after)
 
-    print(f"[TASKS] Found {len(rows)} tasks")
+    print(f"[TASKS] Found {len(rows)} tasks", flush=True)
 
 
     if not rows:
@@ -317,11 +317,11 @@ def sync_tasks():
 
 
     # -------- ROUTER --------
-    print("[TASKS] Pushing...")
+    print("[TASKS] Pushing...", flush=True)
 
     push_to_destination(dest_cfg, SOURCE, rows)
 
-    print(f"[TASKS] Pushed {len(rows)} rows")
+    print(f"[TASKS] Pushed {len(rows)} rows", flush=True)
 
 
     # -------- STATE SAVE --------
@@ -335,7 +335,7 @@ def sync_tasks():
         "last_updated": newest
     })
 
-    print(f"[TASKS] State updated to {newest}")
+    print(f"[TASKS] State updated to {newest}", flush=True)
 
 
     return {

@@ -223,20 +223,20 @@ def fetch_files(service, modified_after=None):
 
 def sync_drive_files():
 
-    print("[DRIVE] Starting sync...")
+    print("[DRIVE] Starting sync...", flush=True)
 
 
     # ---------------- AUTH ----------------
     uid, creds = get_creds()
 
     if not uid:
-        print("[DRIVE] Not connected")
+        print("[DRIVE] Not connected", flush=True)
         return {
             "status": "error",
             "message": "Drive not connected"
         }
 
-    print(f"[DRIVE] Connected as {uid}")
+    print(f"[DRIVE] Connected as {uid}", flush=True)
 
 
     # ---------------- JOB ----------------
@@ -255,20 +255,20 @@ def sync_drive_files():
 
     sync_type = job[0] if job else "delta"
 
-    print(f"[DRIVE] Sync type: {sync_type}")
+    print(f"[DRIVE] Sync type: {sync_type}", flush=True)
 
 
     # ---------------- DEST ----------------
     dest_cfg = get_active_destination(uid)
 
     if not dest_cfg:
-        print("[DRIVE] No destination configured")
+        print("[DRIVE] No destination configured", flush=True)
         return {
             "status": "error",
             "message": "No active destination"
         }
 
-    print(f"[DRIVE] Destination: {dest_cfg['type']}")
+    print(f"[DRIVE] Destination: {dest_cfg['type']}", flush=True)
 
 
     # ---------------- STATE ----------------
@@ -278,9 +278,9 @@ def sync_drive_files():
 
     if state and sync_type in ("delta", "incremental"):
         last_modified = state.get("last_modified_time")
-        print(f"[DRIVE] Incremental from {last_modified}")
+        print(f"[DRIVE] Incremental from {last_modified}", flush=True)
     else:
-        print("[DRIVE] Full sync mode")
+        print("[DRIVE] Full sync mode", flush=True)
 
 
     # ---------------- API ----------------
@@ -290,7 +290,7 @@ def sync_drive_files():
     # ---------------- FETCH ----------------
     rows = fetch_files(service, last_modified)
 
-    print(f"[DRIVE] Found {len(rows)} files")
+    print(f"[DRIVE] Found {len(rows)} files", flush=True)
 
 
     if not rows:
@@ -302,11 +302,11 @@ def sync_drive_files():
 
 
     # ---------------- ROUTER ----------------
-    print("[DRIVE] Pushing to destination...")
+    print("[DRIVE] Pushing to destination...", flush=True)
 
     push_to_destination(dest_cfg, SOURCE, rows)
 
-    print(f"[DRIVE] Pushed {len(rows)} rows")
+    print(f"[DRIVE] Pushed {len(rows)} rows", flush=True)
 
 
     # ---------------- STATE SAVE ----------------
@@ -320,7 +320,7 @@ def sync_drive_files():
         "last_modified_time": newest
     })
 
-    print(f"[DRIVE] State updated to {newest}")
+    print(f"[DRIVE] State updated to {newest}", flush=True)
 
 
     return {

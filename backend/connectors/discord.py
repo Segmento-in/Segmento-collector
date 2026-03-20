@@ -66,12 +66,12 @@ def discord_get(path, uid, params=None):
     if r.status_code == 429:
         data = r.json()
         retry = data.get("retry_after", 5)
-        print(f"[DISCORD] Rate limited. Sleeping {retry} sec...")
+        print(f"[DISCORD] Rate limited. Sleeping {retry} sec...", flush=True)
         time.sleep(float(retry))
         return discord_get(path, uid, params)
 
     if r.status_code != 200:
-        print("[DISCORD ERROR]", r.status_code, r.text[:300])
+        print("[DISCORD ERROR]", r.status_code, r.text[:300], flush=True)
         return []
 
     return r.json()

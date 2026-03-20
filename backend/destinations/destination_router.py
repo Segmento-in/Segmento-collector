@@ -46,10 +46,10 @@ def resolve_destination_format(dest_cfg, source):
 
         if row and row[0]:
             dest_cfg["format"] = row[0].lower()
-            print("[ROUTER] FORMAT RESOLVED FROM DB:", row[0])
+            print("[ROUTER] FORMAT RESOLVED FROM DB:", row[0], flush=True)
 
     except Exception as e:
-        print("[ROUTER FORMAT ERROR]", e)
+        print("[ROUTER FORMAT ERROR]", e, flush=True)
 
     return dest_cfg
 

@@ -145,7 +145,7 @@ def sync_interest(uid, keyword, sync_type="incremental"):
         timeframe = "now 7-d"
         last_date = get_state(uid, keyword)
 
-    print("Using timeframe:", timeframe)
+    print("Using timeframe:", timeframe, flush=True)
 
     df = safe_build_and_fetch(keyword, timeframe)
 
@@ -278,16 +278,16 @@ def sync_trends(uid, keyword, sync_type="incremental"):
     interest = sync_interest(uid, keyword, sync_type)
     related = sync_related(uid, keyword)
 
-    print("Interest result:", interest)
-    print("Related result:", related)
+    print("Interest result:", interest, flush=True)
+    print("Related result:", related, flush=True)
 
     dest = get_active_destination(uid)
-    print("Destination:", dest)
+    print("Destination:", dest, flush=True)
 
     if dest:
 
-        print("Interest rows count:", len(interest.get("rows", [])))
-        print("Related rows count:", len(related.get("rows", [])))
+        print("Interest rows count:", len(interest.get("rows", [])), flush=True)
+        print("Related rows count:", len(related.get("rows", [])), flush=True)
 
         if interest.get("rows"):
             push_to_destination(dest, "google_trends_interest", interest["rows"])
@@ -295,7 +295,7 @@ def sync_trends(uid, keyword, sync_type="incremental"):
         if related.get("rows"):
             push_to_destination(dest, "google_trends_related", related["rows"])
 
-    print("[TRENDS] Done")
+    print("[TRENDS] Done", flush=True)
 
     return {
         "status": "success",

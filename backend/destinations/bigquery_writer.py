@@ -1,4 +1,4 @@
-print("### BIGQUERY FORMAT-AWARE WRITER LOADED ###")
+print("### BIGQUERY FORMAT-AWARE WRITER LOADED ###", flush=True)
 
 import json
 import tempfile
@@ -38,7 +38,7 @@ def push_bigquery(dest, source, rows):
 
     # ---------------- FORMAT ----------------
     fmt = (dest.get("format") or "parquet").lower()
-    print(f"[BIGQUERY] Upload format: {fmt}")
+    print(f"[BIGQUERY] Upload format: {fmt}", flush=True)
 
     # ---------------- Credentials ----------------
     creds_dict = json.loads(dest["password"])
@@ -64,7 +64,8 @@ def push_bigquery(dest, source, rows):
     try:
         client.create_dataset(dataset_ref)
     except Exception:
-        pass
+        import traceback; traceback.print_exc()
+        print('Exception caught', flush=True)
 
     # ==================================================
     # 🔥 NORMALIZE DATA BEFORE ANY FORMAT WRITING
@@ -138,13 +139,13 @@ def push_bigquery(dest, source, rows):
 
         err = str(e)
 
-        print("[BIGQUERY LOAD ERROR]", err)
+        print("[BIGQUERY LOAD ERROR]", err, flush=True)
 
         # ---------------- SCHEMA CONFLICT FIX ----------------
         if "has changed type" in err:
 
-            print("[BIGQUERY] Schema mismatch detected")
-            print("[BIGQUERY] Recreating table...")
+            print("[BIGQUERY] Schema mismatch detected", flush=True)
+            print("[BIGQUERY] Recreating table...", flush=True)
 
             client.delete_table(table_id, not_found_ok=True)
 
@@ -162,6 +163,6 @@ def push_bigquery(dest, source, rows):
 
     os.unlink(file_path)
 
-    print(f"[BIGQUERY] Loaded {len(rows)} rows ({fmt})")
+    print(f"[BIGQUERY] Loaded {len(rows)} rows ({fmt})", flush=True)
 
     return len(rows)

@@ -46,10 +46,10 @@ def push_clickhouse(dest, source, rows):
             column_names=["id", "payload", "fetched_at"]
         )
 
-        print(f"[DEST] Pushed {len(rows)} rows to ClickHouse")
+        print(f"[DEST] Pushed {len(rows)} rows to ClickHouse", flush=True)
 
         return len(rows)
 
     except Exception as e:
-        print("[CLICKHOUSE ERROR]", e)
+        print("[CLICKHOUSE ERROR]", e, flush=True)
         raise e

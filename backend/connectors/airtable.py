@@ -26,7 +26,7 @@ def get_db():
 
 
 def _log(message: str):
-    print(f"[AIRTABLE] {message}")
+    print(f"[AIRTABLE] {message}", flush=True)
 
 
 def _mask_token(token: str | None) -> str | None:

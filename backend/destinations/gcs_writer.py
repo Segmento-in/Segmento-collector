@@ -1,4 +1,4 @@
-print("### GCS FORMAT-AWARE WRITER LOADED ###")
+print("### GCS FORMAT-AWARE WRITER LOADED ###", flush=True)
 
 import json
 import tempfile
@@ -24,7 +24,7 @@ def push_gcs(dest, source, rows):
         return 0
 
     fmt = (dest.get("format") or "parquet").lower()
-    print(f"[GCS] Upload format: {fmt}")
+    print(f"[GCS] Upload format: {fmt}", flush=True)
 
     bucket_name = dest["host"]
     # GCS authentication using Service Account JSON key provided in dest["password"]
@@ -91,14 +91,14 @@ def push_gcs(dest, source, rows):
         f"{source}_{int(time.time())}.{extension}"
     )
 
-    print("[GCS] Uploading:", key)
+    print("[GCS] Uploading:", key, flush=True)
 
     blob = bucket.blob(key)
     blob.upload_from_filename(file_path)
 
     os.unlink(file_path)
 
-    print(f"[GCS] Uploaded {len(rows)} rows → gs://{bucket_name}/{key}")
+    print(f"[GCS] Uploaded {len(rows)} rows → gs://{bucket_name}/{key}", flush=True)
 
     if fmt in ("iceberg", "hudi"):
         table_location = f"gs://{bucket_name}/{source}"

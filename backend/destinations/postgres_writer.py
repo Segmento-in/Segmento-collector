@@ -40,6 +40,6 @@ def push_postgres(dest, source, rows):
     cur.close()
     conn.close()
 
-    print(f"[DEST] Pushed {count} rows to Postgres")
+    print(f"[DEST] Pushed {count} rows to Postgres", flush=True)
 
     return count

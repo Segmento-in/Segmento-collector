@@ -29,7 +29,7 @@ def get_db():
 
 
 def _log(msg: str):
-    print(f"[AWS-RDS] {msg}")
+    print(f"[AWS-RDS] {msg}", flush=True)
 
 
 # ──────────────────────────────────────────────

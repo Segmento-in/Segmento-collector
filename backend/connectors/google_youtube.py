@@ -259,7 +259,7 @@ def fetch_youtube_data(service, since=None):
 
 def sync_youtube(sync_type="incremental"):
 
-    print("[YT] Sync started...")
+    print("[YT] Sync started...", flush=True)
 
     uid, creds = get_creds()
 
@@ -295,7 +295,7 @@ def sync_youtube(sync_type="incremental"):
         "last_sync": datetime.datetime.utcnow().isoformat()
     })
 
-    print("[YT] Done:", len(videos))
+    print("[YT] Done:", len(videos), flush=True)
 
     return {
         "status": "success",

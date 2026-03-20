@@ -26,7 +26,8 @@ def auto_decrypt_row(row):
             try:
                 row[k] = decrypt_value(v)
             except Exception:
-                pass
+                import traceback; traceback.print_exc()
+                print('Exception caught', flush=True)
 
     return row
 

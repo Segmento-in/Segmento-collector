@@ -224,20 +224,20 @@ def fetch_events(service, updated_after=None):
 
 def sync_calendar_files():
 
-    print("[CALENDAR] Starting sync...")
+    print("[CALENDAR] Starting sync...", flush=True)
 
 
     # -------- AUTH --------
     uid, creds = get_creds()
 
     if not uid:
-        print("[CALENDAR] Not connected")
+        print("[CALENDAR] Not connected", flush=True)
         return {
             "status": "error",
             "message": "Calendar not connected"
         }
 
-    print(f"[CALENDAR] Connected as {uid}")
+    print(f"[CALENDAR] Connected as {uid}", flush=True)
 
 
     # -------- JOB --------
@@ -256,20 +256,20 @@ def sync_calendar_files():
 
     sync_type = job[0] if job else "delta"
 
-    print(f"[CALENDAR] Sync type: {sync_type}")
+    print(f"[CALENDAR] Sync type: {sync_type}", flush=True)
 
 
     # -------- DEST --------
     dest_cfg = get_active_destination(uid)
 
     if not dest_cfg:
-        print("[CALENDAR] No destination")
+        print("[CALENDAR] No destination", flush=True)
         return {
             "status": "error",
             "message": "No destination"
         }
 
-    print(f"[CALENDAR] Destination: {dest_cfg['type']}")
+    print(f"[CALENDAR] Destination: {dest_cfg['type']}", flush=True)
 
 
     # -------- STATE --------
@@ -279,9 +279,9 @@ def sync_calendar_files():
 
     if state and sync_type in ("delta", "incremental"):
         updated_after = state.get("last_updated")
-        print(f"[CALENDAR] Incremental from {updated_after}")
+        print(f"[CALENDAR] Incremental from {updated_after}", flush=True)
     else:
-        print("[CALENDAR] Full sync")
+        print("[CALENDAR] Full sync", flush=True)
 
 
     # -------- API --------
@@ -301,7 +301,7 @@ def sync_calendar_files():
         # Google calendar limit: updatedMin too old
         if "updatedMinTooLongAgo" in err:
 
-            print("[CALENDAR] Cursor expired. Rebuilding full history...")
+            print("[CALENDAR] Cursor expired. Rebuilding full history...", flush=True)
 
             rows = fetch_events(service, None)
 
@@ -311,11 +311,11 @@ def sync_calendar_files():
 
 
     # -------- ROUTER --------
-    print("[CALENDAR] Pushing...")
+    print("[CALENDAR] Pushing...", flush=True)
 
     push_to_destination(dest_cfg, SOURCE, rows)
 
-    print(f"[CALENDAR] Pushed {len(rows)} rows")
+    print(f"[CALENDAR] Pushed {len(rows)} rows", flush=True)
 
 
     # -------- STATE SAVE --------
@@ -329,7 +329,7 @@ def sync_calendar_files():
         "last_updated": newest
     })
 
-    print(f"[CALENDAR] State updated to {newest}")
+    print(f"[CALENDAR] State updated to {newest}", flush=True)
 
 
     return {

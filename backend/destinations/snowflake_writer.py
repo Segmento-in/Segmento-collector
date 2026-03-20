@@ -48,10 +48,10 @@ def push_snowflake(dest, source, rows):
         cur.close()
         conn.close()
 
-        print(f"[DEST] Batch pushed {len(rows)} rows to Snowflake")
+        print(f"[DEST] Batch pushed {len(rows)} rows to Snowflake", flush=True)
 
         return len(rows)
 
     except Exception as e:
-        print("[SNOWFLAKE ERROR]", e)
+        print("[SNOWFLAKE ERROR]", e, flush=True)
         raise e

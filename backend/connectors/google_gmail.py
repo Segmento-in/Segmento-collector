@@ -311,7 +311,7 @@ def sync_gmail():
 
         if not last_history_id:
 
-            print("[GMAIL] First sync (full)")
+            print("[GMAIL] First sync (full)", flush=True)
 
             messages = fetch_all(
                 service.users().messages().list,
@@ -326,7 +326,7 @@ def sync_gmail():
         # ================================================= #
         else:
 
-            print("[GMAIL] Incremental from", last_history_id)
+            print("[GMAIL] Incremental from", last_history_id, flush=True)
 
             messages = []
 
@@ -361,14 +361,14 @@ def sync_gmail():
                         })
 
 
-                print(f"[GMAIL] Found {len(messages)} new messages")
+                print(f"[GMAIL] Found {len(messages)} new messages", flush=True)
 
 
             except Exception as e:
 
                 # History expired / invalid → fallback
-                print("[GMAIL] History failed:", e)
-                print("[GMAIL] Falling back to full sync")
+                print("[GMAIL] History failed:", e, flush=True)
+                print("[GMAIL] Falling back to full sync", flush=True)
 
                 messages = fetch_all(
                     service.users().messages().list,
@@ -403,7 +403,7 @@ def sync_gmail():
 
             except Exception as e:
 
-                print("[GMAIL] Skipping missing message:", m["id"])
+                print("[GMAIL] Skipping missing message:", m["id"], flush=True)
                 continue
 
 
@@ -489,12 +489,12 @@ def sync_gmail():
 
             pushed = push_to_destination(dest_cfg, "gmail", rows)
 
-            print(f"[DEST] Pushed {pushed} rows to {dest_cfg['type'].upper()}")
+            print(f"[DEST] Pushed {pushed} rows to {dest_cfg['type'].upper()}", flush=True)
 
 
     except Exception as e:
 
-        print("[GMAIL] FATAL ERROR:", str(e))
+        print("[GMAIL] FATAL ERROR:", str(e), flush=True)
         raise
 
 

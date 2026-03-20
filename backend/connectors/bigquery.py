@@ -27,7 +27,7 @@ def get_db():
 
 
 def _log(message: str):
-    print(f"[BIGQUERY-CONNECTOR] {message}")
+    print(f"[BIGQUERY-CONNECTOR] {message}", flush=True)
 
 
 def _get_config(uid: str):

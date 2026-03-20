@@ -136,7 +136,7 @@ def pinterest_exchange_code(uid, code):
     if r.status_code == 200:
         return r.json()
 
-    print("Pinterest token error:", r.text)
+    print("Pinterest token error:", r.text, flush=True)
     return None
 
 # ---------------- HTTP ----------------
@@ -162,10 +162,10 @@ def api_get(uid,path,params=None):
         if r.status_code==200:
             return r.json()
 
-        print("PINTEREST API ERROR:",r.text[:200])
+        print("PINTEREST API ERROR:",r.text[:200], flush=True)
 
     except Exception as e:
-        print("PINTEREST ERROR:",e)
+        print("PINTEREST ERROR:",e, flush=True)
 
     return None
 

@@ -13,7 +13,7 @@ def push_azure_datalake(dest, source, rows):
         return 0
 
     fmt = (dest.get("format") or "parquet").lower()
-    print(f"[ADLS] Upload format: {fmt}")
+    print(f"[ADLS] Upload format: {fmt}", flush=True)
 
     account_name = dest["host"]
     file_system  = dest.get("port") or "segmento"
@@ -79,7 +79,7 @@ def push_azure_datalake(dest, source, rows):
     )
 
     adls_path = f"{base_path}/{rel_path}" if base_path else rel_path
-    print("[ADLS] Uploading:", adls_path)
+    print("[ADLS] Uploading:", adls_path, flush=True)
 
     file_client = fs_client.get_file_client(adls_path)
     with open(file_path, "rb") as fh:
@@ -87,7 +87,7 @@ def push_azure_datalake(dest, source, rows):
 
     os.unlink(file_path)
 
-    print(f"[ADLS] Uploaded {len(rows)} rows → adls://{file_system}/{adls_path}")
+    print(f"[ADLS] Uploaded {len(rows)} rows → adls://{file_system}/{adls_path}", flush=True)
 
     # ------------------------------------------------------------------ #
     # LAKEHOUSE REGISTRATION (metadata only — no data written here)       #

@@ -296,7 +296,7 @@ def fetch_reports(service, property_id, since_date=None):
 
 def sync_ga4():
 
-    print("[GA4] Starting sync...")
+    print("[GA4] Starting sync...", flush=True)
 
 
     # -------- AUTH --------
@@ -347,7 +347,7 @@ def sync_ga4():
     })
 
 
-    print("[GA4] Done:", pushed)
+    print("[GA4] Done:", pushed, flush=True)
 
 
     return {

@@ -226,20 +226,20 @@ def fetch_responses(form_id, service, since=None):
 
 def sync_forms():
 
-    print("[FORMS] Starting sync...")
+    print("[FORMS] Starting sync...", flush=True)
 
 
     # -------- AUTH --------
     uid, creds = get_creds()
 
     if not uid:
-        print("[FORMS] Not connected")
+        print("[FORMS] Not connected", flush=True)
         return {
             "status": "error",
             "message": "Forms not connected"
         }
 
-    print(f"[FORMS] Connected as {uid}")
+    print(f"[FORMS] Connected as {uid}", flush=True)
 
 
     # -------- JOB --------
@@ -258,20 +258,20 @@ def sync_forms():
 
     sync_type = job[0] if job else "delta"
 
-    print(f"[FORMS] Sync type: {sync_type}")
+    print(f"[FORMS] Sync type: {sync_type}", flush=True)
 
 
     # -------- DEST --------
     dest_cfg = get_active_destination(uid)
 
     if not dest_cfg:
-        print("[FORMS] No destination")
+        print("[FORMS] No destination", flush=True)
         return {
             "status": "error",
             "message": "No destination"
         }
 
-    print(f"[FORMS] Destination: {dest_cfg['type']}")
+    print(f"[FORMS] Destination: {dest_cfg['type']}", flush=True)
 
 
     # -------- STATE --------
@@ -281,9 +281,9 @@ def sync_forms():
 
     if state and sync_type in ("delta", "incremental"):
         last = state.get("last_updated")
-        print(f"[FORMS] Incremental from {last}")
+        print(f"[FORMS] Incremental from {last}", flush=True)
     else:
-        print("[FORMS] Full sync")
+        print("[FORMS] Full sync", flush=True)
 
 
     # -------- API --------
@@ -294,7 +294,7 @@ def sync_forms():
     # -------- LIST FORMS --------
     forms_list = list_forms(drive)
 
-    print(f"[FORMS] Found {len(forms_list)} forms")
+    print(f"[FORMS] Found {len(forms_list)} forms", flush=True)
 
 
     rows = []
@@ -325,7 +325,7 @@ def sync_forms():
         rows.extend(responses)
 
 
-    print(f"[FORMS] Total rows: {len(rows)}")
+    print(f"[FORMS] Total rows: {len(rows)}", flush=True)
 
 
     if not rows:
@@ -337,11 +337,11 @@ def sync_forms():
 
 
     # -------- ROUTER --------
-    print("[FORMS] Pushing...")
+    print("[FORMS] Pushing...", flush=True)
 
     push_to_destination(dest_cfg, SOURCE, rows)
 
-    print(f"[FORMS] Pushed {len(rows)} rows")
+    print(f"[FORMS] Pushed {len(rows)} rows", flush=True)
 
 
     # -------- STATE --------
@@ -355,7 +355,7 @@ def sync_forms():
         "last_updated": newest
     })
 
-    print(f"[FORMS] State updated to {newest}")
+    print(f"[FORMS] State updated to {newest}", flush=True)
 
 
     return {
