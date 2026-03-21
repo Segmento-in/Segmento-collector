@@ -195,6 +195,158 @@ const CONNECTORS = [
   },
 
   {
+    id: "tableau",
+    name: "Tableau",
+    categories: ["analytics", "bi"],
+    logo: "/static/images/logos/tableau.png",
+
+    auth_type: "credentials",
+    api_key_label: "PAT Credentials",
+
+    connect_url: "/connectors/tableau/connect",
+    sync_url: "/connectors/tableau/sync",
+    disconnect_url: "/connectors/tableau/disconnect",
+    status_api: "/api/status/tableau",
+    save_app_url: "/connectors/tableau/save_app",
+
+    models: [
+      { title: "Workbooks", desc: "Workbook metadata including project, owner, and content URLs." },
+      { title: "Datasources", desc: "Published data source metadata and project assignments." },
+      { title: "Projects", desc: "Project hierarchy and metadata for Tableau content organization." }
+    ],
+
+    tables: [
+      "tableau_workbooks",
+      "tableau_datasources",
+      "tableau_projects"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts Tableau workbooks, data sources, and project metadata through the Tableau REST API.",
+
+    data: [
+      "Dashboards and workbooks",
+      "Data sources and datasets",
+      "User and project metadata"
+    ]
+  },
+
+  {
+    id: "power_bi",
+    name: "Power BI",
+    categories: ["analytics", "bi"],
+    logo: "/static/images/logos/powerbi.png",
+
+    auth_type: "oauth",
+    api_key_label: "Azure AD Client Credentials",
+
+    connect_url: "/connectors/power_bi/connect",
+    sync_url: "/connectors/power_bi/sync",
+    disconnect_url: "/connectors/power_bi/disconnect",
+    status_api: "/api/status/power_bi",
+    save_app_url: "/connectors/power_bi/save_app",
+
+    models: [
+      { title: "Workspaces", desc: "Power BI workspaces with capacity and read-only metadata." },
+      { title: "Reports", desc: "Report metadata, dataset links, and web/embed URLs." },
+      { title: "Datasets", desc: "Dataset configuration and refresh capability metadata." }
+    ],
+
+    tables: [
+      "power_bi_workspaces",
+      "power_bi_reports",
+      "power_bi_datasets"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts Power BI workspaces, reports, and datasets using Azure AD client credentials.",
+
+    data: [
+      "Workspaces and dashboards",
+      "Reports and datasets",
+      "Usage metrics"
+    ]
+  },
+
+  {
+    id: "workday",
+    name: "Workday",
+    categories: ["hr", "operations"],
+    logo: "/static/images/logos/workday.png",
+
+    auth_type: "credentials",
+    api_key_label: "Integration Credentials",
+
+    connect_url: "/connectors/workday/connect",
+    sync_url: "/connectors/workday/sync",
+    disconnect_url: "/connectors/workday/disconnect",
+    status_api: "/api/status/workday",
+    save_app_url: "/connectors/workday/save_app",
+
+    models: [
+      { title: "Workers", desc: "Employee and worker profile metadata from Workday." },
+      { title: "Organizations", desc: "Department and organization structure metadata." },
+      { title: "Jobs", desc: "Job and job profile assignments across the tenant." }
+    ],
+
+    tables: [
+      "workday_workers",
+      "workday_organizations",
+      "workday_jobs"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts workers, organizations, and jobs from Workday REST APIs using integration credentials.",
+
+    data: [
+      "Employees and worker data",
+      "Departments and org structure",
+      "Payroll / HR metadata"
+    ]
+  },
+
+  {
+    id: "ebay",
+    name: "eBay",
+    categories: ["ecommerce", "marketplace"],
+    logo: "https://cdn.simpleicons.org/ebay/E53238",
+
+    auth_type: "oauth",
+    api_key_label: "OAuth Access Token",
+
+    connect_url: "/connectors/ebay/connect",
+    sync_url: "/connectors/ebay/sync",
+    disconnect_url: "/connectors/ebay/disconnect",
+    status_api: "/api/status/ebay",
+    save_app_url: "/connectors/ebay/save_app",
+
+    models: [
+      { title: "Orders", desc: "Order and transaction data from eBay Sell Fulfillment APIs." },
+      { title: "Listings", desc: "Inventory and listing metadata from eBay Sell Inventory APIs." },
+      { title: "Customers", desc: "Buyer records derived from synced order payloads." }
+    ],
+
+    tables: [
+      "ebay_orders",
+      "ebay_listings",
+      "ebay_customers"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts orders, listings, and customer data from eBay Sell APIs using an OAuth access token.",
+
+    data: [
+      "Orders and transactions",
+      "Listings and products",
+      "Customers and shipping data"
+    ]
+  },
+
+  {
     id: "sendgrid",
     name: "SendGrid",
     categories: ["email", "marketing"],
@@ -3340,9 +3492,9 @@ data into your configured warehouse destination.
     save_app_url: "/connectors/okta/save_app",
 
     models: [
-      {title: "Users", desc: "Okta user accounts and profile data"},
-      {title: "Groups", desc: "Okta groups and memberships"},
-      {title: "Apps", desc: "Integrated application assignments"}
+      { title: "Users", desc: "Okta user accounts and profile data" },
+      { title: "Groups", desc: "Okta groups and memberships" },
+      { title: "Apps", desc: "Integrated application assignments" }
     ],
 
     tables: [
@@ -3375,9 +3527,9 @@ data into your configured warehouse destination.
     save_app_url: "/connectors/auth0/save_app",
 
     models: [
-      {title: "Users", desc: "Auth0 user accounts and profile data"},
-      {title: "Roles", desc: "Authentication roles and permissions"},
-      {title: "Logs", desc: "Authentication event logs"}
+      { title: "Users", desc: "Auth0 user accounts and profile data" },
+      { title: "Roles", desc: "Authentication roles and permissions" },
+      { title: "Logs", desc: "Authentication event logs" }
     ],
 
     tables: [
@@ -3410,9 +3562,9 @@ data into your configured warehouse destination.
     save_app_url: "/connectors/cloudflare/save_app",
 
     models: [
-      {title: "Zones", desc: "Cloudflare DNS zones and domains"},
-      {title: "DNS Records", desc: "DNS record entries across all zones"},
-      {title: "Analytics", desc: "Web traffic and analytics data"}
+      { title: "Zones", desc: "Cloudflare DNS zones and domains" },
+      { title: "DNS Records", desc: "DNS record entries across all zones" },
+      { title: "Analytics", desc: "Web traffic and analytics data" }
     ],
 
     tables: [
@@ -3445,9 +3597,9 @@ data into your configured warehouse destination.
     save_app_url: "/connectors/sentry/save_app",
 
     models: [
-      {title: "Projects", desc: "Sentry monitored projects"},
-      {title: "Issues", desc: "Error issues and exceptions"},
-      {title: "Events", desc: "Individual error event occurrences"}
+      { title: "Projects", desc: "Sentry monitored projects" },
+      { title: "Issues", desc: "Error issues and exceptions" },
+      { title: "Events", desc: "Individual error event occurrences" }
     ],
 
     tables: [
@@ -3463,4 +3615,143 @@ data into your configured warehouse destination.
     data: ["Projects", "Issues", "Events", "Error levels", "Stack traces"]
   },
 
+
+  {
+    id: "quickbooks",
+    name: "QuickBooks",
+    categories: ["accounting", "financial"],
+    logo: "https://cdn.simpleicons.org/quickbooks/2CA01C",
+
+    auth_type: "oauth",
+    api_key_label: "Client ID & Secret",
+
+    route: "/connectors/quickbooks",
+    connect_url: "/connectors/quickbooks/connect",
+    sync_url: "/connectors/quickbooks/sync",
+    disconnect_url: "/connectors/quickbooks/disconnect",
+    status_api: "/api/status/quickbooks",
+    save_app_url: "/connectors/quickbooks/save_app",
+
+    models: [
+      { title: "Invoices", desc: "Sales invoices with customer and line item details" },
+      { title: "Expenses", desc: "Business expenses and purchase transactions" },
+      { title: "Customers", desc: "Customer records and profile data" }
+    ],
+
+    tables: [
+      "quickbooks_invoices",
+      "quickbooks_expenses",
+      "quickbooks_customers"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect QuickBooks Online to extract financial data including invoices, expenses, and customer records into your warehouse.",
+
+    data: ["Invoices", "Expenses", "Customers", "Payments", "Company Info"]
+  },
+
+  {
+    id: "xero",
+    name: "Xero",
+    categories: ["accounting", "financial"],
+    logo: "https://cdn.simpleicons.org/xero/13B5EA",
+
+    auth_type: "oauth",
+    api_key_label: "Client ID & Secret",
+
+    route: "/connectors/xero",
+    connect_url: "/connectors/xero/connect",
+    sync_url: "/connectors/xero/sync",
+    disconnect_url: "/connectors/xero/disconnect",
+    status_api: "/api/status/xero",
+    save_app_url: "/connectors/xero/save_app",
+
+    models: [
+      { title: "Invoices", desc: "Accounts receivable and payable invoices" },
+      { title: "Bank Transactions", desc: "Bank account transaction history" },
+      { title: "Contacts", desc: "Supplier and customer contact records" }
+    ],
+
+    tables: [
+      "xero_invoices",
+      "xero_transactions",
+      "xero_contacts"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect Xero to sync accounting data including invoices, bank transactions, and contact records with your destination.",
+
+    data: ["Invoices", "Transactions", "Contacts", "Accounts", "Organization"]
+  },
+
+  {
+    id: "amazon_seller",
+    name: "Amazon Seller",
+    categories: ["ecommerce", "sales"],
+    logo: "/static/images/logos/amazonseller.png",
+
+    auth_type: "oauth",
+    api_key_label: "LWA Client ID & Secret",
+
+    route: "/connectors/amazon_seller",
+    connect_url: "/connectors/amazon_seller/connect",
+    sync_url: "/connectors/amazon_seller/sync",
+    disconnect_url: "/connectors/amazon_seller/disconnect",
+    status_api: "/api/status/amazon_seller",
+    save_app_url: "/connectors/amazon_seller/save_app",
+
+    models: [
+      { title: "Orders", desc: "Seller Central orders and fulfillment data" },
+      { title: "Inventory", desc: "FBA and seller-fulfilled inventory levels" },
+      { title: "Financials", desc: "Payment events and settlement reports" }
+    ],
+
+    tables: [
+      "amazon_seller_orders",
+      "amazon_seller_inventory",
+      "amazon_seller_financials"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect Amazon Seller Central via SP-API to extract orders, inventory levels, and financial settlement data.",
+
+    data: ["Orders", "Inventory", "Financials", "Fees", "Fulfillment"]
+  },
+
+  {
+    id: "newrelic",
+    name: "New Relic",
+    categories: ["monitoring", "observability"],
+    logo: "https://cdn.simpleicons.org/newrelic/008C99",
+
+    auth_type: "api_key",
+    api_key_label: "User API Key",
+
+    route: "/connectors/newrelic",
+    sync_url: "/connectors/newrelic/sync",
+    disconnect_url: "/connectors/newrelic/disconnect",
+    status_api: "/api/status/newrelic",
+    save_app_url: "/connectors/newrelic/save_app",
+
+    models: [
+      { title: "Applications", desc: "APM application performance metrics" },
+      { title: "Infrastructure", desc: "Host and container performance data" },
+      { title: "Synthetics", desc: "Synthetic monitor results and uptime" }
+    ],
+
+    tables: [
+      "newrelic_applications",
+      "newrelic_infrastructure",
+      "newrelic_synthetics"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Connect New Relic to extract application performance, infrastructure metrics, and synthetic monitor data into your warehouse.",
+
+    data: ["Applications", "Infrastructure", "Synthetics", "Alerts", "Errors"]
+  },
 ];

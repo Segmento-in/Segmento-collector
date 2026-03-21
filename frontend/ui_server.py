@@ -6277,6 +6277,238 @@ def asana_disconnect_proxy():
     r = proxy_get("/connectors/asana/disconnect")
     return jsonify(r.json()), r.status_code
 
+
+@app.route("/connectors/tableau")
+@require_login
+def tableau_page():
+    return render_template("connectors/tableau.html")
+
+
+@app.route("/connectors/tableau/connect")
+@require_login
+def tableau_connect_proxy():
+    r = proxy_get("/connectors/tableau/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/tableau/sync")
+@require_login
+def tableau_sync_proxy():
+    r = connector_sync("tableau")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/tableau")
+@require_login
+def tableau_status_proxy():
+    r = connector_status("tableau")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/tableau/job/get")
+@require_login
+def tableau_job_get_proxy():
+    r = connector_job_get("tableau")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/tableau/job/save", methods=["POST"])
+@require_login
+def tableau_job_save_proxy():
+    r = connector_job_save("tableau")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/tableau/save_app", methods=["POST"])
+@require_login
+def tableau_save_app_proxy():
+    r = proxy_post("/connectors/tableau/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/tableau/disconnect")
+@require_login
+def tableau_disconnect_proxy():
+    r = proxy_get("/connectors/tableau/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/power_bi")
+@require_login
+def power_bi_page():
+    return render_template("connectors/power_bi.html")
+
+
+@app.route("/connectors/power_bi/connect")
+@require_login
+def power_bi_connect_proxy():
+    r = proxy_get("/connectors/power_bi/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/power_bi/sync")
+@require_login
+def power_bi_sync_proxy():
+    r = connector_sync("power_bi")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/power_bi")
+@require_login
+def power_bi_status_proxy():
+    r = connector_status("power_bi")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/power_bi/job/get")
+@require_login
+def power_bi_job_get_proxy():
+    r = connector_job_get("power_bi")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/power_bi/job/save", methods=["POST"])
+@require_login
+def power_bi_job_save_proxy():
+    r = connector_job_save("power_bi")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/power_bi/save_app", methods=["POST"])
+@require_login
+def power_bi_save_app_proxy():
+    r = proxy_post("/connectors/power_bi/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/power_bi/disconnect")
+@require_login
+def power_bi_disconnect_proxy():
+    r = proxy_get("/connectors/power_bi/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/workday")
+@require_login
+def workday_page():
+    return render_template("connectors/workday.html")
+
+
+@app.route("/connectors/workday/connect")
+@require_login
+def workday_connect_proxy():
+    r = proxy_get("/connectors/workday/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/workday/sync")
+@require_login
+def workday_sync_proxy():
+    r = connector_sync("workday")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/workday")
+@require_login
+def workday_status_proxy():
+    r = connector_status("workday")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/workday/job/get")
+@require_login
+def workday_job_get_proxy():
+    r = connector_job_get("workday")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/workday/job/save", methods=["POST"])
+@require_login
+def workday_job_save_proxy():
+    r = connector_job_save("workday")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/workday/save_app", methods=["POST"])
+@require_login
+def workday_save_app_proxy():
+    r = proxy_post("/connectors/workday/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/workday/disconnect")
+@require_login
+def workday_disconnect_proxy():
+    r = proxy_get("/connectors/workday/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/ebay")
+@require_login
+def ebay_page():
+    return render_template("connectors/ebay.html")
+
+
+@app.route("/connectors/ebay/connect")
+@require_login
+def ebay_connect_proxy():
+    r = proxy_get("/connectors/ebay/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/ebay/sync")
+@require_login
+def ebay_sync_proxy():
+    r = connector_sync("ebay")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/ebay")
+@require_login
+def ebay_status_proxy():
+    r = connector_status("ebay")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/ebay/job/get")
+@require_login
+def ebay_job_get_proxy():
+    r = connector_job_get("ebay")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/ebay/job/save", methods=["POST"])
+@require_login
+def ebay_job_save_proxy():
+    r = connector_job_save("ebay")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/ebay/save_app", methods=["POST"])
+@require_login
+def ebay_save_app_proxy():
+    r = proxy_post("/connectors/ebay/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/ebay/disconnect")
+@require_login
+def ebay_disconnect_proxy():
+    r = proxy_get("/connectors/ebay/disconnect")
+    return jsonify(r.json()), r.status_code
+
 @app.route("/connectors/sendgrid")
 @require_login
 def sendgrid_page():
@@ -6943,4 +7175,162 @@ def sentry_save_app_proxy():
 @require_login
 def sentry_disconnect():
     r = connector_disconnect("sentry")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= QUICKBOOKS =================
+
+@app.route("/connectors/quickbooks")
+@require_login
+def quickbooks_page():
+    return render_template("connectors/quickbooks.html")
+
+@app.route("/connectors/quickbooks/connect")
+@require_login
+def quickbooks_connect():
+    r = proxy_get("/connectors/quickbooks/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/quickbooks/callback")
+def quickbooks_callback():
+    r = proxy_get(f"/connectors/quickbooks/callback?{request.query_string.decode()}")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/quickbooks/sync")
+@require_login
+def quickbooks_sync():
+    r = connector_sync("quickbooks")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/quickbooks")
+@require_login
+def quickbooks_status_proxy():
+    r = connector_status("quickbooks")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/quickbooks/save_app", methods=["POST"])
+@require_login
+def quickbooks_save_app_proxy():
+    r = proxy_post("/connectors/quickbooks/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/quickbooks/disconnect")
+@require_login
+def quickbooks_disconnect():
+    r = connector_disconnect("quickbooks")
+    return jsonify(r.json()), r.status_code
+
+# ================= XERO =================
+
+@app.route("/connectors/xero")
+@require_login
+def xero_page():
+    return render_template("connectors/xero.html")
+
+@app.route("/connectors/xero/connect")
+@require_login
+def xero_connect():
+    r = proxy_get("/connectors/xero/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/xero/callback")
+def xero_callback():
+    r = proxy_get(f"/connectors/xero/callback?{request.query_string.decode()}")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/xero/sync")
+@require_login
+def xero_sync():
+    r = connector_sync("xero")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/xero")
+@require_login
+def xero_status_proxy():
+    r = connector_status("xero")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/xero/save_app", methods=["POST"])
+@require_login
+def xero_save_app_proxy():
+    r = proxy_post("/connectors/xero/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/xero/disconnect")
+@require_login
+def xero_disconnect():
+    r = connector_disconnect("xero")
+    return jsonify(r.json()), r.status_code
+
+# ================= AMAZON SELLER =================
+
+@app.route("/connectors/amazon_seller")
+@require_login
+def amazon_seller_page():
+    return render_template("connectors/amazon_seller.html")
+
+@app.route("/connectors/amazon_seller/connect")
+@require_login
+def amazon_seller_connect():
+    r = proxy_get("/connectors/amazon_seller/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/amazon_seller/callback")
+def amazon_seller_callback():
+    r = proxy_get(f"/connectors/amazon_seller/callback?{request.query_string.decode()}")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/amazon_seller/sync")
+@require_login
+def amazon_seller_sync():
+    r = connector_sync("amazon_seller")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/amazon_seller")
+@require_login
+def amazon_seller_status_proxy():
+    r = connector_status("amazon_seller")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/amazon_seller/save_app", methods=["POST"])
+@require_login
+def amazon_seller_save_app_proxy():
+    r = proxy_post("/connectors/amazon_seller/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/amazon_seller/disconnect")
+@require_login
+def amazon_seller_disconnect():
+    r = connector_disconnect("amazon_seller")
+    return jsonify(r.json()), r.status_code
+
+# ================= NEW RELIC =================
+
+@app.route("/connectors/newrelic")
+@require_login
+def newrelic_page():
+    return render_template("connectors/newrelic.html")
+
+@app.route("/connectors/newrelic/sync")
+@require_login
+def newrelic_sync():
+    r = connector_sync("newrelic")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/newrelic")
+@require_login
+def newrelic_status_proxy():
+    r = connector_status("newrelic")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/newrelic/save_app", methods=["POST"])
+@require_login
+def newrelic_save_app_proxy():
+    r = proxy_post("/connectors/newrelic/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/newrelic/disconnect")
+@require_login
+def newrelic_disconnect():
+    r = connector_disconnect("newrelic")
     return jsonify(r.json()), r.status_code

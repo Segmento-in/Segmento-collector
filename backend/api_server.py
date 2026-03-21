@@ -277,6 +277,30 @@ from backend.connectors.sendgrid import (
     sync_sendgrid,
     disconnect_sendgrid,
 )
+from backend.connectors.tableau import (
+    save_config as save_tableau_config,
+    connect_tableau,
+    sync_tableau,
+    disconnect_tableau,
+)
+from backend.connectors.power_bi import (
+    save_config as save_power_bi_config,
+    connect_power_bi,
+    sync_power_bi,
+    disconnect_power_bi,
+)
+from backend.connectors.workday import (
+    save_config as save_workday_config,
+    connect_workday,
+    sync_workday,
+    disconnect_workday,
+)
+from backend.connectors.ebay import (
+    save_config as save_ebay_config,
+    connect_ebay,
+    sync_ebay,
+    disconnect_ebay,
+)
 from backend.connectors.mixpanel import (
     save_config as save_mixpanel_config,
     connect_mixpanel,
@@ -325,6 +349,11 @@ from backend.connectors.sentry import (
     sync_sentry,
     disconnect_sentry,
 )
+
+from backend.connectors import quickbooks
+from backend.connectors import xero
+from backend.connectors import amazon_seller
+from backend.connectors import newrelic
 
 # ---------------- CONFIG ----------------
 load_dotenv()
@@ -3475,6 +3504,77 @@ def init_db():
         endpoint TEXT,
         method TEXT,
         created_at TEXT
+    )
+    """)
+    # ---------------- QUICKBOOKS ----------------
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS quickbooks_config (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id TEXT,
+        client_secret TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS quickbooks_auth (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        access_token TEXT,
+        refresh_token TEXT,
+        realm_id TEXT,
+        expires_at REAL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # ---------------- XERO ----------------
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS xero_config (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id TEXT,
+        client_secret TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS xero_auth (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        access_token TEXT,
+        refresh_token TEXT,
+        tenant_id TEXT,
+        tenant_name TEXT,
+        expires_at REAL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # ---------------- AMAZON SELLER ----------------
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS amazon_seller_config (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_id TEXT,
+        client_secret TEXT,
+        seller_id TEXT,
+        region TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS amazon_seller_auth (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        refresh_token TEXT,
+        seller_id TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # ---------------- NEW RELIC ----------------
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS newrelic_auth (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        api_key TEXT,
+        account_id TEXT,
+        region TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -18044,6 +18144,338 @@ def sendgrid_job_save():
     con.commit()
     con.close()
     return jsonify({"status": "saved"})
+
+
+# TABLEAU
+@app.route("/connectors/tableau/save_app", methods=["POST"])
+def tableau_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    save_tableau_config(uid, request.json or {})
+    ensure_connector_initialized(uid, "tableau")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/tableau/connect")
+def tableau_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_tableau(uid))
+
+
+@app.route("/connectors/tableau/disconnect")
+def tableau_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_tableau(uid))
+
+
+@app.route("/connectors/tableau/sync")
+def tableau_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_tableau(uid, sync_type))
+
+
+@app.route("/api/status/tableau")
+def status_tableau():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='tableau' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='tableau' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+
+@app.route("/connectors/tableau/job/get")
+def tableau_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='tableau' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+
+
+@app.route("/connectors/tableau/job/save", methods=["POST"])
+def tableau_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json or {}
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'tableau', ?, ?, ?)",
+        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.now(datetime.UTC).isoformat()),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+
+
+# POWER BI
+@app.route("/connectors/power_bi/save_app", methods=["POST"])
+def power_bi_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    save_power_bi_config(uid, request.json or {})
+    ensure_connector_initialized(uid, "power_bi")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/power_bi/connect")
+def power_bi_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_power_bi(uid))
+
+
+@app.route("/connectors/power_bi/disconnect")
+def power_bi_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_power_bi(uid))
+
+
+@app.route("/connectors/power_bi/sync")
+def power_bi_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_power_bi(uid, sync_type))
+
+
+@app.route("/api/status/power_bi")
+def status_power_bi():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='power_bi' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='power_bi' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+
+@app.route("/connectors/power_bi/job/get")
+def power_bi_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='power_bi' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+
+
+@app.route("/connectors/power_bi/job/save", methods=["POST"])
+def power_bi_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json or {}
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'power_bi', ?, ?, ?)",
+        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.now(datetime.UTC).isoformat()),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+
+
+# WORKDAY
+@app.route("/connectors/workday/save_app", methods=["POST"])
+def workday_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    save_workday_config(uid, request.json or {})
+    ensure_connector_initialized(uid, "workday")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/workday/connect")
+def workday_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_workday(uid))
+
+
+@app.route("/connectors/workday/disconnect")
+def workday_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_workday(uid))
+
+
+@app.route("/connectors/workday/sync")
+def workday_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_workday(uid, sync_type))
+
+
+@app.route("/api/status/workday")
+def status_workday():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='workday' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='workday' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+
+@app.route("/connectors/workday/job/get")
+def workday_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='workday' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+
+
+@app.route("/connectors/workday/job/save", methods=["POST"])
+def workday_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json or {}
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'workday', ?, ?, ?)",
+        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.now(datetime.UTC).isoformat()),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+
+
+# EBAY
+@app.route("/connectors/ebay/save_app", methods=["POST"])
+def ebay_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    save_ebay_config(uid, request.json or {})
+    ensure_connector_initialized(uid, "ebay")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/ebay/connect")
+def ebay_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_ebay(uid))
+
+
+@app.route("/connectors/ebay/disconnect")
+def ebay_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_ebay(uid))
+
+
+@app.route("/connectors/ebay/sync")
+def ebay_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_ebay(uid, sync_type))
+
+
+@app.route("/api/status/ebay")
+def status_ebay():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='ebay' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='ebay' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+
+
+@app.route("/connectors/ebay/job/get")
+def ebay_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='ebay' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+
+
+@app.route("/connectors/ebay/job/save", methods=["POST"])
+def ebay_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json or {}
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'ebay', ?, ?, ?)",
+        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.now(datetime.UTC).isoformat()),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
  
  
 # MIXPANEL
@@ -18340,10 +18772,11 @@ def helpscout_job_save():
     cur = con.cursor()
     cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'helpscout', ?, ?, ?)",
                 (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+
     con.commit()
     con.close()
     return jsonify({"status": "saved"})
- 
+
 init_db()
 seed_test_user()
 
@@ -18635,3 +19068,125 @@ def sentry_status_api():
         return jsonify({"connected": False, "has_credentials": False})
     status, config_json = row
     return jsonify({"connected": status == "connected", "has_credentials": bool(config_json), "status": status})
+
+# ---------------- QUICKBOOKS ----------------
+@app.route("/connectors/quickbooks/save_app", methods=["POST"])
+def qb_save():
+    data = request.json
+    return jsonify(quickbooks.save_app_quickbooks(data.get("client_id"), data.get("client_secret")))
+
+@app.route("/connectors/quickbooks/connect")
+def qb_connect():
+    return quickbooks.connect_quickbooks()
+
+@app.route("/connectors/quickbooks/callback")
+def qb_callback():
+    return quickbooks.callback_quickbooks()
+
+@app.route("/connectors/quickbooks/sync")
+def qb_sync():
+    return jsonify(quickbooks.sync_quickbooks())
+
+@app.route("/connectors/quickbooks/disconnect")
+def qb_disconnect():
+    return jsonify(quickbooks.disconnect_quickbooks())
+
+@app.route("/api/status/quickbooks")
+def qb_status():
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT 1 FROM quickbooks_config LIMIT 1")
+    has_creds = bool(cur.fetchone())
+    cur.execute("SELECT 1 FROM quickbooks_auth LIMIT 1")
+    connected = bool(cur.fetchone())
+    con.close()
+    return jsonify({"has_credentials": has_creds, "connected": connected})
+
+# ---------------- XERO ----------------
+@app.route("/connectors/xero/save_app", methods=["POST"])
+def xero_save():
+    data = request.json
+    return jsonify(xero.save_app_xero(data.get("client_id"), data.get("client_secret")))
+
+@app.route("/connectors/xero/connect")
+def xero_connect():
+    return xero.connect_xero()
+
+@app.route("/connectors/xero/callback")
+def xero_callback():
+    return xero.callback_xero()
+
+@app.route("/connectors/xero/sync")
+def xero_sync():
+    return jsonify(xero.sync_xero())
+
+@app.route("/connectors/xero/disconnect")
+def xero_disconnect():
+    return jsonify(xero.disconnect_xero())
+
+@app.route("/api/status/xero")
+def xero_status_route():
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT 1 FROM xero_config LIMIT 1")
+    has_creds = bool(cur.fetchone())
+    cur.execute("SELECT tenant_name FROM xero_auth LIMIT 1")
+    row = cur.fetchone()
+    con.close()
+    return jsonify({"has_credentials": has_creds, "connected": bool(row), "tenant_name": row[0] if row else None})
+
+# ---------------- AMAZON SELLER ----------------
+@app.route("/connectors/amazon_seller/save_app", methods=["POST"])
+def amz_save():
+    data = request.json
+    return jsonify(amazon_seller.save_app_amazon_seller(data.get("client_id"), data.get("client_secret"), data.get("seller_id"), data.get("region")))
+
+@app.route("/connectors/amazon_seller/connect")
+def amz_connect():
+    return amazon_seller.connect_amazon_seller()
+
+@app.route("/connectors/amazon_seller/callback")
+def amz_callback():
+    return amazon_seller.callback_amazon_seller()
+
+@app.route("/connectors/amazon_seller/sync")
+def amz_sync():
+    return jsonify(amazon_seller.sync_amazon_seller())
+
+@app.route("/connectors/amazon_seller/disconnect")
+def amz_disconnect():
+    return jsonify(amazon_seller.disconnect_amazon_seller())
+
+@app.route("/api/status/amazon_seller")
+def amz_status():
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT 1 FROM amazon_seller_config LIMIT 1")
+    has_creds = bool(cur.fetchone())
+    cur.execute("SELECT 1 FROM amazon_seller_auth LIMIT 1")
+    connected = bool(cur.fetchone())
+    con.close()
+    return jsonify({"has_credentials": has_creds, "connected": connected})
+
+# ---------------- NEW RELIC ----------------
+@app.route("/connectors/newrelic/save_app", methods=["POST"])
+def nr_save():
+    data = request.json
+    return jsonify(newrelic.save_app_newrelic(data.get("api_key"), data.get("account_id"), data.get("region")))
+
+@app.route("/connectors/newrelic/sync")
+def nr_sync():
+    return jsonify(newrelic.sync_newrelic())
+
+@app.route("/connectors/newrelic/disconnect")
+def nr_disconnect():
+    return jsonify(newrelic.disconnect_newrelic())
+
+@app.route("/api/status/newrelic")
+def nr_status():
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT 1 FROM newrelic_auth LIMIT 1")
+    connected = bool(cur.fetchone())
+    con.close()
+    return jsonify({"has_credentials": connected, "connected": connected})
