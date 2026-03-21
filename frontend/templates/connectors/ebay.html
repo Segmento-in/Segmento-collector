@@ -32,7 +32,8 @@
         </div>
 
         <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
-          <span class="text-[#e53238]">e</span><span class="text-[#0064d2]">b</span><span class="text-[#f5af02]">a</span><span class="text-[#86b817]">y</span>
+          <span class="text-[#e53238]">e</span><span class="text-[#0064d2]">b</span><span
+            class="text-[#f5af02]">a</span><span class="text-[#86b817]">y</span>
           <span class="text-white block sm:inline">Connector</span>
         </h1>
 
@@ -50,8 +51,7 @@
           </div>
           <div class="flex gap-3">
             <svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
             <span>Uses eBay REST APIs with OAuth 2.0 for secure, scoped access to your seller data.</span>
           </div>
@@ -86,17 +86,20 @@
 
           <div id="credentialsForm" class="space-y-4 transition-opacity duration-500 opacity-100">
             <div>
-              <label class="text-[10px] font-mono text-slate-400 uppercase mb-2 block ml-2 tracking-widest">App ID (Client ID)</label>
+              <label class="text-[10px] font-mono text-slate-400 uppercase mb-2 block ml-2 tracking-widest">App ID
+                (Client ID)</label>
               <input id="appId" placeholder="Enter eBay App ID"
                 class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-all shadow-inner hover:shadow-blue-500/20">
             </div>
             <div>
-              <label class="text-[10px] font-mono text-slate-400 uppercase mb-2 block ml-2 tracking-widest">Cert ID (Client Secret)</label>
+              <label class="text-[10px] font-mono text-slate-400 uppercase mb-2 block ml-2 tracking-widest">Cert ID
+                (Client Secret)</label>
               <input id="certId" type="password" placeholder="Enter eBay Cert ID"
                 class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-all shadow-inner hover:shadow-blue-500/20">
             </div>
             <div>
-              <label class="text-[10px] font-mono text-slate-400 uppercase mb-2 block ml-2 tracking-widest">Dev ID</label>
+              <label class="text-[10px] font-mono text-slate-400 uppercase mb-2 block ml-2 tracking-widest">Dev
+                ID</label>
               <input id="devId" type="password" placeholder="Enter eBay Dev ID"
                 class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-all shadow-inner hover:shadow-blue-500/20">
             </div>
@@ -131,15 +134,17 @@
             <div class="space-y-4">
               <div class="relative inline-block">
                 <div class="absolute -inset-4 bg-emerald-500/20 blur-xl rounded-full"></div>
-                <div class="relative w-20 h-20 mx-auto bg-emerald-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-500/40 rotate-12 animate-in zoom-in duration-500">
-                   <span class="text-4xl text-white">🛍️</span>
+                <div
+                  class="relative w-20 h-20 mx-auto bg-emerald-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-500/40 rotate-12 animate-in zoom-in duration-500">
+                  <span class="text-4xl text-white">🛍️</span>
                 </div>
               </div>
               <h3 class="text-white text-3xl font-black tracking-tight pt-4">
                 eBay Account Linked! 🎉
               </h3>
               <p class="text-slate-300 text-base max-w-md mx-auto leading-relaxed">
-                Your eBay seller account is now successfully connected. You can now configure the sync engine to extract listing and order data.
+                Your eBay seller account is now successfully connected. You can now configure the sync engine to extract
+                listing and order data.
               </p>
               <p id="connectedAs" class="text-emerald-400 text-sm font-bold tracking-wide"></p>
             </div>
@@ -171,7 +176,8 @@
       <div id="accessOverlay"
         class="absolute inset-0 bg-slate-900/90 flex items-center justify-center z-20 rounded-[2.5rem]">
         <div class="text-center space-y-4 p-8 bg-slate-800/50 rounded-3xl border border-white/10 shadow-2xl">
-          <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div
+            class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
             <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -377,8 +383,7 @@
                       </div>
                       <div onclick="selectDestination('s3', 'AWS S3', '/static/images/logos/s3.png')"
                         class="flex items-center gap-3 px-4 py-3 hover:bg-amber-500/10 rounded-xl cursor-pointer transition-colors group">
-                        <img src="/static/images/logos/s3.png"
-                          class="w-6 h-6 object-contain">
+                        <img src="/static/images/logos/s3.png" class="w-6 h-6 object-contain">
                         <span class="text-slate-200 group-hover:text-white font-medium">AWS S3</span>
                       </div>
                       <div
@@ -521,8 +526,8 @@
 
                   <div class="md:col-span-2 pt-2">
                     <button onclick="saveDestination()" id="saveDestBtn"
-                      class="w-full py-3.5 bg-amber-600 hover:bg-amber-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-amber-600/20"> 
-                      Authenticate & Save 
+                      class="w-full py-3.5 bg-amber-600 hover:bg-amber-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-amber-600/20">
+                      Authenticate & Save
                     </button>
                   </div>
                 </div>
@@ -535,135 +540,150 @@
     </div>
 
     <div class="pt-12">
-        <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">eBay <span
-            class="text-blue-500">Schema</span></h2>
-        <div class="grid lg:grid-cols-2 gap-12 items-start">
-          <div class="grid grid-cols-1 gap-4">
-            <div
-              class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all group">
-              <div class="flex items-center gap-3 mb-4">
-                <div
-                  class="w-3 h-3 rounded-full bg-[#e53238] group-hover:animate-pulse shadow-[0_0_10px_rgba(229,50,56,0.8)]">
-                </div>
-                <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">ebay_orders</h4>
+      <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">eBay <span
+          class="text-blue-500">Schema</span></h2>
+      <div class="grid lg:grid-cols-2 gap-12 items-start">
+        <div class="grid grid-cols-1 gap-4">
+          <div
+            class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all group">
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="w-3 h-3 rounded-full bg-[#e53238] group-hover:animate-pulse shadow-[0_0_10px_rgba(229,50,56,0.8)]">
               </div>
-              <div class="flex flex-wrap gap-2">
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">order_id</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">buyer_username</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">total_price</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">currency</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">status</span>
-              </div>
+              <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">ebay_orders</h4>
             </div>
-
-            <div
-              class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all group">
-              <div class="flex items-center gap-3 mb-4">
-                <div
-                  class="w-3 h-3 rounded-full bg-[#0064d2] group-hover:animate-pulse shadow-[0_0_10px_rgba(0,100,210,0.8)]">
-                </div>
-                <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">ebay_listings</h4>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">listing_id</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">title</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">price</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">quantity</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">status</span>
-              </div>
-            </div>
-
-            <div
-              class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all group">
-              <div class="flex items-center gap-3 mb-4">
-                <div
-                  class="w-3 h-3 rounded-full bg-[#f5af02] group-hover:animate-pulse shadow-[0_0_10px_rgba(245,175,2,0.8)]">
-                </div>
-                <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">ebay_transactions</h4>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">transaction_id</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">order_id</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">amount</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">fee</span>
-                <span class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">net_amount</span>
-              </div>
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">order_id</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">buyer_username</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">total_price</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">currency</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">status</span>
             </div>
           </div>
 
-          <div class="sticky top-10 group">
-            <div
-              class="absolute -inset-4 bg-blue-500/10 rounded-[4rem] blur-2xl opacity-30 group-hover:opacity-100 transition-opacity duration-700">
-            </div>
-            <div
-              class="relative bg-slate-800/80 border border-white/10 rounded-[3.5rem] p-4 shadow-3xl overflow-hidden backdrop-blur-md">
+          <div
+            class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all group">
+            <div class="flex items-center gap-3 mb-4">
               <div
-                class="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/5 to-transparent flex items-center px-8 justify-between">
-                <div class="flex gap-2">
-                  <div class="w-2 h-2 rounded-full bg-[#e53238]/40"></div>
-                  <div class="w-2 h-2 rounded-full bg-[#0064d2]/40"></div>
-                  <div class="w-2 h-2 rounded-full bg-[#f5af02]/40"></div>
-                </div>
-                <span
-                  class="text-[9px] font-mono text-slate-400 tracking-widest uppercase">eBay_Marketplace_Object_Model.vuerd</span>
+                class="w-3 h-3 rounded-full bg-[#0064d2] group-hover:animate-pulse shadow-[0_0_10px_rgba(0,100,210,0.8)]">
               </div>
-              <div class="mt-12 p-6 rounded-[2.5rem] bg-slate-900/50 border border-white/5">
-                <img src="/static/images/empty_erd.png"
-                  class="mx-auto max-w-full rounded-2xl opacity-80 group-hover:opacity-100 transition-all duration-700 transform group-hover:scale-[1.02]" />
+              <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">ebay_listings</h4>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">listing_id</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">title</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">price</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">quantity</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">status</span>
+            </div>
+          </div>
+
+          <div
+            class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-blue-500/30 transition-all group">
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="w-3 h-3 rounded-full bg-[#f5af02] group-hover:animate-pulse shadow-[0_0_10px_rgba(245,175,2,0.8)]">
               </div>
+              <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">ebay_transactions</h4>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">transaction_id</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">order_id</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">amount</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">fee</span>
+              <span
+                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-blue-300 transition-colors">net_amount</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="mb-20">
-        <h2 class="text-4xl font-black mb-12 text-center text-white">Data <span class="text-blue-500">Extracted</span>
-        </h2>
-        <div class="grid md:grid-cols-3 gap-6">
+        <div class="sticky top-10 group">
           <div
-            class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-blue-600/5 hover:border-blue-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
-            <div
-              class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#e53238] transition-all duration-500 shadow-xl">
-              <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-            </div>
-            <span
-              class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">listings</span>
+            class="absolute -inset-4 bg-blue-500/10 rounded-[4rem] blur-2xl opacity-30 group-hover:opacity-100 transition-opacity duration-700">
           </div>
-
           <div
-            class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-blue-600/5 hover:border-blue-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
+            class="relative bg-slate-800/80 border border-white/10 rounded-[3.5rem] p-4 shadow-3xl overflow-hidden backdrop-blur-md">
             <div
-              class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#0064d2] transition-all duration-500 shadow-xl">
-              <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-              </svg>
+              class="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/5 to-transparent flex items-center px-8 justify-between">
+              <div class="flex gap-2">
+                <div class="w-2 h-2 rounded-full bg-[#e53238]/40"></div>
+                <div class="w-2 h-2 rounded-full bg-[#0064d2]/40"></div>
+                <div class="w-2 h-2 rounded-full bg-[#f5af02]/40"></div>
+              </div>
+              <span
+                class="text-[9px] font-mono text-slate-400 tracking-widest uppercase">eBay_Marketplace_Object_Model.vuerd</span>
             </div>
-            <span
-              class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">orders</span>
-          </div>
-
-          <div
-            class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-blue-600/5 hover:border-blue-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
-            <div
-              class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#f5af02] transition-all duration-500 shadow-xl">
-              <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <div class="mt-12 p-6 rounded-[2.5rem] bg-slate-900/50 border border-white/5">
+              <img src="/static/images/erd/ebay_erd.png"
+                class="mx-auto max-w-full rounded-2xl opacity-80 group-hover:opacity-100 transition-all duration-700 transform group-hover:scale-[1.02]" />
             </div>
-            <span
-              class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">transactions</span>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="mb-20">
+      <h2 class="text-4xl font-black mb-12 text-center text-white">Data <span class="text-blue-500">Extracted</span>
+      </h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div
+          class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-blue-600/5 hover:border-blue-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
+          <div
+            class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#e53238] transition-all duration-500 shadow-xl">
+            <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+          <span
+            class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">listings</span>
+        </div>
+
+        <div
+          class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-blue-600/5 hover:border-blue-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
+          <div
+            class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#0064d2] transition-all duration-500 shadow-xl">
+            <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+          </div>
+          <span
+            class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">orders</span>
+        </div>
+
+        <div
+          class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-blue-600/5 hover:border-blue-500/20 transition-all flex flex-col items-center text-center group cursor-pointer">
+          <div
+            class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#f5af02] transition-all duration-500 shadow-xl">
+            <svg class="w-6 h-6 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <span
+            class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">transactions</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <style>
@@ -905,8 +925,8 @@
         const card = document.createElement("div");
         card.onclick = () => activateDest(d.id);
         card.className = `group flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer ${isActive
-            ? 'bg-blue-600/10 border-blue-500/40 shadow-lg shadow-blue-600/10'
-            : 'bg-slate-900/50 border-white/5 hover:border-white/10 hover:bg-slate-900'
+          ? 'bg-blue-600/10 border-blue-500/40 shadow-lg shadow-blue-600/10'
+          : 'bg-slate-900/50 border-white/5 hover:border-white/10 hover:bg-slate-900'
           }`;
 
         const logoMap = {
