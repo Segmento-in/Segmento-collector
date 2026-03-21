@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+{% set source_id = "ebay" %}
+{% set source_name = "eBay" %}
+{% set accent_color = "#E53238" %}
+{% set accent_soft_bg = "rgba(229,50,56,0.10)" %}
+{% set accent_border_soft = "rgba(229,50,56,0.20)" %}
+{% set accent_shadow = "rgba(229,50,56,0.25)" %}
+{% set accent_glow_primary = "rgba(229,50,56,0.12)" %}
+{% set accent_glow_secondary = "rgba(229,50,56,0.06)" %}
+{% set accent_gradient = "linear-gradient(to right, #E53238, #ef4444)" %}
+{% set headline_prefix = "" %}
+{% set headline_accent = "eBay" %}
+{% set headline_suffix = " Connector" %}
+{% set description = "Connect eBay Sell APIs with an OAuth access token to sync orders, listings, customers, and marketplace transaction metadata into your warehouse." %}
+{% set step_two_label = "Validate" %}
+{% set primary_button_text = "Save Credentials & Continue" %}
+{% set connect_button_text = "Connect eBay" %}
+{% set connected_text = "eBay connection active" %}
+{% set success_text = "Your eBay seller connection is now securely linked and ready to stream orders, listings, and customer data to your warehouse." %}
+{% set instructions_title = "How to create eBay Sell API credentials" %}
+{% set instructions = ["Go to the eBay Developer Portal.","Create your application keys.","Generate an OAuth token for the production environment.","Paste the access token here to validate Sell API access."] %}
+{% set erd_label = "ebay_entity_diagram.vuerd" %}
+{% set erd_image = "/static/images/empty_erd.png" %}
+{% set schema_tables = [("ebay_orders", ["order_id", "legacy_order_id", "order_creation_date", "order_fulfillment_status", "order_payment_status", "buyer_username"]), ("ebay_listings", ["sku", "title", "condition", "availability", "product"]), ("ebay_customers", ["customer_id", "username", "email", "order_id"])] %}
+{% set extracted_tables = ["orders", "listings", "customers"] %}
+{% set credential_fields = [{"id":"accessToken","key":"access_token","label":"Access Token","placeholder":"Enter eBay OAuth access token","type":"password"}] %}
+{% set security_features = [{"icon":"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z","text":"Credentials are encrypted using AES-256 before being stored in your secure vault."},{"icon":"M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z","text":"OAuth bearer validation is performed against eBay Sell API endpoints before sync access is enabled."}] %}
+{% include "connectors/_warehouse_connector_generic.html" %}
+{% endblock %}
