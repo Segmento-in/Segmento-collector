@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+{% set source_id = "tableau" %}
+{% set source_name = "Tableau" %}
+{% set accent_color = "#E97627" %}
+{% set accent_soft_bg = "rgba(233,118,39,0.10)" %}
+{% set accent_border_soft = "rgba(233,118,39,0.20)" %}
+{% set accent_shadow = "rgba(233,118,39,0.25)" %}
+{% set accent_glow_primary = "rgba(233,118,39,0.12)" %}
+{% set accent_glow_secondary = "rgba(233,118,39,0.06)" %}
+{% set accent_gradient = "linear-gradient(to right, #E97627, #f59e0b)" %}
+{% set headline_prefix = "" %}
+{% set headline_accent = "Tableau" %}
+{% set headline_suffix = " Connector" %}
+{% set description = "Sync Tableau workbooks, data sources, and project metadata into your warehouse using Tableau Personal Access Token authentication." %}
+{% set step_two_label = "Validate" %}
+{% set primary_button_text = "Save Credentials & Continue" %}
+{% set connect_button_text = "Connect Tableau" %}
+{% set connected_text = "Tableau connection active" %}
+{% set success_text = "Your Tableau account is now securely linked and ready to stream dashboards, datasets, and project metadata to your warehouse." %}
+{% set instructions_title = "How to generate Tableau PAT credentials" %}
+{% set instructions = ["Go to Tableau Server or Tableau Cloud.","Navigate to <b>Account Settings → Personal Access Tokens</b>.","Generate a new token and copy the token name and token secret.","Paste the token name, token secret, and your Tableau base URL here."] %}
+{% set erd_label = "tableau_entity_diagram.vuerd" %}
+{% set erd_image = "/static/images/empty_erd.png" %}
+{% set schema_tables = [("tableau_workbooks", ["workbook_id", "name", "project_id", "project_name", "owner_id", "content_url", "updated_at"]), ("tableau_datasources", ["datasource_id", "name", "project_id", "project_name", "owner_id", "content_url", "updated_at"]), ("tableau_projects", ["project_id", "name", "description", "parent_project_id", "top_level_project", "updated_at"])] %}
+{% set extracted_tables = ["workbooks", "datasources", "projects"] %}
+{% set credential_fields = [{"id":"tokenName","key":"token_name","label":"Token Name","placeholder":"Enter Tableau token name","type":"text"},{"id":"tokenSecret","key":"token_secret","label":"Token Secret","placeholder":"Enter Tableau token secret","type":"password"},{"id":"baseUrl","key":"base_url","label":"Base URL","placeholder":"https://your-tableau-domain","type":"text"}] %}
+{% set security_features = [{"icon":"M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z","text":"Credentials are encrypted using AES-256 before being stored in your secure vault."},{"icon":"M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z","text":"Personal Access Token authentication validates Tableau REST API access before sync is enabled."}] %}
+{% include "connectors/_warehouse_connector_generic.html" %}
+{% endblock %}
