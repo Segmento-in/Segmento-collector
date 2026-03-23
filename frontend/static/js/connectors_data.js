@@ -3754,4 +3754,301 @@ data into your configured warehouse destination.
 
     data: ["Applications", "Infrastructure", "Synthetics", "Alerts", "Errors"]
   },
+  // connectors_data.js - ADD THESE ENTRIES TO THE CONNECTORS ARRAY
+
+  {
+    id: "openai",
+    name: "OpenAI",
+    categories: ["ai", "ml"],
+    logo: "/static/images/logos/openai.png",
+    auth_type: "api_key",
+    api_key_label: "API Key",
+    connect_url: "/connectors/openai/connect",
+    sync_url: "/connectors/openai/sync",
+    disconnect_url: "/connectors/openai/disconnect",
+    status_api: "/api/status/openai",
+    save_app_url: "/connectors/openai/save_app",
+    models: [
+      { title: "Models", desc: "OpenAI model metadata and availability." },
+      { title: "Usage", desc: "API usage metrics and token consumption." },
+      { title: "Fine-tunes", desc: "Fine-tuning job status and results." }
+    ],
+    tables: [
+      "openai_models",
+      "openai_usage",
+      "openai_fine_tunes"
+    ],
+    erd: "/static/images/empty_erd.png",
+    description: "Extracts models, usage, and fine-tunes from OpenAI API.",
+    data: [
+      "Model metadata",
+      "API usage metrics",
+      "Fine-tuning jobs",
+      "Token consumption",
+      "Model availability"
+    ]
+  },
+
+  {
+    id: "huggingface",
+    name: "HuggingFace",
+    categories: ["ai", "ml"],
+    logo: "https://cdn.simpleicons.org/huggingface/FFCC4D",
+    auth_type: "api_token",
+    api_key_label: "Access Token",
+    connect_url: "/connectors/huggingface/connect",
+    sync_url: "/connectors/huggingface/sync",
+    disconnect_url: "/connectors/huggingface/disconnect",
+    status_api: "/api/status/huggingface",
+    save_app_url: "/connectors/huggingface/save_app",
+    models: [
+      { title: "Models", desc: "HuggingFace model repositories and metadata." },
+      { title: "Datasets", desc: "Dataset repositories and statistics." },
+      { title: "Spaces", desc: "Spaces applications and deployments." }
+    ],
+    tables: [
+      "huggingface_models",
+      "huggingface_datasets",
+      "huggingface_spaces"
+    ],
+    erd: "/static/images/empty_erd.png",
+    description: "Extracts models, datasets, and spaces from HuggingFace.",
+    data: [
+      "Model repositories",
+      "Dataset metadata",
+      "Spaces applications",
+      "Download statistics",
+      "Community metrics"
+    ]
+  },
+
+  {
+    id: "airflow",
+    name: "Apache Airflow",
+    categories: ["workflow", "orchestration"],
+    logo: "https://cdn.simpleicons.org/apacheairflow/017CEE",
+    auth_type: "basic_auth",
+    api_key_label: "Credentials",
+    connect_url: "/connectors/airflow/connect",
+    sync_url: "/connectors/airflow/sync",
+    disconnect_url: "/connectors/airflow/disconnect",
+    status_api: "/api/status/airflow",
+    save_app_url: "/connectors/airflow/save_app",
+    models: [
+      { title: "DAGs", desc: "Airflow DAG definitions and metadata." },
+      { title: "DAG Runs", desc: "DAG execution runs and status." },
+      { title: "Task Instances", desc: "Individual task execution details." }
+    ],
+    tables: [
+      "airflow_dags",
+      "airflow_dag_runs",
+      "airflow_task_instances"
+    ],
+    erd: "/static/images/empty_erd.png",
+    description: "Extracts DAGs, runs, and tasks from Airflow.",
+    data: [
+      "DAG definitions",
+      "Execution runs",
+      "Task instances",
+      "Schedule intervals",
+      "Run states"
+    ]
+  },
+
+  {
+    id: "kafka",
+    name: "Apache Kafka",
+    categories: ["streaming", "data_infrastructure"],
+    logo: "static/images/logos/apachekafka.png",
+    auth_type: "bootstrap_servers",
+    api_key_label: "Bootstrap Servers",
+    connect_url: "/connectors/kafka/connect",
+    sync_url: "/connectors/kafka/sync",
+    disconnect_url: "/connectors/kafka/disconnect",
+    status_api: "/api/status/kafka",
+    save_app_url: "/connectors/kafka/save_app",
+    models: [
+      { title: "Topics", desc: "Kafka topic metadata and configuration." },
+      { title: "Partitions", desc: "Topic partition details and replicas." },
+      { title: "Consumer Groups", desc: "Consumer group state and offsets." }
+    ],
+    tables: [
+      "kafka_topics",
+      "kafka_partitions",
+      "kafka_consumer_groups"
+    ],
+    erd: "/static/images/empty_erd.png",
+    description: "Extracts topics, partitions, and consumer groups from Kafka.",
+    data: [
+      "Topic metadata",
+      "Partition details",
+      "Consumer groups",
+      "Replication status",
+      "Cluster configuration"
+    ]
+  },
+  // =================================================================
+  // INSTRUCTIONS: Paste the 4 objects below into connectors_data.js
+  // just before the closing  ];  on the last line of the file.
+  // =================================================================
+
+  {
+    id: "dbt",
+    name: "dbt Cloud",
+    categories: ["data_infrastructure", "analytics_engineering"],
+    logo: "/static/images/logos/dbt.png",
+
+    auth_type: "api_key",
+    api_key_label: "dbt Cloud API Token",
+
+    connect_url: "/connectors/dbt/connect",
+    sync_url: "/connectors/dbt/sync",
+    disconnect_url: "/connectors/dbt/disconnect",
+    status_api: "/api/status/dbt",
+    save_app_url: "/connectors/dbt/save_app",
+
+    models: [
+      { title: "Jobs", desc: "dbt Cloud job definitions, triggers, and configuration." },
+      { title: "Runs", desc: "Historical run records with status, timing, and duration." },
+      { title: "Models", desc: "Compiled model nodes extracted from run manifests." }
+    ],
+
+    tables: [
+      "dbt_jobs",
+      "dbt_runs",
+      "dbt_models"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts dbt Cloud jobs, run history, and compiled model metadata via the dbt Cloud API.",
+
+    data: [
+      "Job definitions",
+      "Run history",
+      "Model nodes",
+      "Execution timings",
+      "dbt version metadata"
+    ]
+  },
+
+  {
+    id: "typeform",
+    name: "Typeform",
+    categories: ["forms", "surveys", "productivity"],
+    logo: "/static/images/logos/typeform.png",
+
+    auth_type: "api_key",
+    api_key_label: "Typeform Personal Access Token",
+
+    connect_url: "/connectors/typeform/connect",
+    sync_url: "/connectors/typeform/sync",
+    disconnect_url: "/connectors/typeform/disconnect",
+    status_api: "/api/status/typeform",
+    save_app_url: "/connectors/typeform/save_app",
+
+    models: [
+      { title: "Forms", desc: "Form definitions, settings, and question structure." },
+      { title: "Responses", desc: "Individual response submissions with answer payloads." },
+      { title: "Workspaces", desc: "Workspace containers and member/form counts." }
+    ],
+
+    tables: [
+      "typeform_forms",
+      "typeform_responses",
+      "typeform_workspaces"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts Typeform forms, collected responses, and workspace metadata through a personal access token.",
+
+    data: [
+      "Form definitions",
+      "Response submissions",
+      "Answer payloads",
+      "Workspace metadata",
+      "Calculated scores"
+    ]
+  },
+
+  {
+    id: "surveymonkey",
+    name: "SurveyMonkey",
+    categories: ["forms", "surveys"],
+    logo: "https://cdn.simpleicons.org/surveymonkey/00BF6F",
+
+    auth_type: "api_key",
+    api_key_label: "SurveyMonkey Bearer Token",
+
+    connect_url: "/connectors/surveymonkey/connect",
+    sync_url: "/connectors/surveymonkey/sync",
+    disconnect_url: "/connectors/surveymonkey/disconnect",
+    status_api: "/api/status/surveymonkey",
+    save_app_url: "/connectors/surveymonkey/save_app",
+
+    models: [
+      { title: "Surveys", desc: "Survey definitions, page counts, and response statistics." },
+      { title: "Responses", desc: "Individual responses with page-level answer payloads." },
+      { title: "Collectors", desc: "Collector links with type, status, and response counts." }
+    ],
+
+    tables: [
+      "surveymonkey_surveys",
+      "surveymonkey_responses",
+      "surveymonkey_collectors"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts SurveyMonkey surveys, response submissions, and collector configurations via the v3 REST API.",
+
+    data: [
+      "Survey definitions",
+      "Response submissions",
+      "Collector configurations",
+      "Question payloads",
+      "Respondent metadata"
+    ]
+  },
+
+  {
+    id: "pinecone",
+    name: "Pinecone",
+    categories: ["vector_database", "data_infrastructure", "ai"],
+    logo: "/static/images/logos/pinecone.png",
+
+    auth_type: "api_key",
+    api_key_label: "Pinecone API Key",
+
+    connect_url: "/connectors/pinecone/connect",
+    sync_url: "/connectors/pinecone/sync",
+    disconnect_url: "/connectors/pinecone/disconnect",
+    status_api: "/api/status/pinecone",
+    save_app_url: "/connectors/pinecone/save_app",
+
+    models: [
+      { title: "Indexes", desc: "Vector index metadata, configuration, and status." },
+      { title: "Namespaces", desc: "Namespace statistics including vector counts per index." },
+      { title: "Vectors", desc: "Sampled vector records with metadata and dimension info." }
+    ],
+
+    tables: [
+      "pinecone_indexes",
+      "pinecone_namespaces",
+      "pinecone_vectors"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts Pinecone index metadata, namespace statistics, and sampled vector records via the control-plane and data-plane APIs.",
+
+    data: [
+      "Index configurations",
+      "Namespace vector counts",
+      "Sampled vector records",
+      "Index status and health",
+      "Pod and replica metadata"
+    ]
+  },
 ];
