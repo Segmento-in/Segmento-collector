@@ -6545,7 +6545,6 @@ def sendgrid_job_get_proxy():
     except Exception:
         return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
 
-
 @app.route("/connectors/sendgrid/job/save", methods=["POST"])
 @require_login
 def sendgrid_job_save_proxy():
@@ -6771,11 +6770,6 @@ def helpscout_save_app_proxy():
 def helpscout_disconnect_proxy():
     r = proxy_get("/connectors/helpscout/disconnect")
     return jsonify(r.json()), r.status_code
-
-# ================= MAIN ==========================
-
-if __name__ == "__main__":
-    app.run(port=3000, debug=True)
 
 # ================= LOOKER =================
 
@@ -7334,3 +7328,454 @@ def newrelic_save_app_proxy():
 def newrelic_disconnect():
     r = connector_disconnect("newrelic")
     return jsonify(r.json()), r.status_code
+
+# OPENAI
+@app.route("/connectors/openai")
+@require_login
+def openai_page():
+    return render_template("connectors/openai.html")
+
+@app.route("/connectors/openai/connect")
+@require_login
+def openai_connect_proxy():
+    r = proxy_get("/connectors/openai/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/openai/sync")
+@require_login
+def openai_sync_proxy():
+    r = connector_sync("openai")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/openai")
+@require_login
+def openai_status_proxy():
+    r = connector_status("openai")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/openai/job/get")
+@require_login
+def openai_job_get_proxy():
+    r = connector_job_get("openai")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+@app.route("/connectors/openai/job/save", methods=["POST"])
+@require_login
+def openai_job_save_proxy():
+    r = connector_job_save("openai")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/openai/save_app", methods=["POST"])
+@require_login
+def openai_save_app_proxy():
+    r = proxy_post("/connectors/openai/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/openai/disconnect")
+@require_login
+def openai_disconnect_proxy():
+    r = proxy_get("/connectors/openai/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+# HUGGINGFACE
+@app.route("/connectors/huggingface")
+@require_login
+def huggingface_page():
+    return render_template("connectors/huggingface.html")
+
+@app.route("/connectors/huggingface/connect")
+@require_login
+def huggingface_connect_proxy():
+    r = proxy_get("/connectors/huggingface/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/huggingface/sync")
+@require_login
+def huggingface_sync_proxy():
+    r = connector_sync("huggingface")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/huggingface")
+@require_login
+def huggingface_status_proxy():
+    r = connector_status("huggingface")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/huggingface/job/get")
+@require_login
+def huggingface_job_get_proxy():
+    r = connector_job_get("huggingface")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+@app.route("/connectors/huggingface/job/save", methods=["POST"])
+@require_login
+def huggingface_job_save_proxy():
+    r = connector_job_save("huggingface")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/huggingface/save_app", methods=["POST"])
+@require_login
+def huggingface_save_app_proxy():
+    r = proxy_post("/connectors/huggingface/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/huggingface/disconnect")
+@require_login
+def huggingface_disconnect_proxy():
+    r = proxy_get("/connectors/huggingface/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+# AIRFLOW
+@app.route("/connectors/airflow")
+@require_login
+def airflow_page():
+    return render_template("connectors/airflow.html")
+
+@app.route("/connectors/airflow/connect")
+@require_login
+def airflow_connect_proxy():
+    r = proxy_get("/connectors/airflow/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/airflow/sync")
+@require_login
+def airflow_sync_proxy():
+    r = connector_sync("airflow")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/airflow")
+@require_login
+def airflow_status_proxy():
+    r = connector_status("airflow")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/airflow/job/get")
+@require_login
+def airflow_job_get_proxy():
+    r = connector_job_get("airflow")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+@app.route("/connectors/airflow/job/save", methods=["POST"])
+@require_login
+def airflow_job_save_proxy():
+    r = connector_job_save("airflow")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/airflow/save_app", methods=["POST"])
+@require_login
+def airflow_save_app_proxy():
+    r = proxy_post("/connectors/airflow/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/airflow/disconnect")
+@require_login
+def airflow_disconnect_proxy():
+    r = proxy_get("/connectors/airflow/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+# KAFKA
+@app.route("/connectors/kafka")
+@require_login
+def kafka_page():
+    return render_template("connectors/kafka.html")
+
+@app.route("/connectors/kafka/connect")
+@require_login
+def kafka_connect_proxy():
+    r = proxy_get("/connectors/kafka/connect")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/kafka/sync")
+@require_login
+def kafka_sync_proxy():
+    r = connector_sync("kafka")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/api/status/kafka")
+@require_login
+def kafka_status_proxy():
+    r = connector_status("kafka")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/kafka/job/get")
+@require_login
+def kafka_job_get_proxy():
+    r = connector_job_get("kafka")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+@app.route("/connectors/kafka/job/save", methods=["POST"])
+@require_login
+def kafka_job_save_proxy():
+    r = connector_job_save("kafka")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/kafka/save_app", methods=["POST"])
+@require_login
+def kafka_save_app_proxy():
+    r = proxy_post("/connectors/kafka/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+@app.route("/connectors/kafka/disconnect")
+@require_login
+def kafka_disconnect_proxy():
+    r = proxy_get("/connectors/kafka/disconnect")
+    return jsonify(r.json()), r.status_code
+
+# ================= DBT ========================
+
+@app.route("/connectors/dbt")
+@require_login
+def dbt_page():
+    return render_template("connectors/dbt.html")
+
+
+@app.route("/connectors/dbt/connect")
+@require_login
+def dbt_connect_proxy():
+    r = proxy_get("/connectors/dbt/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/dbt/sync")
+@require_login
+def dbt_sync_proxy():
+    r = connector_sync("dbt")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/dbt")
+@require_login
+def dbt_status_proxy():
+    r = connector_status("dbt")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/dbt/job/get")
+@require_login
+def dbt_job_get_proxy():
+    r = connector_job_get("dbt")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/dbt/job/save", methods=["POST"])
+@require_login
+def dbt_job_save_proxy():
+    r = connector_job_save("dbt")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/dbt/save_app", methods=["POST"])
+@require_login
+def dbt_save_app_proxy():
+    r = proxy_post("/connectors/dbt/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/dbt/disconnect")
+@require_login
+def dbt_disconnect_proxy():
+    r = proxy_get("/connectors/dbt/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= TYPEFORM ========================
+
+@app.route("/connectors/typeform")
+@require_login
+def typeform_page():
+    return render_template("connectors/typeform.html")
+
+
+@app.route("/connectors/typeform/connect")
+@require_login
+def typeform_connect_proxy():
+    r = proxy_get("/connectors/typeform/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/typeform/sync")
+@require_login
+def typeform_sync_proxy():
+    r = connector_sync("typeform")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/typeform")
+@require_login
+def typeform_status_proxy():
+    r = connector_status("typeform")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/typeform/job/get")
+@require_login
+def typeform_job_get_proxy():
+    r = connector_job_get("typeform")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/typeform/job/save", methods=["POST"])
+@require_login
+def typeform_job_save_proxy():
+    r = connector_job_save("typeform")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/typeform/save_app", methods=["POST"])
+@require_login
+def typeform_save_app_proxy():
+    r = proxy_post("/connectors/typeform/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/typeform/disconnect")
+@require_login
+def typeform_disconnect_proxy():
+    r = proxy_get("/connectors/typeform/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= SURVEYMONKEY ========================
+
+@app.route("/connectors/surveymonkey")
+@require_login
+def surveymonkey_page():
+    return render_template("connectors/surveymonkey.html")
+
+
+@app.route("/connectors/surveymonkey/connect")
+@require_login
+def surveymonkey_connect_proxy():
+    r = proxy_get("/connectors/surveymonkey/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/surveymonkey/sync")
+@require_login
+def surveymonkey_sync_proxy():
+    r = connector_sync("surveymonkey")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/surveymonkey")
+@require_login
+def surveymonkey_status_proxy():
+    r = connector_status("surveymonkey")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/surveymonkey/job/get")
+@require_login
+def surveymonkey_job_get_proxy():
+    r = connector_job_get("surveymonkey")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/surveymonkey/job/save", methods=["POST"])
+@require_login
+def surveymonkey_job_save_proxy():
+    r = connector_job_save("surveymonkey")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/surveymonkey/save_app", methods=["POST"])
+@require_login
+def surveymonkey_save_app_proxy():
+    r = proxy_post("/connectors/surveymonkey/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/surveymonkey/disconnect")
+@require_login
+def surveymonkey_disconnect_proxy():
+    r = proxy_get("/connectors/surveymonkey/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= PINECONE ========================
+
+@app.route("/connectors/pinecone")
+@require_login
+def pinecone_page():
+    return render_template("connectors/pinecone.html")
+
+
+@app.route("/connectors/pinecone/connect")
+@require_login
+def pinecone_connect_proxy():
+    r = proxy_get("/connectors/pinecone/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/pinecone/sync")
+@require_login
+def pinecone_sync_proxy():
+    r = connector_sync("pinecone")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/pinecone")
+@require_login
+def pinecone_status_proxy():
+    r = connector_status("pinecone")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/pinecone/job/get")
+@require_login
+def pinecone_job_get_proxy():
+    r = connector_job_get("pinecone")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/pinecone/job/save", methods=["POST"])
+@require_login
+def pinecone_job_save_proxy():
+    r = connector_job_save("pinecone")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/pinecone/save_app", methods=["POST"])
+@require_login
+def pinecone_save_app_proxy():
+    r = proxy_post("/connectors/pinecone/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/pinecone/disconnect")
+@require_login
+def pinecone_disconnect_proxy():
+    r = proxy_get("/connectors/pinecone/disconnect")
+    return jsonify(r.json()), r.status_code
+
+# ================= MAIN ==========================
+
+if __name__ == "__main__":
+    app.run(port=3000, debug=True)
