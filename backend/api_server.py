@@ -349,6 +349,57 @@ from backend.connectors.sentry import (
     sync_sentry,
     disconnect_sentry,
 )
+from backend.connectors.openai import (
+    save_config as save_openai_config,
+    connect_openai,
+    sync_openai,
+    disconnect_openai,
+)
+ 
+from backend.connectors.huggingface import (
+    save_config as save_huggingface_config,
+    connect_huggingface,
+    sync_huggingface,
+    disconnect_huggingface,
+)
+ 
+from backend.connectors.airflow import (
+    save_config as save_airflow_config,
+    connect_airflow,
+    sync_airflow,
+    disconnect_airflow,
+)
+ 
+from backend.connectors.kafka import (
+    save_config as save_kafka_config,
+    connect_kafka,
+    sync_kafka,
+    disconnect_kafka,
+)
+from backend.connectors.dbt import (
+    connect_dbt,
+    sync_dbt,
+    disconnect_dbt,
+    save_config as save_dbt_config,
+)
+from backend.connectors.typeform import (
+    connect_typeform,
+    sync_typeform,
+    disconnect_typeform,
+    save_config as save_typeform_config,
+)
+from backend.connectors.surveymonkey import (
+    connect_surveymonkey,
+    sync_surveymonkey,
+    disconnect_surveymonkey,
+    save_config as save_surveymonkey_config,
+)
+from backend.connectors.pinecone import (
+    connect_pinecone,
+    sync_pinecone,
+    disconnect_pinecone,
+    save_config as save_pinecone_config,
+)
 
 from backend.connectors import quickbooks
 from backend.connectors import xero
@@ -18777,11 +18828,6 @@ def helpscout_job_save():
     con.close()
     return jsonify({"status": "saved"})
 
-init_db()
-seed_test_user()
-
-if __name__=="__main__":
-    app.run(port=4000,debug=True,host="0.0.0.0",use_reloader=False)
 # ================= LOOKER =================
 
 @app.route("/connectors/looker/connect")
@@ -19190,3 +19236,761 @@ def nr_status():
     connected = bool(cur.fetchone())
     con.close()
     return jsonify({"has_credentials": connected, "connected": connected})
+
+# OPENAI
+@app.route("/connectors/openai/save_app", methods=["POST"])
+def openai_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    save_openai_config(uid, api_key=data.get("api_key", ""))
+    return jsonify({"status": "saved"})
+ 
+@app.route("/connectors/openai/connect")
+def openai_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_openai(uid))
+ 
+@app.route("/connectors/openai/disconnect")
+def openai_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_openai(uid))
+ 
+@app.route("/connectors/openai/sync")
+def openai_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_openai(uid, sync_type))
+ 
+@app.route("/api/status/openai")
+def status_openai():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='openai' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='openai' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+ 
+@app.route("/connectors/openai/job/get")
+def openai_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='openai' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+ 
+@app.route("/connectors/openai/job/save", methods=["POST"])
+def openai_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'openai', ?, ?, ?)",
+                (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+ 
+ 
+# HUGGINGFACE
+@app.route("/connectors/huggingface/save_app", methods=["POST"])
+def huggingface_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    save_huggingface_config(uid, access_token=data.get("access_token", ""))
+    return jsonify({"status": "saved"})
+ 
+@app.route("/connectors/huggingface/connect")
+def huggingface_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_huggingface(uid))
+ 
+@app.route("/connectors/huggingface/disconnect")
+def huggingface_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_huggingface(uid))
+ 
+@app.route("/connectors/huggingface/sync")
+def huggingface_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_huggingface(uid, sync_type))
+ 
+@app.route("/api/status/huggingface")
+def status_huggingface():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='huggingface' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='huggingface' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+ 
+@app.route("/connectors/huggingface/job/get")
+def huggingface_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='huggingface' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+ 
+@app.route("/connectors/huggingface/job/save", methods=["POST"])
+def huggingface_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'huggingface', ?, ?, ?)",
+                (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+ 
+ 
+# AIRFLOW
+@app.route("/connectors/airflow/save_app", methods=["POST"])
+def airflow_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    save_airflow_config(uid, base_url=data.get("base_url", ""), username=data.get("username", ""), password=data.get("password", ""))
+    return jsonify({"status": "saved"})
+ 
+@app.route("/connectors/airflow/connect")
+def airflow_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_airflow(uid))
+ 
+@app.route("/connectors/airflow/disconnect")
+def airflow_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_airflow(uid))
+ 
+@app.route("/connectors/airflow/sync")
+def airflow_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_airflow(uid, sync_type))
+ 
+@app.route("/api/status/airflow")
+def status_airflow():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='airflow' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='airflow' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+ 
+@app.route("/connectors/airflow/job/get")
+def airflow_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='airflow' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+ 
+@app.route("/connectors/airflow/job/save", methods=["POST"])
+def airflow_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'airflow', ?, ?, ?)",
+                (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+ 
+ 
+# KAFKA
+@app.route("/connectors/kafka/save_app", methods=["POST"])
+def kafka_save_app():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    save_kafka_config(uid, bootstrap_servers=data.get("bootstrap_servers", ""))
+    return jsonify({"status": "saved"})
+ 
+@app.route("/connectors/kafka/connect")
+def kafka_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(connect_kafka(uid))
+ 
+@app.route("/connectors/kafka/disconnect")
+def kafka_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_kafka(uid))
+ 
+@app.route("/connectors/kafka/sync")
+def kafka_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    sync_type = request.args.get("type", "incremental")
+    return jsonify(sync_kafka(uid, sync_type))
+ 
+@app.route("/api/status/kafka")
+def status_kafka():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT config_json FROM connector_configs WHERE uid=? AND connector='kafka' LIMIT 1", (uid,))
+    cfg_row = fetchone_secure(cur)
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source='kafka' LIMIT 1", (uid,))
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({"has_credentials": bool(cfg_row), "connected": bool(conn_row and conn_row.get("enabled") == 1)})
+ 
+@app.route("/connectors/kafka/job/get")
+def kafka_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT schedule_time, sync_type FROM connector_jobs WHERE uid=? AND source='kafka' LIMIT 1", (uid,))
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "schedule_time": row.get("schedule_time"), "sync_type": row.get("sync_type", "incremental")})
+ 
+@app.route("/connectors/kafka/job/save", methods=["POST"])
+def kafka_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.json
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'kafka', ?, ?, ?)",
+                (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.now().isoformat()))
+    con.commit()
+    con.close()
+    return jsonify({"status": "saved"})
+    
+# ================= DBT ========================
+ 
+@app.route("/connectors/dbt/save_app", methods=["POST"])
+def _dbt_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    api_token  = (data.get("api_token") or "").strip()
+    account_id = (data.get("account_id") or "").strip()
+    if not api_token or not account_id:
+        return jsonify({"error": "missing api_token or account_id"}), 400
+    save_dbt_config(uid, api_token, account_id)
+    ensure_connector_initialized(uid, "dbt")
+    return jsonify({"status": "saved"})
+ 
+ 
+@app.route("/connectors/dbt/connect")
+def _dbt_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_dbt(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+ 
+ 
+@app.route("/connectors/dbt/disconnect")
+def _dbt_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_dbt(uid))
+ 
+ 
+@app.route("/connectors/dbt/sync")
+def _dbt_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='dbt' LIMIT 1",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_dbt(uid, sync_type=sync_type))
+ 
+ 
+@app.route("/api/status/dbt")
+def _dbt_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT config_json FROM connector_configs WHERE uid=? AND connector='dbt' LIMIT 1",
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+    cur.execute(
+        "SELECT enabled FROM google_connections WHERE uid=? AND source='dbt' LIMIT 1",
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected": bool(conn_row and conn_row.get("enabled") == 1),
+    })
+ 
+ 
+@app.route("/connectors/dbt/job/get")
+def _dbt_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='dbt'",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+ 
+ 
+@app.route("/connectors/dbt/job/save", methods=["POST"])
+def _dbt_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type     = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'dbt', ?, ?)",
+        (uid, sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+ 
+ 
+# ================= TYPEFORM ========================
+ 
+@app.route("/connectors/typeform/save_app", methods=["POST"])
+def _typeform_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    access_token = (data.get("access_token") or "").strip()
+    if not access_token:
+        return jsonify({"error": "missing access_token"}), 400
+    save_typeform_config(uid, access_token)
+    ensure_connector_initialized(uid, "typeform")
+    return jsonify({"status": "saved"})
+ 
+ 
+@app.route("/connectors/typeform/connect")
+def _typeform_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_typeform(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+ 
+ 
+@app.route("/connectors/typeform/disconnect")
+def _typeform_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_typeform(uid))
+ 
+ 
+@app.route("/connectors/typeform/sync")
+def _typeform_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='typeform' LIMIT 1",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_typeform(uid, sync_type=sync_type))
+ 
+ 
+@app.route("/api/status/typeform")
+def _typeform_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT config_json FROM connector_configs WHERE uid=? AND connector='typeform' LIMIT 1",
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+    cur.execute(
+        "SELECT enabled FROM google_connections WHERE uid=? AND source='typeform' LIMIT 1",
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected": bool(conn_row and conn_row.get("enabled") == 1),
+    })
+ 
+ 
+@app.route("/connectors/typeform/job/get")
+def _typeform_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='typeform'",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+ 
+ 
+@app.route("/connectors/typeform/job/save", methods=["POST"])
+def _typeform_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type     = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'typeform', ?, ?)",
+        (uid, sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+ 
+ 
+# ================= SURVEYMONKEY ========================
+ 
+@app.route("/connectors/surveymonkey/save_app", methods=["POST"])
+def _surveymonkey_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    access_token = (data.get("access_token") or "").strip()
+    if not access_token:
+        return jsonify({"error": "missing access_token"}), 400
+    save_surveymonkey_config(uid, access_token)
+    ensure_connector_initialized(uid, "surveymonkey")
+    return jsonify({"status": "saved"})
+ 
+ 
+@app.route("/connectors/surveymonkey/connect")
+def _surveymonkey_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_surveymonkey(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+ 
+ 
+@app.route("/connectors/surveymonkey/disconnect")
+def _surveymonkey_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_surveymonkey(uid))
+ 
+ 
+@app.route("/connectors/surveymonkey/sync")
+def _surveymonkey_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='surveymonkey' LIMIT 1",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_surveymonkey(uid, sync_type=sync_type))
+ 
+ 
+@app.route("/api/status/surveymonkey")
+def _surveymonkey_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT config_json FROM connector_configs WHERE uid=? AND connector='surveymonkey' LIMIT 1",
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+    cur.execute(
+        "SELECT enabled FROM google_connections WHERE uid=? AND source='surveymonkey' LIMIT 1",
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected": bool(conn_row and conn_row.get("enabled") == 1),
+    })
+ 
+ 
+@app.route("/connectors/surveymonkey/job/get")
+def _surveymonkey_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='surveymonkey'",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+ 
+ 
+@app.route("/connectors/surveymonkey/job/save", methods=["POST"])
+def _surveymonkey_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type     = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'surveymonkey', ?, ?)",
+        (uid, sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+ 
+ 
+# ================= PINECONE ========================
+ 
+@app.route("/connectors/pinecone/save_app", methods=["POST"])
+def _pinecone_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    api_key     = (data.get("api_key") or "").strip()
+    environment = (data.get("environment") or "").strip()
+    if not api_key or not environment:
+        return jsonify({"error": "missing api_key or environment"}), 400
+    save_pinecone_config(uid, api_key, environment)
+    ensure_connector_initialized(uid, "pinecone")
+    return jsonify({"status": "saved"})
+ 
+ 
+@app.route("/connectors/pinecone/connect")
+def _pinecone_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_pinecone(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+ 
+ 
+@app.route("/connectors/pinecone/disconnect")
+def _pinecone_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_pinecone(uid))
+ 
+ 
+@app.route("/connectors/pinecone/sync")
+def _pinecone_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='pinecone' LIMIT 1",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_pinecone(uid, sync_type=sync_type))
+ 
+ 
+@app.route("/api/status/pinecone")
+def _pinecone_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT config_json FROM connector_configs WHERE uid=? AND connector='pinecone' LIMIT 1",
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+    cur.execute(
+        "SELECT enabled FROM google_connections WHERE uid=? AND source='pinecone' LIMIT 1",
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected": bool(conn_row and conn_row.get("enabled") == 1),
+    })
+ 
+ 
+@app.route("/connectors/pinecone/job/get")
+def _pinecone_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='pinecone'",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+ 
+ 
+@app.route("/connectors/pinecone/job/save", methods=["POST"])
+def _pinecone_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type     = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'pinecone', ?, ?)",
+        (uid, sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+init_db()
+seed_test_user()
+
+if __name__=="__main__":
+    app.run(port=4000,debug=True,host="0.0.0.0",use_reloader=False)
