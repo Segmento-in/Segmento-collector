@@ -400,6 +400,33 @@ from backend.connectors.pinecone import (
     disconnect_pinecone,
     save_config as save_pinecone_config,
 )
+from backend.connectors.bitbucket import (
+    connect_bitbucket,
+    sync_bitbucket,
+    disconnect_bitbucket,
+    save_config as save_bitbucket_config,
+)
+
+from backend.connectors.vercel import (
+    connect_vercel,
+    sync_vercel,
+    disconnect_vercel,
+    save_config as save_vercel_config,
+)
+
+from backend.connectors.netlify import (
+    connect_netlify,
+    sync_netlify,
+    disconnect_netlify,
+    save_config as save_netlify_config,
+)
+
+from backend.connectors.linear import (
+    connect_linear,
+    sync_linear,
+    disconnect_linear,
+    save_config as save_linear_config,
+)
 
 from backend.connectors import quickbooks
 from backend.connectors import xero
@@ -19875,7 +19902,6 @@ def _surveymonkey_job_save():
     con.close()
     return jsonify({"status": "job_saved"})
  
- 
 # ================= PINECONE ========================
  
 @app.route("/connectors/pinecone/save_app", methods=["POST"])
@@ -19983,6 +20009,466 @@ def _pinecone_job_save():
     cur = con.cursor()
     cur.execute(
         "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'pinecone', ?, ?)",
+        (uid, sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+# ================= BITBUCKET ========================
+
+@app.route("/connectors/bitbucket/save_app", methods=["POST"])
+def _bitbucket_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    username = (data.get("username") or "").strip()
+    app_password = (data.get("app_password") or "").strip()
+    if not username or not app_password:
+        return jsonify({"error": "missing username or app_password"}), 400
+    save_bitbucket_config(uid, username, app_password)
+    ensure_connector_initialized(uid, "bitbucket")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/bitbucket/connect")
+def _bitbucket_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_bitbucket(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+
+
+@app.route("/connectors/bitbucket/disconnect")
+def _bitbucket_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_bitbucket(uid))
+
+
+@app.route("/connectors/bitbucket/sync")
+def _bitbucket_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='bitbucket' LIMIT 1",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_bitbucket(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/bitbucket")
+def _bitbucket_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT config_json FROM connector_configs WHERE uid=? AND connector='bitbucket' LIMIT 1",
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+    cur.execute(
+        "SELECT enabled FROM google_connections WHERE uid=? AND source='bitbucket' LIMIT 1",
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected": bool(conn_row and conn_row.get("enabled") == 1),
+    })
+
+
+@app.route("/connectors/bitbucket/job/get")
+def _bitbucket_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='bitbucket'",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({"exists": True, "sync_type": row["sync_type"], "schedule_time": row["schedule_time"]})
+
+
+@app.route("/connectors/bitbucket/job/save", methods=["POST"])
+def _bitbucket_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'bitbucket', ?, ?)",
+        (uid, sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+# ================= VERCEL ========================
+
+@app.route("/connectors/vercel/save_app", methods=["POST"])
+def _vercel_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    api_key = (data.get("api_key") or "").strip()
+    if not api_key:
+        return jsonify({"error": "missing api_key"}), 400
+    save_vercel_config(uid, api_key)
+    ensure_connector_initialized(uid, "vercel")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/vercel/connect")
+def _vercel_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_vercel(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+
+
+@app.route("/connectors/vercel/disconnect")
+def _vercel_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_vercel(uid))
+
+
+@app.route("/connectors/vercel/sync")
+def _vercel_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='vercel' LIMIT 1",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_vercel(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/vercel")
+def _vercel_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT config_json FROM connector_configs WHERE uid=? AND connector='vercel' LIMIT 1",
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+    cur.execute(
+        "SELECT enabled FROM google_connections WHERE uid=? AND source='vercel' LIMIT 1",
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected": bool(conn_row and conn_row.get("enabled") == 1),
+    })
+
+
+@app.route("/connectors/vercel/job/get")
+def _vercel_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='vercel'",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"]
+    })
+
+
+@app.route("/connectors/vercel/job/save", methods=["POST"])
+def _vercel_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'vercel', ?, ?)",
+        (uid, sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+# ================= NETLIFY ========================
+
+@app.route("/connectors/netlify/save_app", methods=["POST"])
+def _netlify_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    api_key = (data.get("api_key") or "").strip()
+    if not api_key:
+        return jsonify({"error": "missing api_key"}), 400
+    save_netlify_config(uid, api_key)
+    ensure_connector_initialized(uid, "netlify")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/netlify/connect")
+def _netlify_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_netlify(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+
+
+@app.route("/connectors/netlify/disconnect")
+def _netlify_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_netlify(uid))
+
+
+@app.route("/connectors/netlify/sync")
+def _netlify_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='netlify' LIMIT 1",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_netlify(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/netlify")
+def _netlify_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT config_json FROM connector_configs WHERE uid=? AND connector='netlify' LIMIT 1",
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+    cur.execute(
+        "SELECT enabled FROM google_connections WHERE uid=? AND source='netlify' LIMIT 1",
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected": bool(conn_row and conn_row.get("enabled") == 1),
+    })
+
+
+@app.route("/connectors/netlify/job/get")
+def _netlify_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='netlify'",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"]
+    })
+
+
+@app.route("/connectors/netlify/job/save", methods=["POST"])
+def _netlify_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'netlify', ?, ?)",
+        (uid, sync_type, schedule_time),
+    )
+    con.commit()
+    con.close()
+    return jsonify({"status": "job_saved"})
+
+# ================= LINEAR ========================
+
+@app.route("/connectors/linear/save_app", methods=["POST"])
+def _linear_save_config():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    api_key = (data.get("api_key") or "").strip()
+    if not api_key:
+        return jsonify({"error": "missing api_key"}), 400
+    save_linear_config(uid, api_key)
+    ensure_connector_initialized(uid, "linear")
+    return jsonify({"status": "saved"})
+
+
+@app.route("/connectors/linear/connect")
+def _linear_connect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    res = connect_linear(uid)
+    if res.get("status") != "success":
+        return jsonify(res), 400
+    return jsonify(res)
+
+
+@app.route("/connectors/linear/disconnect")
+def _linear_disconnect():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(disconnect_linear(uid))
+
+
+@app.route("/connectors/linear/sync")
+def _linear_sync():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='linear' LIMIT 1",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    sync_type = row["sync_type"] if row and row.get("sync_type") else "historical"
+    return jsonify(sync_linear(uid, sync_type=sync_type))
+
+
+@app.route("/api/status/linear")
+def _linear_status():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT config_json FROM connector_configs WHERE uid=? AND connector='linear' LIMIT 1",
+        (uid,),
+    )
+    cfg_row = fetchone_secure(cur)
+    cur.execute(
+        "SELECT enabled FROM google_connections WHERE uid=? AND source='linear' LIMIT 1",
+        (uid,),
+    )
+    conn_row = fetchone_secure(cur)
+    con.close()
+    return jsonify({
+        "has_credentials": bool(cfg_row),
+        "connected": bool(conn_row and conn_row.get("enabled") == 1),
+    })
+
+
+@app.route("/connectors/linear/job/get")
+def _linear_job_get():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "SELECT sync_type, schedule_time FROM connector_jobs WHERE uid=? AND source='linear'",
+        (uid,),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    if not row:
+        return jsonify({"exists": False})
+    return jsonify({
+        "exists": True,
+        "sync_type": row["sync_type"],
+        "schedule_time": row["schedule_time"]
+    })
+
+@app.route("/connectors/linear/job/save", methods=["POST"])
+def _linear_job_save():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    data = request.get_json() or {}
+    sync_type = data.get("sync_type", "incremental")
+    schedule_time = data.get("schedule_time")
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        "INSERT OR REPLACE INTO connector_jobs (uid, source, sync_type, schedule_time) VALUES (?, 'linear', ?, ?)",
         (uid, sync_type, schedule_time),
     )
     con.commit()
