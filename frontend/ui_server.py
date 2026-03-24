@@ -7775,6 +7775,243 @@ def pinecone_disconnect_proxy():
     r = proxy_get("/connectors/pinecone/disconnect")
     return jsonify(r.json()), r.status_code
 
+# ================= NETLIFY ========================
+
+@app.route("/connectors/netlify")
+@require_login
+def netlify_page():
+    return render_template("connectors/netlify.html")
+
+
+@app.route("/connectors/netlify/connect")
+@require_login
+def netlify_connect_proxy():
+    r = proxy_get("/connectors/netlify/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/netlify/sync")
+@require_login
+def netlify_sync_proxy():
+    r = connector_sync("netlify")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/netlify")
+@require_login
+def netlify_status_proxy():
+    r = connector_status("netlify")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/netlify/job/get")
+@require_login
+def netlify_job_get_proxy():
+    r = connector_job_get("netlify")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/netlify/job/save", methods=["POST"])
+@require_login
+def netlify_job_save_proxy():
+    r = connector_job_save("netlify")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/netlify/save_app", methods=["POST"])
+@require_login
+def netlify_save_app_proxy():
+    r = proxy_post("/connectors/netlify/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/netlify/disconnect")
+@require_login
+def netlify_disconnect_proxy():
+    r = proxy_get("/connectors/netlify/disconnect")
+    return jsonify(r.json()), r.status_code
+
+
+# ================= LINEAR ========================
+
+@app.route("/connectors/linear")
+@require_login
+def linear_page():
+    return render_template("connectors/linear.html")
+
+
+@app.route("/connectors/linear/connect")
+@require_login
+def linear_connect_proxy():
+    r = proxy_get("/connectors/linear/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/linear/sync")
+@require_login
+def linear_sync_proxy():
+    r = connector_sync("linear")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/linear")
+@require_login
+def linear_status_proxy():
+    r = connector_status("linear")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/linear/job/get")
+@require_login
+def linear_job_get_proxy():
+    r = connector_job_get("linear")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/linear/job/save", methods=["POST"])
+@require_login
+def linear_job_save_proxy():
+    r = connector_job_save("linear")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/linear/save_app", methods=["POST"])
+@require_login
+def linear_save_app_proxy():
+    r = proxy_post("/connectors/linear/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/linear/disconnect")
+@require_login
+def linear_disconnect_proxy():
+    r = proxy_get("/connectors/linear/disconnect")
+    return jsonify(r.json()), r.status_code
+
+# ================= BITBUCKET ========================
+
+@app.route("/connectors/bitbucket")
+@require_login
+def bitbucket_page():
+    return render_template("connectors/bitbucket.html")
+
+
+@app.route("/connectors/bitbucket/connect")
+@require_login
+def bitbucket_connect_proxy():
+    r = proxy_get("/connectors/bitbucket/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bitbucket/sync")
+@require_login
+def bitbucket_sync_proxy():
+    r = connector_sync("bitbucket")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/bitbucket")
+@require_login
+def bitbucket_status_proxy():
+    r = connector_status("bitbucket")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bitbucket/job/get")
+@require_login
+def bitbucket_job_get_proxy():
+    r = connector_job_get("bitbucket")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/bitbucket/job/save", methods=["POST"])
+@require_login
+def bitbucket_job_save_proxy():
+    r = connector_job_save("bitbucket")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bitbucket/save_app", methods=["POST"])
+@require_login
+def bitbucket_save_app_proxy():
+    r = proxy_post("/connectors/bitbucket/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/bitbucket/disconnect")
+@require_login
+def bitbucket_disconnect_proxy():
+    r = proxy_get("/connectors/bitbucket/disconnect")
+    return jsonify(r.json()), r.status_code
+
+# ================= VERCEL ========================
+
+@app.route("/connectors/vercel")
+@require_login
+def vercel_page():
+    return render_template("connectors/vercel.html")
+
+
+@app.route("/connectors/vercel/connect")
+@require_login
+def vercel_connect_proxy():
+    r = proxy_get("/connectors/vercel/connect")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/vercel/sync")
+@require_login
+def vercel_sync_proxy():
+    r = connector_sync("vercel")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/api/status/vercel")
+@require_login
+def vercel_status_proxy():
+    r = connector_status("vercel")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/vercel/job/get")
+@require_login
+def vercel_job_get_proxy():
+    r = connector_job_get("vercel")
+    try:
+        return jsonify(r.json()), r.status_code
+    except Exception:
+        return jsonify({"exists": False, "sync_type": "incremental", "schedule_time": None}), 200
+
+
+@app.route("/connectors/vercel/job/save", methods=["POST"])
+@require_login
+def vercel_job_save_proxy():
+    r = connector_job_save("vercel")
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/vercel/save_app", methods=["POST"])
+@require_login
+def vercel_save_app_proxy():
+    r = proxy_post("/connectors/vercel/save_app", json=request.get_json())
+    return jsonify(r.json()), r.status_code
+
+
+@app.route("/connectors/vercel/disconnect")
+@require_login
+def vercel_disconnect_proxy():
+    r = proxy_get("/connectors/vercel/disconnect")
+    return jsonify(r.json()), r.status_code
+
 # ================= MAIN ==========================
 
 if __name__ == "__main__":
