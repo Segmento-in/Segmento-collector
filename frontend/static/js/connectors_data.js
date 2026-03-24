@@ -505,7 +505,7 @@ const CONNECTORS = [
   {
     id: "helpscout",
     name: "Help Scout",
-    categories: ["support", "customer_service"],
+    categories: ["support", "customer-service"],
     logo: "https://cdn.simpleicons.org/helpscout/1292EE",
 
     auth_type: "api_key",
@@ -4051,4 +4051,164 @@ data into your configured warehouse destination.
       "Pod and replica metadata"
     ]
   },
+
+  {
+    id: "bitbucket",
+    name: "Bitbucket",
+    categories: ["developer", "git"],
+    logo: "https://cdn.simpleicons.org/bitbucket/0052CC",
+
+    auth_type: "api_token",
+    api_key_label: "App Password",
+
+    connect_url: "/connectors/bitbucket/connect",
+    sync_url: "/connectors/bitbucket/sync",
+    disconnect_url: "/connectors/bitbucket/disconnect",
+    status_api: "/api/status/bitbucket",
+    save_app_url: "/connectors/bitbucket/save_app",
+
+    models: [
+      { title: "Repositories", desc: "Repository metadata including project, language, and visibility." },
+      { title: "Commits", desc: "Commit history with author, message, and timestamps." },
+      { title: "Pull Requests", desc: "PRs with status, reviewers, and merge info." }
+    ],
+
+    tables: [
+      "bitbucket_repositories",
+      "bitbucket_commits",
+      "bitbucket_pull_requests"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts repositories, commits, and pull requests from Bitbucket.",
+
+    data: [
+      "Repositories",
+      "Commits",
+      "Pull requests",
+      "Branches",
+      "Contributors"
+    ]
+  },
+
+  {
+    id: "vercel",
+    name: "Vercel",
+    categories: ["developer", "deployment"],
+    logo: "/static/images/logos/vercel.png",
+
+    auth_type: "api_key",
+    api_key_label: "API Token",
+
+    connect_url: "/connectors/vercel/connect",
+    sync_url: "/connectors/vercel/sync",
+    disconnect_url: "/connectors/vercel/disconnect",
+    status_api: "/api/status/vercel",
+    save_app_url: "/connectors/vercel/save_app",
+
+    models: [
+      { title: "Projects", desc: "Project metadata including framework and repo linkage." },
+      { title: "Deployments", desc: "Deployment history with status and timestamps." },
+      { title: "Domains", desc: "Domains mapped to projects." }
+    ],
+
+    tables: [
+      "vercel_projects",
+      "vercel_deployments",
+      "vercel_domains"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts projects, deployments, and domains from Vercel.",
+
+    data: [
+      "Projects",
+      "Deployments",
+      "Domains",
+      "Build status",
+      "Environment info"
+    ]
+  },
+
+  {
+    id: "netlify",
+    name: "Netlify",
+    categories: ["developer", "deployment"],
+    logo: "https://cdn.simpleicons.org/netlify/00C7B7",
+
+    auth_type: "api_key",
+    api_key_label: "Access Token",
+
+    connect_url: "/connectors/netlify/connect",
+    sync_url: "/connectors/netlify/sync",
+    disconnect_url: "/connectors/netlify/disconnect",
+    status_api: "/api/status/netlify",
+    save_app_url: "/connectors/netlify/save_app",
+
+    models: [
+      { title: "Sites", desc: "Website metadata including URLs and build settings." },
+      { title: "Deploys", desc: "Deployment history with state and timestamps." },
+      { title: "Forms", desc: "Form submissions collected via Netlify forms." }
+    ],
+
+    tables: [
+      "netlify_sites",
+      "netlify_deploys",
+      "netlify_forms"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts sites, deploys, and form submissions from Netlify.",
+
+    data: [
+      "Sites",
+      "Deploy history",
+      "Forms",
+      "Build logs",
+      "Environment variables"
+    ]
+  },
+
+  {
+    id: "linear",
+    name: "Linear",
+    categories: ["project_management"],
+    logo: "/static/images/logos/linear.png",
+
+    auth_type: "api_key",
+    api_key_label: "API Key",
+
+    connect_url: "/connectors/linear/connect",
+    sync_url: "/connectors/linear/sync",
+    disconnect_url: "/connectors/linear/disconnect",
+    status_api: "/api/status/linear",
+    save_app_url: "/connectors/linear/save_app",
+
+    models: [
+      { title: "Issues", desc: "Issue tracking with status, priority, and assignee." },
+      { title: "Projects", desc: "Project metadata and timelines." },
+      { title: "Teams", desc: "Team structure and member details." }
+    ],
+
+    tables: [
+      "linear_issues",
+      "linear_projects",
+      "linear_teams"
+    ],
+
+    erd: "/static/images/empty_erd.png",
+
+    description: "Extracts issues, projects, and teams from Linear.",
+
+    data: [
+      "Issues",
+      "Projects",
+      "Teams",
+      "Cycles",
+      "Labels"
+    ]
+  }
 ];
