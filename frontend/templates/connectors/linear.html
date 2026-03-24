@@ -1,0 +1,1075 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="bg-slate-900 min-h-screen px-6 py-24 relative overflow-hidden">
+    <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-400/15 blur-[120px] rounded-full"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-500/10 blur-[120px] rounded-full">
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10 space-y-24">
+        <div class="mb-6" data-aos="fade-right">
+            <a href="javascript:history.back()"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-indigo-400/40 bg-indigo-500/10 text-indigo-200 text-sm font-bold hover:bg-indigo-300 hover:text-slate-900 transition-all shadow-[0_0_15px_rgba(99,102,241,0.2)] hover:shadow-[0_0_25px_rgba(99,102,241,0.35)] hover:-translate-x-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to previous
+            </a>
+        </div>
+
+        <!-- ① HERO + CONNECTOR INFO -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+            <!-- Left: Hero -->
+            <div data-aos="fade-right" class="pt-8">
+                <div id="statusBadge"
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase">
+                    <span class="h-2 w-2 rounded-full bg-slate-600"></span>
+                    NOT CONNECTED
+                </div>
+
+                <h1 class="text-7xl font-black text-white tracking-tighter mb-6">
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-indigo-400 to-indigo-500">Linear</span>
+                    <span class="text-white">Connector</span>
+                </h1>
+
+                <p class="text-slate-300 text-lg mb-6 leading-relaxed font-medium max-w-xl">
+                    Sync issues, teams, and users from Linear into your warehouse in real-time.
+                </p>
+
+                <div class="space-y-4 text-slate-400 text-sm max-w-lg mb-10">
+                    <div class="flex gap-3">
+                        <svg class="w-5 h-5 text-indigo-300 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <span>Your Linear Personal API Key is encrypted with AES-256 before being stored in your secure
+                            vault.</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <svg class="w-5 h-5 text-indigo-300 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                        </svg>
+                        <span>Fetches all issues, teams, and users using the Linear GraphQL API.</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <svg class="w-5 h-5 text-indigo-300 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Read-only extraction only. Segmento never edits your issues, teams, or users.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: 3-Step Connect Card -->
+            <div class="relative" data-aos="zoom-in">
+                <div id="connectSection"
+                    class="relative bg-slate-800/60 backdrop-blur-xl border border-white/10 p-10 rounded-[3.5rem] shadow-2xl transition-all duration-500">
+
+                    <!-- Step indicators -->
+                    <div class="flex justify-between mb-10 px-2">
+                        <div class="flex flex-col items-center gap-2">
+                            <div id="step1-circle"
+                                class="w-8 h-8 rounded-full bg-indigo-500 text-slate-900 flex items-center justify-center text-xs font-bold transition-all duration-300">
+                                1</div>
+                            <span
+                                class="text-[9px] font-mono text-indigo-200 uppercase tracking-tighter">Credentials</span>
+                        </div>
+                        <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div id="step2-circle"
+                                class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300">
+                                2</div>
+                            <span class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Validate</span>
+                        </div>
+                        <div class="flex-1 h-[1px] bg-slate-700 mt-4 mx-2"></div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div id="step3-circle"
+                                class="w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300">
+                                3</div>
+                            <span class="text-[9px] font-mono text-slate-500 uppercase tracking-tighter">Account
+                                Linked</span>
+                        </div>
+                    </div>
+
+                    <!-- Credentials Form -->
+                    <div id="credentialsForm" class="space-y-4 transition-opacity duration-500 opacity-100">
+
+                        <div>
+                            <label
+                                class="text-[10px] font-mono text-slate-500 uppercase mb-2 block ml-2 tracking-widest">Linear
+                                Personal API Key</label>
+                            <input id="apiKey" type="password" placeholder="Enter Linear API Key"
+                                class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-400 transition-all shadow-inner hover:shadow-indigo-500/10">
+                        </div>
+
+                        <button id="saveCredsBtn" onclick="saveCredentials()"
+                            class="w-full py-5 bg-indigo-500 text-white rounded-2xl font-black hover:bg-indigo-400 hover:text-slate-900 transition-all shadow-lg shadow-indigo-500/20 text-xs uppercase tracking-widest mt-2 hover:shadow-indigo-400/30">
+                            Save & Connect
+                        </button>
+
+                        <div class="mt-8 pt-8 border-t border-white/5">
+                            <h4 class="text-white text-xs font-bold mb-4 uppercase tracking-widest">Prerequisites</h4>
+                            <ul class="space-y-3">
+                                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0"></span>
+                                    <span>Go to Linear Dashboard → Settings → API → Personal API Keys</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0"></span>
+                                    <span>Generate a new API key</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-[11px] text-slate-400">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0"></span>
+                                    <span>Copy and paste the key above</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Success State -->
+                    <div id="successState"
+                        class="hidden text-center space-y-8 transition-opacity duration-500 opacity-0 relative pt-4 pb-20">
+                        <div class="space-y-4">
+                            <svg class="w-20 h-20 mx-auto text-emerald-500 animate-pulse-once" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <h3 class="text-white text-3xl font-bold tracking-tight">Successfully Connected</h3>
+                            <p class="text-slate-300 text-base max-w-md mx-auto">Your Linear connector is linked and
+                                ready for synchronisation.</p>
+                            <p id="connectedAs" class="text-indigo-200 text-sm font-medium"></p>
+                        </div>
+
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-xs px-6">
+                            <button onclick="disconnectLinear()" id="disconnectBtn"
+                                class="group relative w-full py-4 px-6 bg-transparent border-2 border-red-600/70 text-red-400 font-semibold rounded-2xl hover:bg-red-700/20 hover:border-red-500 hover:text-white transition-all duration-300">
+                                <span class="flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7" />
+                                    </svg>
+                                    Disconnect Connector
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ③ SYNC ENGINE  +  ④ DESTINATION WAREHOUSE -->
+        <div id="syncDestinationSection" class="relative transition-all duration-500">
+            <div id="accessOverlay"
+                class="absolute inset-0 bg-slate-900/90 flex items-center justify-center z-20 rounded-[2.5rem]">
+                <div class="text-center space-y-4 p-8 bg-slate-800/50 rounded-3xl border border-white/10 shadow-2xl">
+                    <div
+                        class="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                        <svg class="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-white text-2xl font-black tracking-tight">Connect to Unlock</h3>
+                    <p class="text-slate-300 text-sm max-w-xs leading-relaxed">Establish a connection to access sync
+                        engine and
+                        warehouse destination settings.</p>
+                </div>
+            </div>
+
+            <div id="syncContent"
+                class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start opacity-65 blur-sm pointer-events-none">
+                <div class="lg:col-span-1">
+                    <div
+                        class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div
+                                class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </div>
+                            <h3 class="text-white font-black text-xl">Sync Engine</h3>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label
+                                    class="text-[10px] font-mono text-slate-400 uppercase mb-3 block tracking-widest">Refresh
+                                    Strategy</label>
+                                <select id="syncType"
+                                    class="w-full p-4 rounded-xl bg-slate-900/80 text-white border border-white/10 focus:border-indigo-500 outline-none text-sm cursor-pointer hover:bg-slate-900 transition-all">
+                                    <option value="incremental">Incremental (Delta)</option>
+                                    <option value="historical">Historical (Full Load)</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="text-[10px] font-mono text-slate-400 uppercase mb-3 block tracking-widest">Daily
+                                    Schedule</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="relative">
+                                        <select id="hourSelect"
+                                            class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-indigo-500 outline-none">
+                                            {% for h in range(0, 24) %}<option value="{{ '%02d' % h }}"
+                                                class="bg-slate-800">{{ '%02d' % h }}
+                                            </option>{% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="relative">
+                                        <select id="minSelect"
+                                            class="w-full p-4 rounded-xl bg-slate-900 text-white border border-white/10 appearance-none text-center font-bold focus:border-indigo-500 outline-none">
+                                            {% for m in range(0, 60, 5) %}<option value="{{ '%02d' % m }}"
+                                                class="bg-slate-800">{{ '%02d' % m
+                                                }}</option>{% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 space-y-3">
+                                <button onclick="saveJob()"
+                                    class="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all text-xs uppercase tracking-widest">Update
+                                    Schedule</button>
+                                <button onclick="runSync()" id="syncBtn"
+                                    class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-black transition-all shadow-lg shadow-emerald-600/30 text-xs uppercase tracking-widest">Run
+                                    Manual Sync</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div
+                        class="bg-slate-800/60 backdrop-blur-md border border-white/10 p-8 rounded-[2.5rem] shadow-2xl h-full">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center border border-indigo-500/20">
+                                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-white font-black text-xl tracking-tight">Warehouse Destination</h3>
+                            </div>
+                            <div id="destStatus"
+                                class="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 px-4 py-1.5 rounded-full border border-indigo-500/20 uppercase font-bold tracking-tighter">
+                                System Ready</div>
+                        </div>
+
+                        <!-- Saved Destinations Section -->
+                        <div class="mb-8 p-6 bg-black/20 border border-white/5 rounded-3xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <label class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Active &
+                                    Saved
+                                    Destinations</label>
+                                <button onclick="toggleSetupMode()" id="toggleSetupBtn"
+                                    class="text-[10px] font-bold text-indigo-400 hover:text-rose-300 transition-colors uppercase tracking-widest flex items-center gap-2">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    Setup New
+                                </button>
+                            </div>
+
+                            <div id="savedDestList" class="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
+                                <div class="animate-pulse flex space-x-4 p-3 rounded-2xl bg-slate-900/50">
+                                    <div class="rounded-xl bg-slate-800 h-9 w-9"></div>
+                                    <div class="flex-1 space-y-2 py-1">
+                                        <div class="h-2 bg-slate-800 rounded w-3/4"></div>
+                                        <div class="h-2 bg-slate-800 rounded w-1/2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="manualSetupFields" class="hidden animate-in fade-in slide-in-from-top-4 duration-500">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="md:col-span-2 relative">
+                                    <label
+                                        class="text-[9px] font-mono text-slate-400 uppercase mb-1.5 block ml-1 tracking-widest">Target
+                                        Platform</label>
+                                    <div id="customSelectTrigger" onclick="toggleDropdown()"
+                                        class="w-full px-5 py-3.5 bg-slate-900 border border-slate-700 rounded-xl text-white flex items-center justify-between cursor-pointer hover:border-indigo-500 transition-all">
+                                        <div id="selectedOption" class="flex items-center gap-3">
+                                            <span class="text-slate-400 text-sm">Select Connector...</span>
+                                        </div>
+                                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <input type="hidden" id="destType" value="">
+                                    <div id="dropdownMenu"
+                                        class="hidden absolute w-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto backdrop-blur-xl custom-scrollbar">
+                                        <div class="p-2 space-y-1">
+                                            <div onclick="selectDestination('mysql', 'MySQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg"
+                                                    class="w-6 h-6 object-contain">
+                                                <span
+                                                    class="text-slate-200 group-hover:text-white font-medium">MySQL</span>
+                                            </div>
+                                            <div onclick="selectDestination('postgres', 'PostgreSQL', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg"
+                                                    class="w-6 h-6 object-contain">
+                                                <span
+                                                    class="text-slate-200 group-hover:text-white font-medium">PostgreSQL</span>
+                                            </div>
+                                            <div onclick="selectDestination('redshift', 'Amazon Redshift', '/static/images/logos/redshift.png')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="/static/images/logos/redshift.png"
+                                                    class="w-6 h-6 object-contain">
+                                                <span class="text-slate-200 group-hover:text-white font-medium">Amazon
+                                                    Redshift</span>
+                                            </div>
+                                            <div onclick="selectDestination('bigquery', 'Google BigQuery', 'https://cdn.simpleicons.org/googlebigquery/4285F4')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.simpleicons.org/googlebigquery/4285F4"
+                                                    class="w-6 h-6 object-contain">
+                                                <span class="text-slate-200 group-hover:text-white font-medium">Google
+                                                    BigQuery</span>
+                                            </div>
+                                            <div onclick="selectDestination('snowflake', 'Snowflake', 'https://cdn.simpleicons.org/snowflake/29B5E8')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.simpleicons.org/snowflake/29B5E8"
+                                                    class="w-6 h-6 object-contain">
+                                                <span
+                                                    class="text-slate-200 group-hover:text-white font-medium">Snowflake</span>
+                                            </div>
+                                            <div onclick="selectDestination('clickhouse', 'ClickHouse', 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg"
+                                                    class="w-6 h-6 object-contain">
+                                                <span
+                                                    class="text-slate-200 group-hover:text-white font-medium">ClickHouse</span>
+                                            </div>
+                                            <div onclick="selectDestination('s3', 'AWS S3', '')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="{{ url_for('static', filename='images/logos/s3.png') }}"
+                                                    class="w-6 h-6 object-contain">
+                                                <span class="text-slate-200 group-hover:text-white font-medium">AWS
+                                                    S3</span>
+                                            </div>
+                                            <div onclick="selectDestination('azure_datalake', 'Azure Data Lake', '/static/images/logos/adls.png')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="/static/images/logos/adls.png" class="w-6 h-6 object-contain">
+                                                <span class="text-slate-200 group-hover:text-white font-medium">Azure
+                                                    Data Lake</span>
+                                            </div>
+                                            <div onclick="selectDestination('databricks', 'Databricks', 'https://cdn.simpleicons.org/databricks/EF3A2C')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.simpleicons.org/databricks/EF3A2C"
+                                                    class="w-6 h-6 object-contain">
+                                                <span
+                                                    class="text-slate-200 group-hover:text-white font-medium">Databricks</span>
+                                            </div>
+                                            <div onclick="selectDestination('mongodb', 'MongoDB', 'https://cdn.simpleicons.org/mongodb/47A248')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.simpleicons.org/mongodb/47A248"
+                                                    class="w-6 h-6 object-contain">
+                                                <span
+                                                    class="text-slate-200 group-hover:text-white font-medium">MongoDB</span>
+                                            </div>
+                                            <div onclick="selectDestination('elasticsearch', 'Elasticsearch', 'https://cdn.simpleicons.org/elasticsearch/005571')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.simpleicons.org/elasticsearch/005571"
+                                                    class="w-6 h-6 object-contain">
+                                                <span
+                                                    class="text-slate-200 group-hover:text-white font-medium">Elasticsearch</span>
+                                            </div>
+                                            <div onclick="selectDestination('duckdb', 'DuckDB', 'https://cdn.simpleicons.org/duckdb/FFF000')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.simpleicons.org/duckdb/FFF000"
+                                                    class="w-6 h-6 object-contain">
+                                                <span
+                                                    class="text-slate-200 group-hover:text-white font-medium">DuckDB</span>
+                                            </div>
+                                            <div onclick="selectDestination('gcs', 'Google Cloud Storage', 'https://cdn.simpleicons.org/googlecloudstorage/4285F4')"
+                                                class="flex items-center gap-3 px-4 py-3 hover:bg-indigo-500/10 rounded-xl cursor-pointer transition-colors group">
+                                                <img src="https://cdn.simpleicons.org/googlecloudstorage/4285F4"
+                                                    class="w-6 h-6 object-contain">
+                                                <span class="text-slate-200 group-hover:text-white font-medium">Google
+                                                    Cloud Storage</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="dbFields" class="hidden md:contents animate-in fade-in duration-500">
+                                    <div id="sqlFields" class="contents">
+                                        <input id="dbHost" placeholder="Host (e.g. 127.0.0.1)"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="dbPort" placeholder="Port"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="dbUser" placeholder="Username"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="dbPass" type="password" placeholder="Password"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="dbName" placeholder="Database Name"
+                                            class="md:col-span-2 w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                    </div>
+                                    <div id="bigqueryFields" class="hidden contents">
+                                        <input id="bqProject" placeholder="Project ID"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="bqDataset" placeholder="Dataset ID"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <div class="md:col-span-2">
+                                            <textarea id="bqKey" placeholder="Service Account JSON Key" rows="2"
+                                                class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 resize-y font-mono text-xs"></textarea>
+                                        </div>
+                                    </div>
+                                    <div id="s3Fields" class="hidden contents">
+                                        <input id="s3Bucket" placeholder="Bucket Name"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="s3Region" placeholder="Region"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="s3AccessKey" placeholder="Access Key ID"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="s3SecretKey" type="password" placeholder="Secret Access Key"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                    </div>
+                                    <div id="adlsFields" class="hidden contents">
+                                        <input id="adlsAccount" placeholder="Storage Account"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="adlsFilesystem" placeholder="File System"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="adlsPath" placeholder="Base Path"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="adlsKey" type="password" placeholder="Account Key"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                    </div>
+                                    <div id="databricksFields" class="hidden contents">
+                                        <input id="dbxHost" placeholder="Workspace Hostname"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="dbxHttpPath" placeholder="HTTP Path"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="dbxCatalogSchema" placeholder="Catalog.Schema"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                        <input id="dbxToken" type="password" placeholder="Personal Access Token"
+                                            class="w-full p-3.5 rounded-xl bg-slate-900/50 text-white border border-white/5 text-sm">
+                                    </div>
+                                    <div id="formatField" class="hidden md:col-span-2">
+                                        <label class="text-[10px] font-mono text-slate-400 uppercase mb-3 block">Data
+                                            Format</label>
+                                        <div class="flex gap-4">
+                                            <button onclick="selectFormat('parquet')" id="format-parquet"
+                                                class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                                                <span class="font-bold">Parquet</span>
+                                                <div
+                                                    class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                                                    <div
+                                                        class="dot w-2 h-2 rounded-full bg-indigo-500 scale-0 transition-transform">
+                                                    </div>
+                                                </div>
+                                            </button>
+                                            <button onclick="selectFormat('json')" id="format-json"
+                                                class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                                                <span class="font-bold">JSON</span>
+                                                <div
+                                                    class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                                                    <div
+                                                        class="dot w-2 h-2 rounded-full bg-indigo-500 scale-0 transition-transform">
+                                                    </div>
+                                                </div>
+                                            </button>
+                                            <button onclick="selectFormat('iceberg')" id="format-iceberg"
+                                                class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                                                <span class="font-bold">Iceberg</span>
+                                                <div
+                                                    class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                                                    <div
+                                                        class="dot w-2 h-2 rounded-full bg-indigo-500 scale-0 transition-transform">
+                                                    </div>
+                                                </div>
+                                            </button>
+                                            <button onclick="selectFormat('hudi')" id="format-hudi"
+                                                class="format-option flex-1 flex items-center justify-between p-4 rounded-2xl bg-slate-900 border-2 border-white/5 text-slate-400 transition-all hover:bg-slate-800">
+                                                <span class="font-bold">Hudi</span>
+                                                <div
+                                                    class="radio-indicator w-4 h-4 rounded-full border-2 border-slate-700 flex items-center justify-center">
+                                                    <div
+                                                        class="dot w-2 h-2 rounded-full bg-indigo-500 scale-0 transition-transform">
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </div>
+                                        <input type="hidden" id="dataFormat" value="parquet">
+                                    </div>
+                                    <div class="md:col-span-2 pt-2">
+                                        <button onclick="saveDestination()" id="saveDestBtn"
+                                            class="w-full py-3.5 bg-indigo-500 hover:bg-indigo-400 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/20">
+                                            Authenticate & Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pt-12">
+            <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">Linear <span
+                    class="text-indigo-400">Schema</span></h2>
+            <div class="grid lg:grid-cols-2 gap-12 items-start">
+                <div class="grid grid-cols-1 gap-4">
+                    {% for table, columns in [
+                    ('linear_issues', ['uid', 'source', 'id', 'name', 'created_at', 'updated_at', 'data_json',
+                    'raw_json', 'fetched_at']),
+                    ('linear_teams', ['uid', 'source', 'id', 'name', 'created_at', 'updated_at', 'data_json',
+                    'raw_json', 'fetched_at']),
+                    ('linear_users', ['uid', 'source', 'id', 'name', 'created_at', 'updated_at', 'data_json',
+                    'raw_json', 'fetched_at'])
+                    ] %}
+                    <div
+                        class="p-6 bg-slate-800/40 border border-white/5 rounded-3xl hover:border-indigo-400/20 transition-all group">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div
+                                class="w-3 h-3 rounded-full bg-indigo-400 group-hover:animate-pulse shadow-[0_0_10px_rgba(99,102,241,0.6)]">
+                            </div>
+                            <h4 class="text-white font-mono font-bold text-sm tracking-widest uppercase">{{table}}</h4>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            {% for col in columns %}
+                            <span
+                                class="px-3 py-1.5 bg-slate-900/80 border border-white/10 rounded-xl text-[10px] font-mono text-slate-400 group-hover:text-indigo-200 transition-colors">{{col}}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="sticky top-10 group">
+                    <div
+                        class="absolute -inset-4 bg-indigo-500/10 rounded-[4rem] blur-2xl opacity-30 group-hover:opacity-100 transition-opacity duration-700">
+                    </div>
+                    <div
+                        class="relative bg-slate-800/80 border border-white/10 rounded-[3.5rem] p-4 shadow-3xl overflow-hidden backdrop-blur-md">
+                        <div
+                            class="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/5 to-transparent flex items-center px-8 justify-between">
+                            <div class="flex gap-2">
+                                <div class="w-2 h-2 rounded-full bg-red-500/40"></div>
+                                <div class="w-2 h-2 rounded-full bg-yellow-500/40"></div>
+                                <div class="w-2 h-2 rounded-full bg-green-500/40"></div>
+                            </div>
+                            <span
+                                class="text-[9px] font-mono text-slate-500 tracking-widest uppercase">Linear_Connector.vuerd</span>
+                        </div>
+                        <div class="mt-12 p-6 rounded-[2.5rem] bg-slate-900/50 border border-white/5">
+                            <img src="/static/images/erd/linear_erd.png"
+                                class="mx-auto max-w-full rounded-2xl opacity-80 group-hover:opacity-100 transition-all duration-700 transform group-hover:scale-[1.02]"
+                                alt="Linear Connector" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ⑥ EXTRACTED DATA SECTION -->
+        <div class="mb-32">
+            <h2 class="text-4xl font-black mb-12 text-center text-white">Data <span
+                    class="text-indigo-400">Extracted</span></h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                {% for table in ['linear_issues', 'linear_teams', 'linear_users'] %}
+                <div
+                    class="p-8 bg-slate-800/40 border border-white/5 rounded-[2rem] hover:bg-indigo-500/5 hover:border-indigo-400/20 transition-all flex flex-col items-center text-center group cursor-pointer">
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-indigo-500/10 transition-all duration-500 shadow-xl">
+                        <svg class="w-6 h-6 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <span
+                        class="font-mono text-slate-400 font-bold text-sm tracking-widest group-hover:text-white transition-colors">{{table}}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<style>
+    .bg-\[\#0f172a\] {
+        background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.02) 1px, transparent 0);
+        background-size: 40px 40px;
+    }
+
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1em;
+    }
+
+    .format-option.selected {
+        border-color: #6366f1;
+        color: white;
+        background-color: rgba(99, 102, 241, 0.05);
+    }
+
+    .format-option.selected .radio-indicator {
+        border-color: #6366f1;
+    }
+
+    .format-option.selected .dot {
+        transform: scale(1);
+    }
+
+    @keyframes pulse-once {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: .6;
+        }
+    }
+
+    .animate-pulse-once {
+        animation: pulse-once 2s ease-in-out;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        checkLinearStatus();
+        loadDestinations();
+        loadJob();
+        selectFormat('parquet');
+    });
+
+    function selectFormat(val) {
+        document.getElementById('dataFormat').value = val;
+        document.querySelectorAll('.format-option').forEach(el => el.classList.remove('selected'));
+        document.getElementById('format-' + val).classList.add('selected');
+    }
+
+    async function checkLinearStatus() {
+        try {
+            const res = await fetch("/api/status/linear");
+            const data = await res.json();
+
+            const badge = document.getElementById("statusBadge");
+            const connectedAs = document.getElementById("connectedAs");
+            const syncContent = document.getElementById("syncContent");
+            const accessOverlay = document.getElementById("accessOverlay");
+
+            if (data.connected) {
+                badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+                connectedAs.innerHTML = `Connected to <strong>Linear</strong>`;
+                updateFlowUI(3);
+                syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
+                accessOverlay.classList.add("hidden");
+            } else if (data.has_credentials) {
+                badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
+                badge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
+                updateFlowUI(1);
+                syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+                accessOverlay.classList.remove("hidden");
+            } else {
+                badge.innerHTML = `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
+                syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+                accessOverlay.classList.remove("hidden");
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function updateFlowUI(step) {
+        const s1 = document.getElementById("step1-circle");
+        const s2 = document.getElementById("step2-circle");
+        const s3 = document.getElementById("step3-circle");
+        const btn = document.getElementById("saveCredsBtn");
+        const form = document.getElementById("credentialsForm");
+        const success = document.getElementById("successState");
+
+        if (step >= 1) {
+            s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+            s1.innerHTML = "✓";
+            s2.className = "w-8 h-8 rounded-full bg-indigo-500 text-slate-900 flex items-center justify-center text-xs font-bold transition-all duration-300";
+            btn.innerText = "Connect Linear";
+            btn.className = "w-full py-5 bg-indigo-500 text-white rounded-2xl font-black hover:bg-indigo-400 transition-all shadow-lg text-xs uppercase tracking-widest mt-2 hover:shadow-indigo-400/40";
+            btn.onclick = () => connectLinear();
+        }
+
+        if (step >= 3) {
+            s2.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+            s2.innerHTML = "✓";
+            s3.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+            s3.innerHTML = "✓";
+            form.classList.add("opacity-0", "hidden");
+            success.classList.remove("hidden");
+            success.classList.add("opacity-100");
+        }
+    }
+
+    async function saveCredentials() {
+        const api_key = document.getElementById("apiKey").value.trim();
+        if (!api_key) { alert("API Key is required"); return; }
+        try {
+            const res = await fetch("/connectors/linear/save_app", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ api_key })
+            });
+            if (res.ok) { checkLinearStatus(); }
+            else { alert("Save failed"); }
+        } catch (e) { alert("Save failed"); }
+    }
+
+    async function connectLinear() {
+        try {
+            const res = await fetch("/connectors/linear/connect");
+            const data = await res.json();
+            if (data.status === "success") {
+                checkLinearStatus();
+            } else {
+                alert("Connection failed: " + (data.message || "Unknown error"));
+            }
+        } catch (e) { alert("Connection error"); }
+    }
+
+    async function disconnectLinear() {
+        if (!confirm("Disconnecting will stop all future Linear syncs.\n\nContinue?")) return;
+        const btn = document.getElementById("disconnectBtn");
+        btn.disabled = true;
+        btn.innerText = "Disconnecting...";
+        try {
+            const res = await fetch("/connectors/linear/disconnect");
+            if (res.ok) { alert("Connection revoked."); location.reload(); }
+            else { alert("Failed to disconnect."); }
+        } catch (e) { alert("Disconnect error."); }
+    }
+
+    async function loadDestinations() {
+        try {
+            const res = await fetch(`/destination/list/linear`);
+            const data = await res.json();
+            const listContainer = document.getElementById("savedDestList");
+            const statusEl = document.getElementById("destStatus");
+
+            listContainer.innerHTML = '';
+
+            if (!data.destinations || data.destinations.length === 0) {
+                listContainer.innerHTML = `
+          <div class="text-center py-6 border-2 border-dashed border-white/5 rounded-2xl">
+            <p class="text-slate-500 text-[10px] font-mono uppercase tracking-widest">No saved connections found</p>
+          </div>`;
+                toggleSetupMode(true);
+                return;
+            }
+
+            data.destinations.forEach(d => {
+                const isActive = d.active;
+                if (isActive) {
+                    statusEl.innerText = "Connection Active";
+                    statusEl.classList.replace("text-indigo-400", "text-emerald-400");
+                    statusEl.classList.replace("bg-indigo-500/10", "bg-emerald-500/10");
+                    statusEl.classList.replace("border-indigo-500/20", "border-emerald-500/20");
+                }
+
+                const card = document.createElement("div");
+                card.onclick = () => activateDest(d.id);
+                card.className = `group flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer ${isActive
+                    ? 'bg-indigo-500/10 border-indigo-500/40 shadow-lg shadow-indigo-500/10'
+                    : 'bg-slate-900/50 border-white/5 hover:border-white/10 hover:bg-slate-900'}`;
+
+                const logoMap = {
+                    'mysql': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
+                    'postgres': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg',
+                    'mongodb': 'https://cdn.simpleicons.org/mongodb/47A248',
+                    'elasticsearch': 'https://cdn.simpleicons.org/elasticsearch/005571',
+                    'redshift': '/static/images/logos/redshift.png',
+                    'bigquery': 'https://cdn.simpleicons.org/googlebigquery/4285F4',
+                    'snowflake': 'https://cdn.simpleicons.org/snowflake/29B5E8',
+                    'clickhouse': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/clickhouse/clickhouse-original.svg',
+                    'duckdb': 'https://cdn.simpleicons.org/duckdb/FFF000',
+                    's3': '/static/images/logos/s3.png',
+                    'azure_datalake': '/static/images/logos/adls.png',
+                    'databricks': 'https://cdn.simpleicons.org/databricks/EF3A2C',
+                    'gcs': 'https://cdn.simpleicons.org/googlecloudstorage/4285F4'
+                };
+
+                const logoUrl = logoMap[(d.type || '').toLowerCase()] || '';
+                card.innerHTML = `
+          <div class="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center p-2 group-hover:scale-110 transition-transform">
+            ${logoUrl ? `<img src="${logoUrl}" class="w-full h-full object-contain">` : '<div class="w-full h-full bg-slate-700 rounded"></div>'}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-1">
+              <h4 class="text-white font-bold text-sm truncate uppercase tracking-tighter">${d.type}</h4>
+              ${isActive ? '<span class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20"><span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-emerald-400 text-[8px] font-black uppercase tracking-widest">Current Active Destination</span></span>' : ''}
+            </div>
+            <p class="text-slate-500 text-[10px] font-mono truncate lowercase">${d.database || d.host || 'active session'}</p>
+          </div>
+          <div class="shrink-0">
+            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center ${isActive ? 'border-indigo-500 bg-indigo-500' : 'border-slate-700'}">
+              ${isActive ? '<svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>' : ''}
+            </div>
+          </div>`;
+                listContainer.appendChild(card);
+            });
+        } catch (e) {
+            console.error("Error loading destinations:", e);
+        }
+    }
+
+    let isSetupVisible = false;
+    function toggleSetupMode(forceShow = false) {
+        const fields = document.getElementById("manualSetupFields");
+        const btn = document.getElementById("toggleSetupBtn");
+        if (forceShow || !isSetupVisible) {
+            fields.classList.remove("hidden");
+            btn.innerText = "Hide";
+            isSetupVisible = true;
+        } else {
+            fields.classList.add("hidden");
+            btn.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg> Setup New`;
+            isSetupVisible = false;
+        }
+    }
+
+    async function saveDestination() {
+        const type = document.getElementById("destType").value;
+        if (!type) { alert("Please select a destination type"); return; }
+        const payload = { source: "linear", dest_type: type };
+        if (["mysql", "postgres", "mongodb", "elasticsearch", "redshift", "snowflake", "clickhouse", "duckdb"].includes(type)) {
+            payload.host = document.getElementById("dbHost").value;
+            payload.port = document.getElementById("dbPort").value;
+            payload.username = document.getElementById("dbUser").value;
+            payload.password = document.getElementById("dbPass").value;
+            payload.database_name = document.getElementById("dbName").value;
+        } else if (type === "bigquery") {
+            payload.project = document.getElementById("bqProject").value;
+            payload.dataset = document.getElementById("bqDataset").value;
+            payload.key_json = document.getElementById("bqKey").value;
+        } else if (type === "s3") {
+            payload.bucket = document.getElementById("s3Bucket").value;
+            payload.region = document.getElementById("s3Region").value;
+            payload.access_key = document.getElementById("s3AccessKey").value;
+            payload.secret_key = document.getElementById("s3SecretKey").value;
+        } else if (type === "azure_datalake") {
+            payload.account = document.getElementById("adlsAccount").value;
+            payload.filesystem = document.getElementById("adlsFilesystem").value;
+            payload.path = document.getElementById("adlsPath").value;
+            payload.key = document.getElementById("adlsKey").value;
+        } else if (type === "databricks") {
+            payload.host = document.getElementById("dbxHost").value;
+            payload.http_path = document.getElementById("dbxHttpPath").value;
+            payload.catalog_schema = document.getElementById("dbxCatalogSchema").value;
+            payload.token = document.getElementById("dbxToken").value;
+        }
+        payload.data_format = document.getElementById("dataFormat").value;
+        try {
+            const res = await fetch("/destination/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) { alert("Destination saved!"); loadDestinations(); }
+            else { alert("Failed to save destination."); }
+        } catch (e) { alert("Error saving destination."); }
+    }
+
+    async function activateDest(id) {
+        await fetch("/destination/activate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ source: "linear", dest_id: id })
+        });
+        loadDestinations();
+    }
+
+    async function runSync() {
+        const btn = document.getElementById("syncBtn");
+        btn.disabled = true;
+        btn.innerText = "Syncing...";
+        try {
+            const res = await fetch("/connectors/linear/sync");
+            const data = await res.json();
+            if (data.status === "success") {
+                alert(`Sync complete!\nIssues: ${data.issues_found || 0}\nTeams: ${data.teams_found || 0}\nUsers: ${data.users_found || 0}`);
+            } else {
+                alert("Sync failed: " + (data.message || "Unknown error"));
+            }
+        } catch (e) {
+            alert("Sync error.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Run Manual Sync";
+        }
+    }
+
+    async function saveJob() {
+        const syncType = document.getElementById("syncType").value;
+        const hour = document.getElementById("hourSelect").value;
+        const min = document.getElementById("minSelect").value;
+        const scheduleTime = `${hour}:${min}`;
+        try {
+            const res = await fetch("/connectors/linear/job/save", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sync_type: syncType, schedule_time: scheduleTime })
+            });
+            if (res.ok) { alert("Schedule saved!"); }
+        } catch (e) { alert("Error saving schedule."); }
+    }
+
+    async function loadJob() {
+        try {
+            const res = await fetch("/connectors/linear/job/get");
+            const data = await res.json();
+            if (data.exists) {
+                if (data.sync_type) document.getElementById("syncType").value = data.sync_type;
+                if (data.schedule_time) {
+                    const parts = data.schedule_time.split(":");
+                    if (parts[0]) document.getElementById("hourSelect").value = parts[0];
+                    if (parts[1]) document.getElementById("minSelect").value = parts[1];
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function toggleDropdown() {
+        const menu = document.getElementById('dropdownMenu');
+        menu.classList.toggle('hidden');
+    }
+
+    function selectDestination(value, label, logoUrl) {
+        document.getElementById('destType').value = value;
+        const selectedDiv = document.getElementById('selectedOption');
+        const clickedElement = event.currentTarget;
+        const imgClone = clickedElement.querySelector('img').cloneNode(true);
+        selectedDiv.innerHTML = '';
+        selectedDiv.appendChild(imgClone);
+        const textSpan = document.createElement('span');
+        textSpan.className = "text-white font-bold";
+        textSpan.innerText = label;
+        selectedDiv.appendChild(textSpan);
+        document.getElementById('dropdownMenu').classList.add('hidden');
+        toggleDestFields(value);
+    }
+
+    window.onclick = function (event) {
+        if (!event.target.closest('#customSelectTrigger') && !event.target.closest('#dropdownMenu')) {
+            document.getElementById('dropdownMenu').classList.add('hidden');
+        }
+    }
+
+    function toggleDestFields(type) {
+        const formatMatrix = {
+            mysql: ["json"], postgres: ["json"], mongodb: ["json"], elasticsearch: ["json"],
+            bigquery: ["json", "parquet"], snowflake: ["json", "parquet"], redshift: ["json", "parquet"],
+            clickhouse: ["json", "parquet"], duckdb: ["json", "parquet"],
+            s3: ["json", "parquet", "iceberg", "hudi"], azure_datalake: ["json", "parquet", "iceberg", "hudi"],
+            databricks: ["json", "parquet", "iceberg", "hudi"], gcs: ["json", "parquet", "iceberg", "hudi"]
+        };
+        const fields = document.getElementById("dbFields");
+        if (!type) { if (fields) fields.classList.add("hidden"); return; }
+        if (fields) fields.classList.remove("hidden");
+
+        const sqlFields = document.getElementById("sqlFields");
+        const bqFields = document.getElementById("bigqueryFields");
+        const s3Fields = document.getElementById("s3Fields");
+        const adlsFields = document.getElementById("adlsFields");
+        const dbxFields = document.getElementById("databricksFields");
+        const formatField = document.getElementById("formatField");
+
+        if (sqlFields) sqlFields.classList.toggle("hidden", ["bigquery", "s3", "azure_datalake", "databricks"].includes(type));
+        if (bqFields) bqFields.classList.toggle("hidden", type !== "bigquery");
+        if (s3Fields) s3Fields.classList.toggle("hidden", type !== "s3");
+        if (adlsFields) adlsFields.classList.toggle("hidden", type !== "azure_datalake");
+        if (dbxFields) dbxFields.classList.toggle("hidden", type !== "databricks");
+
+        const supportedFormats = formatMatrix[type] || ["json"];
+        if (formatField) formatField.classList.toggle("hidden", supportedFormats.length <= 1);
+
+        const formatButtons = {
+            json: document.getElementById("format-json"), parquet: document.getElementById("format-parquet"),
+            iceberg: document.getElementById("format-iceberg"), hudi: document.getElementById("format-hudi")
+        };
+        Object.entries(formatButtons).forEach(([fmt, btn]) => {
+            if (btn) btn.classList.toggle("hidden", !supportedFormats.includes(fmt));
+        });
+
+        const formatInput = document.getElementById("dataFormat");
+        if (formatInput && !supportedFormats.includes(formatInput.value)) {
+            selectFormat(supportedFormats[0]);
+        }
+
+        const hostInp = document.getElementById("dbHost");
+        const portInp = document.getElementById("dbPort");
+        const userInp = document.getElementById("dbUser");
+        const passInp = document.getElementById("dbPass");
+        const nameInp = document.getElementById("dbName");
+
+        [hostInp, portInp, userInp, passInp, nameInp].forEach(el => { if (el) el.classList.remove("hidden"); });
+
+        if (type === "mongodb") {
+            if (hostInp) hostInp.placeholder = "Cluster URI";
+            if (nameInp) nameInp.placeholder = "Database Name";
+            if (portInp) portInp.classList.add("hidden");
+        } else if (type === "elasticsearch") {
+            if (hostInp) hostInp.placeholder = "Endpoint URL";
+            if (portInp) portInp.placeholder = "Port (9200)";
+            if (nameInp) nameInp.placeholder = "Index Name";
+        } else if (type === "duckdb") {
+            if (hostInp) hostInp.placeholder = "File Path";
+            if (portInp) portInp.classList.add("hidden");
+            if (userInp) userInp.classList.add("hidden");
+            if (passInp) passInp.classList.add("hidden");
+            if (nameInp) nameInp.classList.add("hidden");
+        } else {
+            if (hostInp) hostInp.placeholder = "Host (IP/DNS)";
+            if (portInp) portInp.placeholder = "Port";
+            if (userInp) userInp.placeholder = "Username";
+            if (passInp) passInp.placeholder = "Password";
+            if (nameInp) nameInp.placeholder = "Database Name";
+        }
+    }
+</script>
+{% endblock %}
