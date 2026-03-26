@@ -8012,7 +8012,28 @@ def vercel_disconnect_proxy():
     r = proxy_get("/connectors/vercel/disconnect")
     return jsonify(r.json()), r.status_code
 
-# ================= MAIN ==========================
+# ================= AI COMPANION ==========================
 
+# ================= AI COMPANION ==========================
+
+@app.route("/ai/chats", methods=["GET"])
+@require_login
+def ai_chats():
+    r = proxy_get("/ai/chats")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/ai/chat/<chat_id>", methods=["GET"])
+@require_login
+def ai_chat_history(chat_id):
+    r = proxy_get(f"/ai/chat/{chat_id}")
+    return jsonify(r.json()), r.status_code
+
+@app.route("/ai/chat", methods=["POST"])
+@require_login
+def ai_chat_message():
+    r = proxy_post("/ai/chat", json=request.get_json(silent=True) or {})
+    return jsonify(r.json()), r.status_code
+
+# ================= MAIN ==========================
 if __name__ == "__main__":
     app.run(port=3000, debug=True)
