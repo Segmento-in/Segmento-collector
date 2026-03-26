@@ -8014,8 +8014,6 @@ def vercel_disconnect_proxy():
 
 # ================= AI COMPANION ==========================
 
-# ================= AI COMPANION ==========================
-
 @app.route("/ai/chats", methods=["GET"])
 @require_login
 def ai_chats():
