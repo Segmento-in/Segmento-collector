@@ -767,6 +767,26 @@ def init_db():
     con = get_db()
     cur = con.cursor()
 
+    # AI Companion
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS ai_chats(
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        title TEXT,
+        created_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS ai_messages(
+        id TEXT PRIMARY KEY,
+        chat_id TEXT,
+        role TEXT,
+        content TEXT,
+        created_at TEXT
+    )
+    """)
+
     # Visits
     cur.execute("""
     CREATE TABLE IF NOT EXISTS visits(
@@ -20473,6 +20493,115 @@ def _linear_job_save():
     con.commit()
     con.close()
     return jsonify({"status": "job_saved"})
+
+# ================= AI COMPANION HELPERS =================
+
+def create_chat(user_id):
+    chat_id = "chat_" + secrets.token_hex(8)
+    title = "New Conversation"
+    created_at = datetime.datetime.now(datetime.UTC).isoformat()
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT INTO ai_chats (id, user_id, title, created_at) VALUES (?, ?, ?, ?)",
+                (chat_id, user_id, title, created_at))
+    con.commit()
+    con.close()
+    return {"id": chat_id, "user_id": user_id, "title": title, "created_at": created_at}
+
+def save_message(chat_id, role, content):
+    msg_id = "msg_" + secrets.token_hex(8)
+    created_at = datetime.datetime.now(datetime.UTC).isoformat()
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("INSERT INTO ai_messages (id, chat_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
+                (msg_id, chat_id, role, content, created_at))
+    con.commit()
+    con.close()
+    return {"id": msg_id, "chat_id": chat_id, "role": role, "content": content, "created_at": created_at}
+
+def get_chats(user_id):
+    con = get_db()
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    cur.execute("SELECT * FROM ai_chats WHERE user_id=? ORDER BY created_at DESC", (user_id,))
+    rows = cur.fetchall()
+    con.close()
+    return [dict(r) for r in rows]
+
+def get_messages(chat_id):
+    con = get_db()
+    con.row_factory = sqlite3.Row
+    cur = con.cursor()
+    cur.execute("SELECT * FROM ai_messages WHERE chat_id=? ORDER BY created_at ASC", (chat_id,))
+    rows = cur.fetchall()
+    con.close()
+    return [dict(r) for r in rows]
+
+# ================= AI COMPANION ROUTES =================
+
+@app.route("/ai/chats", methods=["GET"])
+def ai_chats():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"chats": []}), 200
+    chats = get_chats(uid)
+    return jsonify({"chats": chats}), 200
+
+@app.route("/ai/chat/<chat_id>", methods=["GET"])
+def ai_chat_history(chat_id):
+    uid = get_uid()
+    if not uid:
+        return jsonify({"messages": []}), 200
+        
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT user_id FROM ai_chats WHERE id=?", (chat_id,))
+    row = cur.fetchone()
+    con.close()
+    
+    if not row or row[0] != uid:
+        return jsonify({"error": "unauthorized"}), 403
+        
+    messages = get_messages(chat_id)
+    return jsonify({"messages": messages}), 200
+
+@app.route("/ai/chat", methods=["POST"])
+def ai_chat_message():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+    
+    data = request.get_json(silent=True) or {}
+    message = data.get("message", "")
+    chat_id = data.get("chat_id")
+    
+    if not chat_id:
+        chat_res = create_chat(uid)
+        chat_id = chat_res["id"]
+        title = message[:40] + ("..." if len(message) > 40 else "")
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("UPDATE ai_chats SET title=? WHERE id=?", (title, chat_id))
+        con.commit()
+        con.close()
+    else:
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("SELECT user_id FROM ai_chats WHERE id=?", (chat_id,))
+        row = cur.fetchone()
+        con.close()
+        
+        if not row or row[0] != uid:
+            return jsonify({"error": "unauthorized"}), 403
+            
+    save_message(chat_id, "user", message)
+    response_text = f"Received: {message}"
+    save_message(chat_id, "ai", response_text)
+    
+    return jsonify({
+        "message": response_text,
+        "chat_id": chat_id
+    }), 200
 
 init_db()
 seed_test_user()
