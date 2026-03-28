@@ -1,5 +1,6 @@
 import os
 import logging
+import importlib
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -50,6 +51,7 @@ sqlite3.connect = fixed_connect
 # AI
 from backend.ai.intent_engine import detect_intent
 from backend.ai.executor import execute_intent
+from backend.ai.orchestrator import orchestrate
 
 #credentials security
 from backend.security.secure_db import encrypt_payload
@@ -716,6 +718,336 @@ def ensure_connector_initialized(uid, source):
     con.commit()
     con.close()
 
+
+GOOGLE_OAUTH_SOURCES = {
+    "gmail",
+    "drive",
+    "calendar",
+    "sheets",
+    "forms",
+    "classroom",
+    "contacts",
+    "tasks",
+    "ga4",
+    "search-console",
+    "youtube",
+}
+
+OAUTH_SOURCES = GOOGLE_OAUTH_SOURCES | {
+    "github",
+    "instagram",
+    "tiktok",
+    "x",
+    "linkedin",
+}
+
+CONNECT_MODULE_OVERRIDES = {
+    "search-console": "google_search_console",
+    "books": "googlebooks",
+    "factcheck": "googlefactcheck",
+    "news": "googlenews",
+    "webfonts": "google_webfonts",
+}
+
+CONNECT_FUNCTION_OVERRIDES = {
+    "aws_rds": "connect_rds",
+}
+
+OAUTH_REDIRECTS = {
+    "github": "/github/connect",
+    "instagram": "/instagram/connect",
+    "tiktok": "/connectors/tiktok/connect",
+    "x": "/connectors/x/connect",
+    "linkedin": "/connectors/linkedin/connect",
+}
+
+
+def _is_internal_ai_request():
+    return bool(request.headers.get("X-Internal-UID"))
+
+
+def _has_connector_config(uid, source):
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT 1
+        FROM connector_configs
+        WHERE uid=? AND connector=?
+        LIMIT 1
+        """,
+        (uid, source),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    return bool(row)
+
+
+def _is_connector_enabled(uid, source):
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT enabled
+        FROM google_connections
+        WHERE uid=? AND source=?
+        LIMIT 1
+        """,
+        (uid, source),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    return bool(row and row.get("enabled") == 1)
+
+
+def _oauth_redirect_for(source):
+    if source in GOOGLE_OAUTH_SOURCES:
+        return f"/google/connect?source={source}"
+    return OAUTH_REDIRECTS.get(source)
+
+
+def _has_google_oauth_completion(uid, source):
+    con = get_db()
+    cur = con.cursor()
+    cur.execute(
+        """
+        SELECT 1
+        FROM google_accounts
+        WHERE uid=? AND source=?
+        LIMIT 1
+        """,
+        (uid, source),
+    )
+    row = fetchone_secure(cur)
+    con.close()
+    return bool(row)
+
+
+def _has_oauth_completion(uid, source):
+    con = get_db()
+    cur = con.cursor()
+
+    try:
+        if source in GOOGLE_OAUTH_SOURCES:
+            cur.execute(
+                """
+                SELECT 1
+                FROM google_accounts
+                WHERE uid=? AND source=?
+                LIMIT 1
+                """,
+                (uid, source),
+            )
+        elif source == "github":
+            cur.execute("SELECT 1 FROM github_tokens WHERE uid=? LIMIT 1", (uid,))
+        elif source == "instagram":
+            cur.execute(
+                """
+                SELECT 1
+                FROM instagram_connections
+                WHERE uid=? AND ig_account_id IS NOT NULL
+                LIMIT 1
+                """,
+                (uid,),
+            )
+        elif source == "tiktok":
+            cur.execute(
+                """
+                SELECT 1
+                FROM tiktok_connections
+                WHERE uid=? AND advertiser_id IS NOT NULL
+                LIMIT 1
+                """,
+                (uid,),
+            )
+        elif source == "x":
+            cur.execute(
+                """
+                SELECT 1
+                FROM x_connections
+                WHERE uid=? AND x_user_id IS NOT NULL
+                LIMIT 1
+                """,
+                (uid,),
+            )
+        elif source == "linkedin":
+            cur.execute(
+                """
+                SELECT 1
+                FROM linkedin_connections
+                WHERE uid=? AND linkedin_member_id IS NOT NULL
+                LIMIT 1
+                """,
+                (uid,),
+            )
+        else:
+            return False
+
+        row = fetchone_secure(cur)
+        return bool(row)
+    finally:
+        con.close()
+
+
+def _load_connector_module(source):
+    module_name = CONNECT_MODULE_OVERRIDES.get(source, source.replace("-", "_"))
+    return importlib.import_module(f"backend.connectors.{module_name}")
+
+
+def _get_connector_connect_callable(source):
+    module = _load_connector_module(source)
+    function_name = CONNECT_FUNCTION_OVERRIDES.get(
+        source,
+        f"connect_{source.replace('-', '_')}",
+    )
+    return getattr(module, function_name, None)
+
+
+def _run_connector_connect_probe(uid, source):
+    try:
+        connect_fn = _get_connector_connect_callable(source)
+    except Exception:
+        return None
+
+    if not callable(connect_fn):
+        return None
+
+    try:
+        return connect_fn(uid)
+    except TypeError:
+        return None
+    except Exception as exc:
+        return {"status": "error", "error": str(exc)}
+
+
+def _normalize_probe_error(result):
+    if not isinstance(result, dict):
+        return "connection failed"
+
+    error = result.get("error") or result.get("message") or "connection failed"
+    error_text = str(error).strip().lower()
+    if "missing" in error_text and "credential" in error_text:
+        return "missing credentials"
+    if "not configured" in error_text:
+        return "missing credentials"
+    return str(error)
+
+
+def _resolve_connector_contract(uid, source):
+    if source in OAUTH_SOURCES:
+        has_config = _has_connector_config(uid, source)
+        if not has_config:
+            return {"connected": False, "auth_required": False}
+        if _has_oauth_completion(uid, source):
+            return {"connected": True, "auth_required": False}
+        return {"connected": False, "auth_required": True}
+
+    if not _has_connector_config(uid, source):
+        return {"connected": False, "auth_required": False}
+
+    result = _run_connector_connect_probe(uid, source)
+    connected = bool(
+        isinstance(result, dict)
+        and (
+            result.get("connected") is True
+            or result.get("status") in ("success", "connected")
+        )
+    )
+    return {"connected": connected, "auth_required": False}
+
+
+def _normalize_connect_response_payload(data, status_code, location=None):
+    source = None
+    path = request.path.rstrip("/")
+    if path.startswith("/connectors/") and path.endswith("/connect"):
+        parts = path.split("/")
+        if len(parts) >= 4:
+            source = parts[2]
+
+    uid = getattr(g, "user_id", None)
+    if uid and source in OAUTH_SOURCES:
+        state = _resolve_connector_contract(uid, source)
+        if state["connected"]:
+            return {"connected": True}
+        if state["auth_required"]:
+            return {
+                "connected": False,
+                "auth_required": True,
+                "redirect": _oauth_redirect_for(source) or location,
+            }
+        return {"connected": False, "error": "missing credentials"}
+
+    if location:
+        return {
+            "connected": False,
+            "auth_required": True,
+            "redirect": location,
+        }
+
+    if not isinstance(data, dict):
+        return {"connected": False, "error": "Invalid connector response"}
+
+    if data.get("connected") is True:
+        return {"connected": True}
+
+    if data.get("auth_required") and data.get("redirect"):
+        return {
+            "connected": False,
+            "auth_required": True,
+            "redirect": data["redirect"],
+        }
+
+    if data.get("status") in ("success", "connected"):
+        return {"connected": True}
+
+    error = data.get("error") or data.get("message")
+    if status_code >= 400 and error:
+        return {"connected": False, "error": str(error)}
+
+    if error:
+        return {"connected": False, "error": str(error)}
+
+    normalized_error = _normalize_probe_error(data)
+    if normalized_error == "missing credentials":
+        return {"connected": False, "error": "missing credentials"}
+
+    return {"connected": False, "error": normalized_error}
+
+
+@app.after_request
+def normalize_connector_contracts(response):
+    path = request.path.rstrip("/")
+
+    if path.startswith("/api/status/") and response.status_code < 400:
+        uid = getattr(g, "user_id", None)
+        source = path.split("/", 3)[-1]
+        if uid and source:
+            state = _resolve_connector_contract(uid, source)
+            normalized = jsonify(state)
+            normalized.status_code = response.status_code
+            return normalized
+
+    if (
+        _is_internal_ai_request()
+        and path.startswith("/connectors/")
+        and path.endswith("/connect")
+    ):
+        location = response.headers.get("Location") if 300 <= response.status_code < 400 else None
+        data = response.get_json(silent=True) or {}
+        payload = _normalize_connect_response_payload(data, response.status_code, location=location)
+        status_code = response.status_code
+        if payload.get("connected") is True:
+            status_code = 200
+        elif payload.get("auth_required"):
+            status_code = 200
+        elif payload.get("error") == "missing credentials":
+            status_code = 400
+        normalized = jsonify(payload)
+        normalized.status_code = status_code
+        return normalized
+
+    return response
+
 # ---------------- USAGE: SYNC RUN LOGGER ----------------
 
 def log_sync_start(uid, source, sync_type):
@@ -787,6 +1119,15 @@ def init_db():
         role TEXT,
         content TEXT,
         created_at TEXT
+    )
+    """)
+
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS ai_state(
+        chat_id TEXT PRIMARY KEY,
+        uid TEXT,
+        state_json TEXT,
+        updated_at TEXT
     )
     """)
 
@@ -3946,53 +4287,7 @@ def connector_status(source):
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
-
-    conn = sqlite3.connect("identity.db")
-    cur = conn.cursor()
-
-    # ---------------------------
-    # CHECK OAUTH CONNECTION
-    # ---------------------------
-    cur.execute("""
-        SELECT enabled
-        FROM google_connections
-        WHERE uid=? AND source=?
-        LIMIT 1
-    """, (uid, source))
-
-    row = cur.fetchone()
-
-    if row and row[0] == 1:
-        conn.close()
-        return jsonify({
-            "stage": "connected",
-            "connected": True
-        })
-
-    # ---------------------------
-    # CHECK CREDENTIALS SAVED
-    # ---------------------------
-    cur.execute("""
-        SELECT 1
-        FROM connector_configs
-        WHERE uid=? AND connector=?
-        LIMIT 1
-    """, (uid, source))
-
-    creds = cur.fetchone()
-
-    conn.close()
-
-    if creds:
-        return jsonify({
-            "stage": "authorized_pending",
-            "connected": False
-        })
-
-    return jsonify({
-        "stage": "not_connected",
-        "connected": False
-    })
+    return jsonify(_resolve_connector_contract(uid, source))
 
 # ---------------- GOOGLE OAUTH ----------------
 
@@ -4282,6 +4577,28 @@ def ai_connector_router(connector, action):
         return jsonify({
             "error": str(e)
         }), 500
+
+@app.route("/connectors/gmail/connect")
+def gmail_connect_alt():
+    uid = get_uid()
+    if not uid:
+        return jsonify({"error": "unauthorized"}), 401
+
+    if not _has_connector_config(uid, "gmail"):
+        return jsonify({"connected": False, "error": "credentials_required"}), 400
+
+    auth_url = "/google/connect?source=gmail"
+    if _is_internal_ai_request():
+        return jsonify({
+            "connected": False,
+            "auth_required": True,
+            "redirect": auth_url,
+        })
+    return redirect(auth_url)
+
+@app.route("/connectors/gmail/status")
+def gmail_status_alt():
+    return gmail_status()
 
     if action == "status":
         try:
@@ -13897,18 +14214,38 @@ def connector_connect(source):
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
 
-    con = get_db()
-    cur = con.cursor()
+    state = _resolve_connector_contract(uid, source)
+    if state["connected"]:
+        return jsonify({"connected": True})
 
-    cur.execute("""
-        INSERT OR REPLACE INTO google_connections (uid, source, enabled)
-        VALUES (?, ?, 1)
-    """, (uid, source))
+    if source in OAUTH_SOURCES:
+        if not _has_connector_config(uid, source):
+            return jsonify({"connected": False, "error": "missing credentials"}), 400
 
-    con.commit()
-    con.close()
+        auth_url = _oauth_redirect_for(source)
+        if not auth_url:
+            return jsonify({"connected": False, "error": "missing credentials"}), 400
 
-    return jsonify({"status": "connected"})
+        if _is_internal_ai_request():
+            return jsonify({
+                "connected": False,
+                "auth_required": True,
+                "redirect": auth_url,
+            })
+        return redirect(auth_url)
+
+    if not _has_connector_config(uid, source):
+        return jsonify({"connected": False, "error": "missing credentials"}), 400
+
+    result = _run_connector_connect_probe(uid, source)
+    if isinstance(result, dict) and (
+        result.get("connected") is True
+        or result.get("status") in ("success", "connected")
+    ):
+        return jsonify({"connected": True})
+
+    error = _normalize_probe_error(result or {})
+    return jsonify({"connected": False, "error": error}), 400
 
 @app.route("/connectors/<source>/disconnect")
 def disconnect_connector(source):
@@ -19303,6 +19640,25 @@ def xero_status_route():
     con.close()
     return jsonify({"has_credentials": has_creds, "connected": bool(row), "tenant_name": row[0] if row else None})
 
+@app.route("/api/status/google_gmail")
+@app.route("/api/status/gmail")
+def gmail_status():
+    uid = get_uid()
+    if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    # Check if we have an account for this user and source with BOTH tokens
+    cur.execute("""
+        SELECT 1 FROM google_accounts 
+        WHERE uid=? AND source='gmail' 
+        AND access_token IS NOT NULL AND access_token != ''
+        AND refresh_token IS NOT NULL AND refresh_token != ''
+        LIMIT 1
+    """, (uid,))
+    row = cur.fetchone()
+    con.close()
+    return jsonify({"connected": bool(row)})
+
 # ---------------- AMAZON SELLER ----------------
 @app.route("/connectors/amazon_seller/save_app", methods=["POST"])
 def amz_save():
@@ -20640,6 +20996,38 @@ def ai_chat_history(chat_id):
     messages = get_messages(chat_id)
     return jsonify({"messages": messages}), 200
 
+def get_ai_state(chat_id):
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("SELECT state_json FROM ai_state WHERE chat_id=?", (chat_id,))
+        row = cur.fetchone()
+        con.close()
+        if not row or not row[0]: return None
+        return json.loads(row[0])
+    except:
+        con.close()
+        return None
+
+def save_ai_state(chat_id, uid, state):
+    con = get_db()
+    cur = con.cursor()
+    if not state:
+        cur.execute("DELETE FROM ai_state WHERE chat_id=?", (chat_id,))
+    else:
+        cur.execute("""
+            INSERT OR REPLACE INTO ai_state 
+            (chat_id, uid, state_json, updated_at)
+            VALUES (?, ?, ?, ?)
+        """, (
+            chat_id,
+            uid,
+            json.dumps(state),
+            datetime.datetime.now(datetime.UTC).isoformat()
+        ))
+    con.commit()
+    con.close()
+
 @app.route("/ai/chat", methods=["POST"])
 def ai_chat_message():
     uid = get_uid()
@@ -20675,12 +21063,21 @@ def ai_chat_message():
     # ── Persist user message ───────────────────────────────────
     save_message(chat_id, "user", message)
  
-    # ── AI: detect intent + execute ───────────────────────────
+    # ── Orchestration ──────────────────────────────────────────
     try:
+        # Load state
+        state = data.get("state") or get_ai_state(chat_id)
+        
         intent = detect_intent(message)
-        result = execute_intent(intent, uid)
+        result = orchestrate(intent, uid, chat_id, message, state)
+        
+        # Save state
+        save_ai_state(chat_id, uid, result.get("state"))
+        
     except Exception as exc:
-        print(f"[AI] Error processing intent: {exc}", flush=True)
+        print(f"[AI] Error in orchestration: {exc}", flush=True)
+        import traceback
+        traceback.print_exc()
         result = {
             "type":       "error",
             "message":    "Something went wrong while processing your request. Please try again.",
@@ -20692,7 +21089,7 @@ def ai_chat_message():
     # ── Persist AI reply ──────────────────────────────────────
     save_message(chat_id, "ai", result["message"])
  
-    # ── Return full result so the frontend can render rich UI ──
+    # ── Return result ──
     return jsonify({
         "message":    result["message"],
         "chat_id":    chat_id,
@@ -20700,6 +21097,7 @@ def ai_chat_message():
         "connectors": result.get("connectors", []),
         "links":      result.get("links", []),
         "data":       result.get("data"),
+        "state":      result.get("state")
     }), 200
 
 init_db()

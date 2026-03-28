@@ -43,6 +43,19 @@ _ACTION_KEYWORDS: dict[str, list[str]] = {
         "list", "show", "what connectors", "available connectors",
         "which connectors", "all connectors", "supported connectors",
     ],
+    "destination": [
+        "destination", "set destination", "change destination", "active destination",
+        "target", "warehouse", "database", "where to push", "pick destination",
+    ],
+    "schedule": [
+        "schedule", "set schedule", "job", "at", "every", "cron",
+        "automated sync", "auto-sync", "run at",
+    ],
+    "query": [
+        "how many", "status of", "what is", "usage", "records", "synced",
+        "rows", "pushed", "total", "stats", "erd", "schema", "table",
+        "connectors connected", "destinations exist", "active destination",
+    ],
     "help": [
         "help", "how do i", "how to", "what can you do",
         "what can i do", "capabilities", "guide",
@@ -66,7 +79,10 @@ def detect_action(message: str) -> str:
     lower = message.lower()
 
     # Check from highest to lowest priority
-    priority = ["greeting", "help", "list", "connect", "disconnect", "sync", "status"]
+    priority = [
+        "greeting", "help", "list", "destination", "schedule", "query",
+        "connect", "disconnect", "sync", "status"
+    ]
 
     for action in priority:
         for kw in _ACTION_KEYWORDS[action]:

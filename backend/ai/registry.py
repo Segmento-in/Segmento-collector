@@ -120,10 +120,21 @@ def _build_alias_index(display_names: dict[str, list[str]]) -> dict[str, str]:
 
 ALIAS_INDEX: dict[str, str] = _build_alias_index(DISPLAY_NAMES)
 
+# ──────────────────────────────────────────────
+# 4. Canonical Mapping (Manual Overrides for Logic)
+# ──────────────────────────────────────────────
+
+CANONICAL_MAPPING = {
+    "google_gmail": "gmail"
+}
+
 # Helpers
 def resolve_alias(alias: str) -> str | None:
     """Return canonical connector name for an alias, or None if unknown."""
-    return ALIAS_INDEX.get(alias.lower().strip())
+    name = ALIAS_INDEX.get(alias.lower().strip())
+    if name in CANONICAL_MAPPING:
+        return CANONICAL_MAPPING[name]
+    return name
 
 
 def list_connectors() -> list[str]:

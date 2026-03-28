@@ -310,8 +310,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (sendBtn) sendBtn.addEventListener("click", sendMessage);
     if (chatInput) {
-        chatInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") { e.preventDefault(); sendMessage(); }
+        chatInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) { 
+                e.preventDefault(); 
+                sendMessage(); 
+            }
+        });
+
+        chatInput.addEventListener("input", function() {
+            this.style.height = 'auto';
+            const newHeight = Math.min(this.scrollHeight, 120);
+            this.style.height = (newHeight > 34 ? newHeight : 34) + 'px';
         });
     }
 });

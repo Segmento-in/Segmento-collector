@@ -9,30 +9,26 @@ def call_connector_route(path, uid, method="GET", json_data=None):
                     path,
                     json=json_data or {},
                     headers={"X-Internal-UID": uid},
-                    follow_redirects=True
+                    follow_redirects=False
                 )
             else:
                 res = client.get(
                     path,
                     headers={"X-Internal-UID": uid},
-                    follow_redirects=True
+                    follow_redirects=False
                 )
 
             data = res.get_json(silent=True) or {}
 
-            # Treat more cases as success
-            success = res.status_code in (200, 201, 302)
+            # Strict success: only standard OK codes
+            ok = res.status_code in (200, 201)
 
-            # Also treat known "non-failure" responses as success
-            if isinstance(data, dict):
-                if data.get("status") in ["success", "ok", "already_connected"]:
-                    success = True
-                if "redirect" in data or "auth" in str(data).lower():
-                    success = True
+            connected = isinstance(data, dict) and data.get("connected") is True
 
             return {
-                "ok": success,
-                "status": res.status_code,
+                "ok": ok,
+                "connected": connected,
+                "http_status": res.status_code,
                 "data": data
             }
             
