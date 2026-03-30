@@ -1,6 +1,8 @@
 import os
 import logging
 import importlib
+import inspect
+import re
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -50,6 +52,7 @@ sqlite3.connect = fixed_connect
 
 # AI
 from backend.ai.intent_engine import detect_intent
+from backend.ai.llm_engine import call_llm
 from backend.ai.executor import execute_intent
 from backend.ai.orchestrator import orchestrate
 
@@ -64,6 +67,31 @@ from backend.security.secure_fetch import (
 )
 from backend.security.auth_routes import auth
 from backend.security.auth_middleware import load_logged_user
+
+
+def resolve_intent(message: str) -> dict:
+    try:
+        llm_intent = call_llm(message)
+
+        if llm_intent and llm_intent.get("action") not in (None, "unknown"):
+            connector = llm_intent.get("connector")
+
+            # Normalize any LLM-suggested connector through the registry first.
+            from backend.ai.registry import ALIAS_INDEX
+
+            canonical = None
+            if connector:
+                canonical = ALIAS_INDEX.get(str(connector).lower())
+
+            return {
+                "action": llm_intent.get("action"),
+                "connectors": [canonical] if canonical else [],
+                "raw": message,
+            }
+    except Exception as e:
+        print(f"[LLM] Failed: {e}", flush=True)
+
+    return detect_intent(message)
 
 # Connectors
 from backend.connectors.pinterest import (
@@ -831,7 +859,7 @@ def _has_oauth_completion(uid, source):
         if source in GOOGLE_OAUTH_SOURCES:
             cur.execute(
                 """
-                SELECT 1
+                SELECT access_token
                 FROM google_accounts
                 WHERE uid=? AND source=?
                 LIMIT 1
@@ -839,13 +867,13 @@ def _has_oauth_completion(uid, source):
                 (uid, source),
             )
         elif source == "github":
-            cur.execute("SELECT 1 FROM github_tokens WHERE uid=? LIMIT 1", (uid,))
+            cur.execute("SELECT access_token FROM github_tokens WHERE uid=? LIMIT 1", (uid,))
         elif source == "instagram":
             cur.execute(
                 """
-                SELECT 1
+                SELECT access_token
                 FROM instagram_connections
-                WHERE uid=? AND ig_account_id IS NOT NULL
+                WHERE uid=?
                 LIMIT 1
                 """,
                 (uid,),
@@ -853,9 +881,9 @@ def _has_oauth_completion(uid, source):
         elif source == "tiktok":
             cur.execute(
                 """
-                SELECT 1
+                SELECT access_token
                 FROM tiktok_connections
-                WHERE uid=? AND advertiser_id IS NOT NULL
+                WHERE uid=?
                 LIMIT 1
                 """,
                 (uid,),
@@ -863,9 +891,9 @@ def _has_oauth_completion(uid, source):
         elif source == "x":
             cur.execute(
                 """
-                SELECT 1
+                SELECT access_token
                 FROM x_connections
-                WHERE uid=? AND x_user_id IS NOT NULL
+                WHERE uid=?
                 LIMIT 1
                 """,
                 (uid,),
@@ -873,9 +901,9 @@ def _has_oauth_completion(uid, source):
         elif source == "linkedin":
             cur.execute(
                 """
-                SELECT 1
+                SELECT access_token
                 FROM linkedin_connections
-                WHERE uid=? AND linkedin_member_id IS NOT NULL
+                WHERE uid=?
                 LIMIT 1
                 """,
                 (uid,),
@@ -884,7 +912,10 @@ def _has_oauth_completion(uid, source):
             return False
 
         row = fetchone_secure(cur)
-        return bool(row)
+        if not row:
+            return False
+        value = next(iter(row.values())) if isinstance(row, dict) else row[0]
+        return bool(value and str(value).strip())
     finally:
         con.close()
 
@@ -933,27 +964,144 @@ def _normalize_probe_error(result):
     return str(error)
 
 
-def _resolve_connector_contract(uid, source):
-    if source in OAUTH_SOURCES:
-        has_config = _has_connector_config(uid, source)
-        if not has_config:
-            return {"connected": False, "auth_required": False}
-        if _has_oauth_completion(uid, source):
-            return {"connected": True, "auth_required": False}
-        return {"connected": False, "auth_required": True}
+def _credential_template_path(source):
+    try:
+        from backend.ai.registry import get_connector_url
+        template_name = get_connector_url(source).rstrip("/").split("/")[-1]
+    except Exception:
+        template_name = source.replace("-", "_")
 
-    if not _has_connector_config(uid, source):
-        return {"connected": False, "auth_required": False}
+    connectors_dir = os.path.join(PROJECT_ROOT, "frontend", "templates", "connectors")
+    candidates = [
+        template_name,
+        source,
+        source.replace("-", "_"),
+        source.replace("_", ""),
+        source.replace("-", ""),
+    ]
 
-    result = _run_connector_connect_probe(uid, source)
-    connected = bool(
-        isinstance(result, dict)
-        and (
-            result.get("connected") is True
-            or result.get("status") in ("success", "connected")
-        )
+    seen = set()
+    for candidate in candidates:
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        path = os.path.join(connectors_dir, f"{candidate}.html")
+        if os.path.exists(path):
+            return path
+    return None
+
+
+def _to_snake_case(name):
+    text = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", str(name))
+    return text.replace("-", "_").strip().lower()
+
+
+def _extract_template_field_labels(source):
+    path = _credential_template_path(source)
+    if not path:
+        return {}, []
+
+    try:
+        html = open(path, "r", encoding="utf-8").read()
+    except Exception:
+        return {}, []
+
+    pattern = re.compile(
+        r"<label[^>]*>(.*?)</label>\s*<(?:input|select|textarea)[^>]*id=\"([^\"]+)\"",
+        re.IGNORECASE | re.DOTALL,
     )
-    return {"connected": connected, "auth_required": False}
+
+    by_key = {}
+    ordered = []
+    for raw_label, raw_id in pattern.findall(html):
+        label = re.sub(r"<[^>]+>", "", raw_label)
+        label = " ".join(label.split()).strip()
+        field_key = _to_snake_case(raw_id)
+        if not label or not field_key:
+            continue
+        if field_key not in by_key:
+            by_key[field_key] = label
+            ordered.append(label)
+
+    return by_key, ordered
+
+
+def get_required_fields(source):
+    route_path = f"/connectors/{source}/save_app"
+    endpoint = None
+    for rule in app.url_map.iter_rules():
+        if rule.rule == route_path:
+            endpoint = rule.endpoint
+            break
+
+    if not endpoint:
+        return {}
+
+    view_fn = app.view_functions.get(endpoint)
+    if not view_fn:
+        return {}
+
+    try:
+        src = inspect.getsource(view_fn)
+    except Exception:
+        return {}
+
+    fields = []
+    for field in re.findall(r"data\.get\(\s*[\"']([a-zA-Z0-9_]+)[\"']", src):
+        if field not in fields:
+            fields.append(field)
+
+    if not fields:
+        return {}
+
+    labels_by_key, ordered_labels = _extract_template_field_labels(source)
+    required = {}
+    for idx, field in enumerate(fields):
+        label = labels_by_key.get(field)
+        if not label and idx < len(ordered_labels):
+            label = ordered_labels[idx]
+        if not label:
+            label = field.replace("_", " ").title()
+        required[field] = label
+
+    return required
+
+
+def _resolve_connector_contract(uid, source):
+    has_config = _has_connector_config(uid, source)
+
+    if source in OAUTH_SOURCES:
+        if not has_config:
+            return {
+                "connected": False,
+                "auth_required": False,
+                "credentials_required": True,
+            }
+        oauth_done = _has_oauth_completion(uid, source)
+        if not oauth_done:
+            return {
+                "connected": False,
+                "auth_required": True,
+                "credentials_required": False,
+            }
+        return {
+            "connected": True,
+            "auth_required": False,
+            "credentials_required": False,
+        }
+
+    if not has_config:
+        return {
+            "connected": False,
+            "auth_required": False,
+            "credentials_required": True,
+        }
+
+    return {
+        "connected": True,
+        "auth_required": False,
+        "credentials_required": False,
+    }
 
 
 def _normalize_connect_response_payload(data, status_code, location=None):
@@ -965,17 +1113,27 @@ def _normalize_connect_response_payload(data, status_code, location=None):
             source = parts[2]
 
     uid = getattr(g, "user_id", None)
-    if uid and source in OAUTH_SOURCES:
+    if uid and source:
         state = _resolve_connector_contract(uid, source)
+        print("[CONNECTOR CONTRACT]", {
+            "source": source,
+            "state": state
+        }, flush=True)
         if state["connected"]:
             return {"connected": True}
+        if state["credentials_required"]:
+            payload = {"connected": False, "error": "missing credentials"}
+            required_fields = get_required_fields(source)
+            if required_fields:
+                payload["required_fields"] = required_fields
+            return payload
         if state["auth_required"]:
             return {
                 "connected": False,
                 "auth_required": True,
                 "redirect": _oauth_redirect_for(source) or location,
             }
-        return {"connected": False, "error": "missing credentials"}
+        return {"connected": False, "error": "connection failed"}
 
     if location:
         return {
@@ -1009,7 +1167,11 @@ def _normalize_connect_response_payload(data, status_code, location=None):
 
     normalized_error = _normalize_probe_error(data)
     if normalized_error == "missing credentials":
-        return {"connected": False, "error": "missing credentials"}
+        payload = {"connected": False, "error": "missing credentials"}
+        required_fields = get_required_fields(source)
+        if required_fields:
+            payload["required_fields"] = required_fields
+        return payload
 
     return {"connected": False, "error": normalized_error}
 
@@ -21068,7 +21230,8 @@ def ai_chat_message():
         # Load state
         state = data.get("state") or get_ai_state(chat_id)
         
-        intent = detect_intent(message)
+        intent = resolve_intent(message)
+        print(f"[AI] Intent -> {intent}", flush=True)
         result = orchestrate(intent, uid, chat_id, message, state)
         
         # Save state
