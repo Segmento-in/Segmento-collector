@@ -89,7 +89,7 @@
                 class="w-full px-6 py-4 bg-slate-900/50 border border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-red-400 transition-all shadow-inner hover:shadow-red-500/20">
             </div>
 
-            <button id="saveCredsBtn" onclick="savePinterestConfig()"
+            <button id="saveCredsBtn"
               class="w-full py-5 bg-red-600 text-white rounded-2xl font-black hover:bg-white hover:text-red-600 transition-all shadow-lg shadow-red-600/20 text-xs uppercase tracking-widest mt-2 hover:shadow-red-600/40">
               Save Credentials & Continue
             </button>
@@ -109,7 +109,7 @@
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
                   <span>Set Redirect URI: <code
-                      class="bg-slate-900 px-1 rounded">http://localhost:4000/connectors/pinterest/callback</code></span>
+                      class="bg-slate-900 px-1 rounded">http://localhost:4000/pinterest/callback</code></span>
                 </li>
                 <li class="flex items-start gap-3 text-[11px] text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
@@ -478,8 +478,8 @@
 
                   <div class="md:col-span-2 pt-2">
                     <button onclick="saveDestination()" id="saveDestBtn"
-                      class="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-rose-600/20"> 
-                      Authenticate & Save 
+                      class="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-rose-600/20">
+                      Authenticate & Save
                     </button>
                   </div>
                 </div>
@@ -487,9 +487,9 @@
             </div>
           </div>
         </div>
-        </div>
       </div>
-      <div class="pt-12">
+    </div>
+    <div class="pt-12">
       <h2 class="text-4xl font-black mb-12 text-center text-white tracking-tight">Pinterest <span
           class="text-red-500">Schema</span></h2>
       <div class="grid lg:grid-cols-2 gap-12 items-start">
@@ -566,7 +566,7 @@
 </section>
 
 <style>
-.bg-\[\#0f172a\] {
+  .bg-\[\#0f172a\] {
     background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.02) 1px, transparent 0);
     background-size: 40px 40px;
   }
@@ -630,11 +630,25 @@
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("saveCredsBtn").onclick = saveCredentials;
+
+    const params = new URLSearchParams(window.location.search);
+    const isFreshOAuth = params.get("connected") === "1" || params.has("code");
+
     checkPinterestStatus();
+
+    if (isFreshOAuth) {
+      setTimeout(() => checkPinterestStatus(), 500);
+      setTimeout(() => checkPinterestStatus(), 1500);
+      setTimeout(() => checkPinterestStatus(), 3000);
+    } else {
+      setTimeout(() => checkPinterestStatus(), 1000);
+    }
+
     loadDestinations();
     loadJob();
-    selectFormat('parquet'); // Default selection
+    selectFormat('parquet');
   });
 
   function selectFormat(val) {
@@ -645,59 +659,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function checkPinterestStatus() {
     try {
-      const res = await fetch("/api/status/pinterest");
+      const res = await fetch("/api/status/pinterest", {
+        cache: "no-store"
+      });
       const data = await res.json();
+      console.log("Pinterest status:", data);
 
       const badge = document.getElementById("statusBadge");
       const connectedAs = document.getElementById("connectedAs");
       const syncContent = document.getElementById("syncContent");
       const accessOverlay = document.getElementById("accessOverlay");
 
-      if (data.connected) {
+      if (data.connected === true) {
 
         badge.innerHTML =
           `<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> CONNECTED`;
-
         badge.className =
           "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
 
         if (data.email) {
-          connectedAs.innerHTML =
-            `Connected as <strong>${data.email}</strong>`;
+          connectedAs.innerHTML = `Connected as <strong>${data.email}</strong>`;
         }
 
         updateFlowUI(3);
 
-        syncContent.classList.remove(
-          "opacity-65", "blur-sm", "pointer-events-none"
-        );
+        syncContent.classList.remove("opacity-65", "blur-sm", "pointer-events-none");
         accessOverlay.classList.add("hidden");
-      }
 
-      else if (data.has_credentials) {
+      } else if (data.auth_required === true) {
 
         badge.innerHTML =
           `<span class="h-2 w-2 rounded-full bg-yellow-500"></span> CREDENTIALS SAVED`;
-
         badge.className =
           "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/5 text-yellow-400 text-[10px] font-mono mb-8 uppercase tracking-widest";
 
         updateFlowUI(1);
 
-        syncContent.classList.add(
-          "opacity-65", "blur-sm", "pointer-events-none"
-        );
+        syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
         accessOverlay.classList.remove("hidden");
-      }
 
-      else {
+      } else if (data.credentials_required === true) {
+
+        badge.innerHTML =
+          `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
+        badge.className =
+          "inline-flex items-center gap-2 px-3 py-1 rounded-full border border-slate-700 bg-slate-800/50 text-slate-400 text-[10px] font-mono mb-8 tracking-widest uppercase";
+
+        updateFlowUI(0);
+
+        syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
+        accessOverlay.classList.remove("hidden");
+
+      } else {
+
         badge.innerHTML =
           `<span class="h-2 w-2 rounded-full bg-slate-600"></span> NOT CONNECTED`;
 
-        syncContent.classList.add(
-          "opacity-65", "blur-sm", "pointer-events-none"
-        );
+        syncContent.classList.add("opacity-65", "blur-sm", "pointer-events-none");
         accessOverlay.classList.remove("hidden");
+
       }
 
     } catch (e) {
@@ -713,14 +733,34 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("credentialsForm");
     const success = document.getElementById("successState");
 
+    if (step === 0) {
+      s1.className = "w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
+      s1.innerHTML = "1";
+      s2.className = "w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300";
+      s2.innerHTML = "2";
+      s3.className = "w-8 h-8 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300";
+      s3.innerHTML = "3";
+
+      btn.innerText = "Save Credentials & Continue";
+      btn.className = "w-full py-5 bg-red-600 text-white rounded-2xl font-black hover:bg-white hover:text-red-600 transition-all shadow-lg shadow-red-600/20 text-xs uppercase tracking-widest mt-2 hover:shadow-red-600/40";
+      btn.onclick = saveCredentials;
+
+      form.classList.remove("opacity-0", "hidden");
+      form.classList.add("opacity-100");
+      success.classList.add("hidden");
+      success.classList.remove("opacity-100");
+    }
+
     if (step >= 1) {
       s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
       s1.innerHTML = "✓";
       s2.className = "w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
 
-      btn.innerText = "Authorize with Google";
+      btn.innerText = "Authorize with Pinterest";
       btn.className = "w-full py-5 bg-white text-red-600 rounded-2xl font-black hover:bg-red-600 hover:text-white transition-all shadow-lg text-xs uppercase tracking-widest mt-2 hover:shadow-red-600/40";
-      btn.onclick = () => window.location.href = "/connectors/pinterest/connect";
+      btn.onclick = () => {
+        window.location.href = "/connectors/pinterest/connect";
+      };
     }
 
     if (step >= 3) {
@@ -736,17 +776,35 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function saveCredentials() {
-    const clientId = document.getElementById("clientId").value.trim();
-    const clientSecret = document.getElementById("clientSecret").value.trim();
-    if (!clientId || !clientSecret) { alert("Credentials required"); return; }
+    const clientId = document.getElementById("pinterest_client_id")?.value.trim();
+    const clientSecret = document.getElementById("pinterest_client_secret")?.value.trim();
+
+    if (!clientId || !clientSecret) {
+      alert("Credentials required");
+      return;
+    }
+
     try {
       const res = await fetch("/connectors/pinterest/save_app", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          client_id: clientId,
+          client_secret: clientSecret
+        })
       });
-      if (res.ok) { checkPinterestStatus(); }
-    } catch (e) { alert("Save failed"); }
+
+      if (res.ok) {
+        await checkPinterestStatus();
+      } else {
+        alert("Failed to save credentials");
+      }
+
+    } catch (e) {
+      alert("Save failed");
+    }
   }
 
   async function disconnectPinterest() {
@@ -805,8 +863,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const card = document.createElement("div");
         card.onclick = () => activateDest(d.id);
         card.className = `group flex items-center gap-4 p-4 rounded-2xl border-2 transition-all cursor-pointer ${isActive
-            ? 'bg-rose-500/10 border-rose-500/40 shadow-lg shadow-rose-500/10'
-            : 'bg-slate-900/50 border-white/5 hover:border-white/10 hover:bg-slate-900'
+          ? 'bg-rose-500/10 border-rose-500/40 shadow-lg shadow-rose-500/10'
+          : 'bg-slate-900/50 border-white/5 hover:border-white/10 hover:bg-slate-900'
           }`;
 
         const logoMap = {

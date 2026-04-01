@@ -762,6 +762,7 @@ GOOGLE_OAUTH_SOURCES = {
 }
 
 OAUTH_SOURCES = GOOGLE_OAUTH_SOURCES | {
+    "pinterest",
     "github",
     "instagram",
     "tiktok",
@@ -13444,17 +13445,50 @@ def pinterest_disconnect():
 
 @app.route("/pinterest/callback")
 def pinterest_callback():
+    uid = get_uid()
+    code = request.args.get("code")
 
-    uid = getattr(g, "user_id", None)
+    print(f"[PINTEREST CALLBACK] uid={uid} code_present={bool(code)}", flush=True)
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
-    code = request.args.get("code")
 
-    token_data = pinterest_exchange_code(uid, code)
+    if not code:
+        return jsonify({"error": "missing code"}), 400
 
-    if not token_data:
-        return "Token exchange failed",400
+    try:
+        token = pinterest_exchange_code(uid, code)
+
+        if not token:
+            print("[PINTEREST CALLBACK] Token exchange returned None", flush=True)
+            return jsonify({"error": "token exchange failed"}), 400
+
+        access_token  = token.get("access_token")
+        refresh_token = token.get("refresh_token")
+        expires_in    = token.get("expires_in")
+
+        if not access_token:
+            print(f"[PINTEREST CALLBACK] No access_token in response: {token}", flush=True)
+            return jsonify({"error": "missing access_token", "response": token}), 400
+
+        pinterest_save_token(uid, access_token, refresh_token, expires_in)
+
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("""
+            INSERT OR REPLACE INTO google_connections
+            (uid, source, enabled)
+            VALUES (?, 'pinterest', 1)
+        """, (uid,))
+        con.commit()
+        con.close()
+
+        print(f"[PINTEREST CALLBACK] Success — token saved for uid={uid}", flush=True)
+        return redirect("http://localhost:3000/connectors/pinterest?connected=1")
+
+    except Exception as e:
+        print(f"[PINTEREST CALLBACK ERROR] {str(e)}", flush=True)
+        return jsonify({"error": str(e)}), 500
     
 @app.route("/connectors/pinterest/sync")
 def pinterest_sync_universal():
@@ -13542,46 +13576,52 @@ def pinterest_sync_universal():
 
 # ---------------- PINTEREST SAVE CONFIG ----------------
 
-@app.route("/connectors/pinterest/save_config", methods=["POST"])
-def pinterest_save_config():
+@app.route("/connectors/pinterest/save_app", methods=["POST"])
+def save_pinterest_app():
 
-    uid = getattr(g, "user_id", None)
+    uid = get_uid()
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
-    data = encrypt_payload(request.get_json) or {}
 
-    client_id = data.get("client_id")
-    client_secret = data.get("client_secret")
+    data = request.get_json(silent=True) or {}
+    client_id = (data.get("client_id") or data.get("app_id") or "").strip()
+    client_secret = (data.get("client_secret") or data.get("app_secret") or "").strip()
 
     if not client_id or not client_secret:
         return jsonify({"error": "missing credentials"}), 400
+
+    encrypted = encrypt_payload({
+        "client_id": client_id,
+        "client_secret": client_secret
+    })
 
     con = get_db()
     cur = con.cursor()
 
     cur.execute("""
         INSERT OR REPLACE INTO connector_configs
-        (uid, connector, config_json, created_at)
-        VALUES (?, ?, ?, datetime('now'))
+        (uid, connector, client_id, client_secret, config_json, created_at)
+        VALUES (?, ?, ?, ?, ?, ?)
     """, (
         uid,
         "pinterest",
-        json.dumps({
-            "client_id": client_id,
-            "client_secret": client_secret
-        })
+        encrypted["client_id"],
+        encrypted["client_secret"],
+        json.dumps(encrypted),
+        datetime.datetime.now(datetime.UTC).isoformat()
     ))
 
     con.commit()
     con.close()
 
-    return jsonify({"status": "saved"})    
+    ensure_connector_initialized(uid, "pinterest")
+    return jsonify({"status": "saved"})
 
 @app.route("/api/status/pinterest")
 def pinterest_status():
 
-    uid = getattr(g, "user_id", None)
+    uid = get_uid()
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
@@ -13590,22 +13630,34 @@ def pinterest_status():
     cur = con.cursor()
 
     cur.execute("""
-        SELECT enabled
-        FROM google_connections
-        WHERE uid=? AND source='pinterest'
+        SELECT access_token
+        FROM pinterest_tokens
+        WHERE uid=?
+        LIMIT 1
     """,(uid,))
 
     connected = bool(
-        (row := cur.fetchone()) and row[0] == 1
+        (row := cur.fetchone()) and row[0]
     )
 
     cur.execute("""
-        SELECT 1
+        SELECT config_json
         FROM connector_configs
         WHERE uid=? AND connector='pinterest'
+        LIMIT 1
     """,(uid,))
 
-    has_credentials = bool(cur.fetchone())
+    row = cur.fetchone()
+
+    has_credentials = bool(
+        row and row[0] and row[0] != "{}"
+    )
+
+    print("[PINTEREST STATUS]", {
+        "uid": uid,
+        "has_credentials": has_credentials,
+        "connected": connected
+    }, flush=True)
 
     con.close()
 
