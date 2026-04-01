@@ -53,7 +53,7 @@ def resolve_destination_format(dest_cfg, source):
 
     return dest_cfg
 
-def push_to_destination(dest_cfg, source, rows):
+def push_to_destination(dest_cfg, source, rows, skip_storage=False):
 
     if not rows:
         return 0
@@ -71,6 +71,14 @@ def push_to_destination(dest_cfg, source, rows):
 
     if has_request_context():
         uid = getattr(g, "user_id", None)
+
+    # ---------------- 24H RECOVERY HOOK ----------------
+    if not skip_storage and uid:
+        try:
+            from backend.utils.sync_storage import store_sync_data
+            store_sync_data(uid, source, rows)
+        except Exception as e:
+            print(f"[ROUTER AUTO BUFFER ERROR] {e}", flush=True)
 
     # ---------------- FORMAT ISOLATION ----------------
     if dest_type in ["bigquery", "s3", "azure_datalake", "databricks", "gcs", "duckdb"]:
