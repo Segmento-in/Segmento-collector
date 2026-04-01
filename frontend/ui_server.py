@@ -199,6 +199,11 @@ def connector_job_get(source):
 def connector_job_save(source):
     return proxy_post(f"/connectors/{source}/job/save", json=request.get_json())
 
+@app.route("/connectors/<source>/recover", methods=["POST"])
+@require_login
+def ui_recover_connector_data(source):
+    r = proxy_post(f"/connectors/{source}/recover", json=request.get_json(silent=True) or {})
+    return jsonify(r.json()), r.status_code
 
 # ================= CONNECTOR ROUTES =================
 # ================= SOCIAL INSIDER ========================
