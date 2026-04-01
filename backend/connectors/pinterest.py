@@ -2,6 +2,9 @@ import requests,sqlite3,os,time,json
 from datetime import datetime
 from dotenv import load_dotenv
 
+from backend.security.token_manager import ensure_valid_pinterest_token
+from backend.security.crypto import decrypt_value
+
 load_dotenv()
 
 DB="identity.db"
@@ -112,11 +115,17 @@ def pinterest_exchange_code(uid, code):
 
     import base64
 
-    creds = f"{cfg['client_id']}:{cfg['client_secret']}"
-    b64 = base64.b64encode(creds.encode()).decode()
+    client_id = cfg["client_id"]
+    if client_id.startswith("gAAAA"):
+        client_id = decrypt_value(client_id)
+
+    client_secret = decrypt_value(cfg["client_secret"])
+
+    auth_str = f"{client_id}:{client_secret}"
+    auth_b64 = base64.b64encode(auth_str.encode()).decode()
 
     headers = {
-        "Authorization": f"Basic {b64}",
+        "Authorization": f"Basic {auth_b64}",
         "Content-Type": "application/x-www-form-urlencoded"
     }
 
@@ -126,24 +135,26 @@ def pinterest_exchange_code(uid, code):
         "redirect_uri": REDIRECT_URI
     }
 
-    r = requests.post(
-        TOKEN_URL,
+    response = requests.post(
+        "https://api.pinterest.com/v5/oauth/token",
         headers=headers,
         data=data,
         timeout=20
     )
 
-    if r.status_code == 200:
-        return r.json()
+    print("Pinterest token response:", response.text, flush=True)
 
-    print("Pinterest token error:", r.text, flush=True)
+    if response.status_code == 200:
+        return response.json()
+
+    print("Pinterest token error:", response.text, flush=True)
     return None
 
 # ---------------- HTTP ----------------
 
 def api_get(uid,path,params=None):
 
-    token=get_token(uid)
+    token=ensure_valid_pinterest_token(uid)
 
     if not token:
         return None
