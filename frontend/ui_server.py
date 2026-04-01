@@ -1997,16 +1997,44 @@ def pinterest_pins():
 
     return jsonify(rows)
 
-@app.route("/connectors/pinterest/save_config", methods=["POST"])
-def pinterest_save_config_proxy():
+@app.route("/connectors/pinterest/save_app", methods=["POST"])
+def pinterest_save_app_proxy():
 
     r = requests.post(
-        "http://localhost:4000/connectors/pinterest/save_config",
+        "http://localhost:4000/connectors/pinterest/save_app",
         json=request.get_json(),
         cookies=request.cookies
     )
 
     return jsonify(r.json()), r.status_code
+
+
+@app.route("/pinterest/callback")
+def pinterest_callback_proxy():
+    """
+    Pinterest OAuth redirects here. Must match the redirect_uri registered
+    in the Pinterest Developer app (e.g. http://localhost:5000/pinterest/callback).
+    Proxies to api_server carrying the session cookie so get_uid() resolves,
+    then redirects the browser back to the connector page.
+    """
+    code  = request.args.get("code", "")
+    state = request.args.get("state", "")
+
+    if not code:
+        return "Authorization failed: no code returned from Pinterest.", 400
+
+    r = requests.get(
+        f"http://localhost:4000/pinterest/callback?code={code}&state={state}",
+        cookies=request.cookies,
+        allow_redirects=False
+    )
+
+    print(f"[PINTEREST CALLBACK PROXY] api_server responded {r.status_code}", flush=True)
+
+    if r.status_code not in (200, 302):
+        return f"OAuth error ({r.status_code}): {r.text}", 400
+
+    return redirect("/connectors/pinterest")
 
 # ================= TWITCH =================
 
