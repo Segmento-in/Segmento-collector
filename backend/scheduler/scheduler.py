@@ -203,8 +203,25 @@ def start_scheduler():
         coalesce=True
     )
 
+    def run_cleanup_job():
+        print("[SCHEDULER] Triggering cleanup job", flush=True)
+        try:
+            from backend.utils.sync_storage import cleanup_expired_data
+            cleanup_expired_data()
+        except Exception as e:
+            print(f"[CLEANUP ERROR] {e}", flush=True)
+
+    scheduler.add_job(
+        run_cleanup_job,
+        "interval",
+        seconds=60,
+        max_instances=1,
+        coalesce=True
+    )
+
     scheduler.start()
 
+    print("[SCHEDULER] Cleanup job registered", flush=True)
     print("[SCHEDULER] Universal Scheduler Started (1-min interval)", flush=True)
 
 # -------------------------------
