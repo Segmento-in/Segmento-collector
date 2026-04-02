@@ -31,6 +31,9 @@ _ACTION_KEYWORDS: dict[str, list[str]] = {
         "import", "refresh", "update", "execute", "trigger",
         "start sync", "begin sync", "start a sync", "do a sync",
     ],
+    "recover": [
+        "recover", "retry", "restore", "replay", "resend", "push again",
+    ],
     "disconnect": [
         "disconnect", "unlink", "remove", "disable", "delete",
         "revoke", "turn off", "deactivate",
@@ -81,7 +84,7 @@ def detect_action(message: str) -> str:
     # Check from highest to lowest priority
     priority = [
         "greeting", "help", "list", "destination", "schedule", "query",
-        "connect", "disconnect", "sync", "status"
+        "connect", "disconnect", "recover", "sync", "status"
     ]
 
     for action in priority:

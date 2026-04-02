@@ -727,6 +727,45 @@ def _handle_disconnect(source: str, uid: str) -> Dict:
     return _error_response("disconnect", source, _route_error(res))
 
 
+def _handle_recover(source: Optional[str], uid: str) -> Dict:
+    if not source:
+        return _response("message", "Which connector would you like to recover?")
+        
+    stat = call_connector_route(f"/api/status/{source}", uid)
+    if not _route_connected(stat):
+        return _response("error", f"{_pretty(source)} is not connected", connectors=[source])
+        
+    res = call_connector_route(f"/connectors/{source}/recover", uid, method="POST")
+    http_status = res.get("http_status", 200)
+    payload = _route_payload(res)
+    err = _route_error(res)
+    
+    str_res = str(res).lower()
+    
+    # Case 1: No data available
+    if http_status == 404 or "no batches" in str_res or "empty result" in str_res:
+        return _response("message", "No recovery data found for the last 24 hours.\nEither no sync was run or data has expired.", connectors=[source])
+        
+    # Check for success vs error
+    ok = res.get("ok", True)
+    if http_status >= 400:
+        ok = False
+        
+    # Case 4: Error
+    if not ok:
+        return _response("error", f"Failed to recover data for {_pretty(source)}.\nReason: {err}", connectors=[source])
+        
+    # Case 3: Partial / zero rows pushed
+    rows_pushed = payload.get("rows_pushed")
+    if rows_pushed is not None and str(rows_pushed) == "0":
+        return _response("message", "Recovery executed, but no rows were pushed.\nThis may be due to schema mismatch or empty data.", connectors=[source])
+    if "zero rows" in str_res or "0 rows" in str_res:
+        return _response("message", "Recovery executed, but no rows were pushed.\nThis may be due to schema mismatch or empty data.", connectors=[source])
+
+    # Case 2: Success
+    return _response("message", f"Recovery completed successfully for {_pretty(source)}.\nRe-pushed last available data to your destination.", connectors=[source])
+
+
 def orchestrate(intent: Dict, uid: str, chat_id: str, message: str, state: Optional[Dict]) -> Dict:
     action = intent.get("action", "unknown")
     connectors = intent.get("connectors", [])
@@ -753,6 +792,10 @@ def orchestrate(intent: Dict, uid: str, chat_id: str, message: str, state: Optio
         return _normalize_response(_handle_connect(source, uid, chat_id, message, None))
     if action == "disconnect" and source:
         return _normalize_response(_handle_disconnect(source, uid))
+    if action == "recover":
+        if not source:
+            return _normalize_response(_handle_recover(None, uid))
+        return _normalize_response(_handle_recover(source, uid))
     if action == "destination" and source:
         return _normalize_response(_handle_destination(source, uid, chat_id, message, None))
     if action == "schedule" and source:
