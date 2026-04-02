@@ -11,18 +11,18 @@
 </div>
 
 <!-- Intro -->
-<div id="intro" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950 overflow-hidden">
+<div id="intro" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-50 dark:bg-slate-950 overflow-hidden">
   <div class="relative text-center">
     <div id="welcomeText"
-      class="text-xl md:text-2xl font-medium text-cyan-500/80 mb-4 opacity-0 transform translate-y-4 transition-all duration-700">
+      class="text-xl md:text-2xl font-medium text-cyan-600 dark:text-cyan-500/80 mb-4 opacity-0 transform translate-y-4 transition-all duration-700">
       Welcome to the future of data
     </div>
     <h1 id="introText"
-      class="text-[1.5rem] md:text-[4rem] lg:text-[7rem] font-black text-white transition-all duration-[1000ms] opacity-0 scale-90">
-      Segmento <span class="text-cyan-400">Collector</span>
+      class="text-[1.5rem] md:text-[4rem] lg:text-[7rem] font-black text-slate-900 dark:text-white transition-all duration-[1000ms] opacity-0 scale-90">
+      Segmento <span class="text-cyan-600 dark:text-cyan-400">Collector</span>
     </h1>
     <div id="introLine"
-      class="mt-6 h-[2px] w-0 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto transition-all duration-[1500ms]">
+      class="mt-6 h-[2px] w-0 bg-gradient-to-r from-transparent via-cyan-500 dark:via-cyan-400 to-transparent mx-auto transition-all duration-[1500ms]">
     </div>
   </div>
 </div>
@@ -82,30 +82,30 @@
       </button>
 
       <div id="integrationDiscoveryMenu"
-        class="absolute left-0 top-[calc(100%+0.75rem)] z-30 hidden w-[18rem] rounded-3xl border border-slate-700/60 bg-slate-950/95 p-3 text-left shadow-[0_25px_80px_rgba(2,6,23,0.75)] backdrop-blur-2xl">
+        class="absolute left-0 top-[calc(100%+0.75rem)] z-30 hidden w-[18rem] rounded-3xl border border-slate-200 dark:border-slate-700/60 bg-white/95 dark:bg-slate-950/95 p-3 text-left shadow-[0_25px_80px_rgba(2,6,23,0.1)] dark:shadow-[0_25px_80px_rgba(2,6,23,0.75)] backdrop-blur-2xl">
         <button type="button"
-          class="integration-discovery-option w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-900"
+          class="integration-discovery-option w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-50 dark:hover:bg-white dark:bg-slate-900"
           data-filter-key="available-sources">
-          <span class="block text-sm font-bold text-white">Available Sources</span>
-          <span class="mt-1 block text-xs text-slate-400">Browse the live source connector catalog.</span>
+          <span class="block text-sm font-bold text-slate-900 dark:text-white">Available Sources</span>
+          <span class="mt-1 block text-xs text-slate-500 dark:text-slate-400">Browse the live source connector catalog.</span>
         </button>
         <button type="button"
-          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-900"
+          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-50 dark:hover:bg-white dark:bg-slate-900"
           data-filter-key="available-destinations">
-          <span class="block text-sm font-bold text-white">Available Destinations</span>
-          <span class="mt-1 block text-xs text-slate-400">See active warehouse and storage targets.</span>
+          <span class="block text-sm font-bold text-slate-900 dark:text-white">Available Destinations</span>
+          <span class="mt-1 block text-xs text-slate-500 dark:text-slate-400">See active warehouse and storage targets.</span>
         </button>
         <button type="button"
-          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-900"
+          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-50 dark:hover:bg-white dark:bg-slate-900"
           data-filter-key="upcoming-sources">
-          <span class="block text-sm font-bold text-white">Upcoming Sources</span>
-          <span class="mt-1 block text-xs text-slate-400">Preview integrations planned for future releases.</span>
+          <span class="block text-sm font-bold text-slate-900 dark:text-white">Upcoming Sources</span>
+          <span class="mt-1 block text-xs text-slate-500 dark:text-slate-400">Preview integrations planned for future releases.</span>
         </button>
         <button type="button"
-          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-900"
+          class="integration-discovery-option mt-2 w-full rounded-2xl border border-transparent px-4 py-3 text-left transition-all hover:border-cyan-400/20 hover:bg-slate-50 dark:hover:bg-white dark:bg-slate-900"
           data-filter-key="upcoming-destinations">
-          <span class="block text-sm font-bold text-white">Upcoming Destinations</span>
-          <span class="mt-1 block text-xs text-slate-400">Preview the next storage targets on the roadmap.</span>
+          <span class="block text-sm font-bold text-slate-900 dark:text-white">Upcoming Destinations</span>
+          <span class="mt-1 block text-xs text-slate-500 dark:text-slate-400">Preview the next storage targets on the roadmap.</span>
         </button>
       </div>
     </div>
@@ -128,37 +128,37 @@
 
   <div class="relative z-10 max-w-5xl mx-auto">
     <div data-aos="fade-down"
-      class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-400/30 bg-cyan-400/5 text-cyan-400 text-xs font-mono mb-8 tracking-widest uppercase">
+      class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-cyan-500/30 dark:border-cyan-400/30 bg-cyan-500/10 dark:bg-cyan-400/5 text-cyan-600 dark:text-cyan-400 text-xs font-mono mb-8 tracking-widest uppercase">
       <span class="relative flex h-2 w-2">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-500 dark:bg-cyan-400 opacity-75"></span>
         <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
       </span>
       105 connectors are in Live
     </div>
 
     <h1 data-aos="fade-up" class="text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-none">
-      <span class="bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-500">Segmento</span>
-      <span class="text-cyan-400">Collector</span>
+      <span class="bg-clip-text text-transparent bg-gradient-to-b from-slate-900 to-slate-500 dark:from-white dark:to-slate-500">Segmento</span>
+      <span class="text-cyan-500 dark:text-cyan-400">Collector</span>
     </h1>
 
     <p data-aos="fade-up" data-aos-delay="150"
-      class="text-lg md:text-2xl font-medium text-slate-300 mb-4 max-w-2xl mx-auto">
-      A Unified <span class="text-white">Data Collection Platform</span>
+      class="text-lg md:text-2xl font-medium text-slate-600 dark:text-slate-300 mb-4 max-w-2xl mx-auto">
+      A Unified <span class="text-slate-900 dark:text-white">Data Collection Platform</span>
     </p>
 
     <p data-aos="fade-up" data-aos-delay="250"
-      class="text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed italic border-l-2 border-cyan-400/20 pl-4">
+      class="text-slate-500 dark:text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed italic border-l-2 border-cyan-500/20 dark:border-cyan-400/20 pl-4">
       Capture, organise, and store high-fidelity data from websites, cloud platforms, and social systems in one secure
       ecosystem
     </p>
 
     <div data-aos="fade-up" data-aos-delay="400" class="flex flex-col sm:flex-row justify-center gap-5">
       <a href="/tracking"
-        class="group relative px-8 py-4 bg-cyan-400 text-black rounded-xl font-bold transition-all hover:shadow-[0_0_25px_rgba(34,211,238,0.4)] hover:bg-cyan-300">
+        class="group relative px-8 py-4 bg-cyan-500 dark:bg-cyan-400 text-white dark:text-black rounded-xl font-bold transition-all hover:shadow-[0_0_25px_rgba(34,211,238,0.4)] hover:bg-cyan-600 dark:hover:bg-cyan-300">
         Start Tracking
       </a>
       <a href="/connectors"
-        class="px-8 py-4 border border-slate-700 bg-slate-900/50 backdrop-blur-md rounded-xl hover:border-cyan-400 transition-colors">
+        class="px-8 py-4 border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/50 text-slate-900 dark:text-white backdrop-blur-md rounded-xl hover:border-cyan-400 transition-colors">
         View Connectors
       </a>
     </div>
@@ -166,33 +166,33 @@
 </section>
 
 <div id="integrationOverlay" class="fixed inset-x-0 top-28 bottom-6 z-40 hidden px-4 md:px-6">
-  <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" data-overlay-close="true"></div>
+  <div class="absolute inset-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm" data-overlay-close="true"></div>
   <div
-    class="integration-overlay-panel relative mx-auto flex h-full max-h-[calc(100vh-8.5rem)] w-full max-w-5xl min-h-0 flex-col overflow-hidden rounded-[2rem] border border-cyan-400/15 bg-slate-900/95 shadow-[0_30px_100px_rgba(2,6,23,0.8)]">
+    class="integration-overlay-panel relative mx-auto flex h-full max-h-[calc(100vh-8.5rem)] w-full max-w-5xl min-h-0 flex-col overflow-hidden rounded-[2rem] border border-cyan-500/15 dark:border-cyan-400/15 bg-white/95 dark:bg-slate-900/95 shadow-[0_30px_100px_rgba(2,6,23,0.2)] dark:shadow-[0_30px_100px_rgba(2,6,23,0.8)]">
     <div
-      class="absolute inset-0 bg-[linear-gradient(to_right,#083344_1px,transparent_1px),linear-gradient(to_bottom,#083344_1px,transparent_1px)] bg-[size:40px_40px] opacity-25 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,#000_60%,transparent_100%)]">
+      class="absolute inset-0 bg-[linear-gradient(to_right,#083344_1px,transparent_1px),linear-gradient(to_bottom,#083344_1px,transparent_1px)] bg-[size:40px_40px] opacity-10 dark:opacity-25 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,#000_60%,transparent_100%)]">
     </div>
-    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-500/10"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 dark:from-cyan-500/10 via-transparent to-blue-500/5 dark:to-blue-500/10"></div>
 
-    <div class="relative z-10 flex items-start justify-between gap-4 border-b border-slate-800/80 px-5 py-4 md:px-7">
+    <div class="relative z-10 flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-800/80 px-5 py-4 md:px-7">
       <div>
         <div id="integrationOverlayEyebrow"
-          class="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-300">
+          class="inline-flex items-center gap-2 rounded-full border border-cyan-500/20 dark:border-cyan-400/20 bg-cyan-500/10 dark:bg-cyan-400/10 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.22em] text-cyan-600 dark:text-cyan-300">
           Integration Discovery
         </div>
-        <h2 id="integrationOverlayTitle" class="mt-3 text-2xl font-black tracking-tight text-white md:text-3xl"></h2>
+        <h2 id="integrationOverlayTitle" class="mt-3 text-2xl font-black tracking-tight text-slate-900 dark:text-white md:text-3xl"></h2>
         <p id="integrationOverlayCount" class="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
         </p>
-        <p id="integrationOverlayDescription" class="mt-2 max-w-xl text-sm text-slate-400"></p>
+        <p id="integrationOverlayDescription" class="mt-2 max-w-xl text-sm text-slate-600 dark:text-slate-400"></p>
       </div>
 
       <div class="flex items-center gap-2">
         <a id="integrationOverlayCatalogLink" href="/connectors"
-          class="hidden rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-300 transition-all hover:border-cyan-300 hover:bg-cyan-400 hover:text-slate-950">
+          class="hidden rounded-2xl border border-cyan-500/30 dark:border-cyan-400/30 bg-cyan-500/10 dark:bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-700 dark:text-cyan-300 transition-all hover:border-cyan-600 dark:hover:border-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-400 hover:text-cyan-900 dark:hover:text-slate-950">
           Know more about sources
         </a>
         <button id="integrationOverlayClose" type="button"
-          class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-700/70 bg-slate-950/70 text-slate-300 transition-colors hover:border-cyan-400/40 hover:text-white"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-300 dark:border-slate-700/70 bg-slate-100 dark:bg-slate-950/70 text-slate-500 dark:text-slate-300 transition-colors hover:border-cyan-500/40 dark:hover:border-cyan-400/40 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white"
           aria-label="Close integrations overlay">
           <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -223,7 +223,7 @@
   <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
 
     <div data-aos="fade-up"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl">
       <div
         class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/5 blur-[60px] group-hover:bg-cyan-500/10 transition-all">
       </div>
@@ -243,7 +243,7 @@
     </div>
 
     <div data-aos="fade-up" data-aos-delay="150"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-blue-500/30 hover:border-blue-400 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-blue-500/30 hover:border-blue-400 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl">
       <div
         class="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/5 blur-[60px] group-hover:bg-blue-500/10 transition-all">
       </div>
@@ -263,7 +263,7 @@
     </div>
 
     <div data-aos="fade-up" data-aos-delay="300"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-purple-500/30 hover:border-purple-400 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-purple-500/30 hover:border-purple-400 transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl">
       <div
         class="absolute -top-24 -right-24 w-48 h-48 bg-purple-500/5 blur-[60px] group-hover:bg-purple-500/10 transition-all">
       </div>
@@ -286,26 +286,26 @@
 </section>
 
 <!-- Architecture -->
-<section class="px-6 py-28 bg-slate-900 relative overflow-hidden">
+<section class="px-6 py-28 bg-slate-50 dark:bg-slate-900 relative overflow-hidden transition-colors duration-300">
   <div
     class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-cyan-500/10 blur-[120px] rounded-full -z-10">
   </div>
 
-  <h2 data-aos="fade" class="text-3xl font-bold text-center mb-16 uppercase tracking-[0.3em] text-slate-400">
-    The <span class="text-white">Segmento Collector</span> Engine
+  <h2 data-aos="fade" class="text-3xl font-bold text-center mb-16 uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+    The <span class="text-slate-900 dark:text-white">Segmento Collector</span> Engine
   </h2>
 
   <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6">
 
     <div data-aos="fade-right" class="md:col-span-4 space-y-4">
       <div
-        class="motion-card-3d group p-6 bg-slate-900/40 border border-cyan-500/30 rounded-2xl hover:border-cyan-400 transition-all shadow-xl backdrop-blur-md">
+        class="motion-card-3d group p-6 bg-white dark:bg-slate-900/40 border border-cyan-500/30 rounded-2xl hover:border-cyan-400 transition-all shadow-xl backdrop-blur-md">
         <div class="flex justify-between items-start mb-4">
           <p class="text-[10px] text-cyan-400 font-mono tracking-widest uppercase">Input Alpha</p>
           <div class="h-2 w-2 rounded-full bg-cyan-400 animate-pulse"></div>
         </div>
-        <h4 class="font-bold text-xl text-white">Custom JS SDK</h4>
-        <p class="text-slate-400 text-xs mt-1">Real-time event streaming</p>
+        <h4 class="font-bold text-xl text-slate-900 dark:text-white">Custom JS SDK</h4>
+        <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Real-time event streaming</p>
         <div class="mt-6 h-[1px] w-full bg-slate-700 relative overflow-hidden">
           <div
             class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400 to-transparent w-20 animate-[move_2s_linear_infinite]">
@@ -314,19 +314,19 @@
       </div>
 
       <div
-        class="motion-card-3d group p-6 bg-slate-900/40 border border-blue-500/30 rounded-2xl hover:border-blue-400 transition-all shadow-xl backdrop-blur-md">
+        class="motion-card-3d group p-6 bg-white dark:bg-slate-900/40 border border-blue-500/30 rounded-2xl hover:border-blue-400 transition-all shadow-xl backdrop-blur-md">
         <div class="flex justify-between items-start mb-4">
           <p class="text-[10px] text-cyan-400 font-mono tracking-widest uppercase">Input Beta</p>
           <div class="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
         </div>
-        <h4 class="font-bold text-xl text-white">60+ Connectors</h4>
-        <p class="text-slate-400 text-xs mt-1">Cloud & Social API hooks</p>
+        <h4 class="font-bold text-xl text-slate-900 dark:text-white">60+ Connectors</h4>
+        <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Cloud & Social API hooks</p>
       </div>
     </div>
 
     <div data-aos="zoom-in" class="md:col-span-4 relative group">
       <div
-        class="motion-card-3d h-full p-8 bg-slate-900/40 border border-cyan-400/30 rounded-3xl flex flex-col items-center justify-center text-center relative z-10 overflow-hidden shadow-[0_0_50px_-12px_rgba(34,211,238,0.3)] backdrop-blur-md">
+        class="motion-card-3d h-full p-8 bg-white dark:bg-slate-900/40 border border-cyan-400/30 rounded-3xl flex flex-col items-center justify-center text-center relative z-10 overflow-hidden shadow-[0_0_50px_-12px_rgba(34,211,238,0.3)] backdrop-blur-md">
         <div
           class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent animate-[scan_4s_linear_infinite]">
         </div>
@@ -335,8 +335,8 @@
           class="w-20 h-20 bg-cyan-400/10 rounded-full flex items-center justify-center mb-6 border border-cyan-400/20 group-hover:scale-110 transition-transform">
           <span class="text-4xl">🧠</span>
         </div>
-        <h3 class="text-2xl font-black text-white mb-2 tracking-tight">Identity Server</h3>
-        <p class="text-sm text-slate-400 leading-relaxed">
+        <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Identity Server</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
           Cross-platform identity resolution and <span class="text-cyan-400">session stitching</span>.
         </p>
 
@@ -351,13 +351,13 @@
 
     <div data-aos="fade-left" class="md:col-span-4 flex flex-col gap-4">
       <div
-        class="motion-card-3d flex-1 p-6 bg-slate-900/40 border border-purple-500/30 rounded-2xl flex items-center gap-4 group shadow-xl backdrop-blur-md">
+        class="motion-card-3d flex-1 p-6 bg-white dark:bg-slate-900/40 border border-purple-500/30 rounded-2xl flex items-center gap-4 group shadow-xl backdrop-blur-md">
         <div
-          class="p-3 bg-slate-900 rounded-lg border border-slate-700 group-hover:border-cyan-400/50 transition-colors">
+          class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-300 dark:border-slate-700 group-hover:border-cyan-400/50 transition-colors">
           🗄️
         </div>
         <div>
-          <h4 class="font-bold text-white">Unified Database</h4>
+          <h4 class="font-bold text-slate-900 dark:text-white">Unified Database</h4>
           <p class="text-[10px] text-slate-500 font-mono italic">SQL / NoSQL Storage</p>
         </div>
       </div>
@@ -365,9 +365,9 @@
       <div
         class="flex-2 p-1 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-2xl group cursor-pointer overflow-hidden shadow-2xl">
         <div
-          class="bg-slate-900 h-full w-full rounded-[calc(1rem-1px)] p-6 group-hover:bg-transparent transition-colors duration-500">
-          <h4 class="font-bold text-white group-hover:text-black transition-colors">Interactive Dashboard</h4>
-          <p class="text-sm text-slate-400 group-hover:text-black/80 transition-colors mt-2">Visualize your data flow in
+          class="bg-white dark:bg-slate-900 h-full w-full rounded-[calc(1rem-1px)] p-6 group-hover:bg-transparent transition-colors duration-500">
+          <h4 class="font-bold text-slate-900 dark:text-white group-hover:text-black transition-colors">Interactive Dashboard</h4>
+          <p class="text-sm text-slate-500 dark:text-slate-400 group-hover:text-black/80 transition-colors mt-2">Visualize your data flow in
             real-time.</p>
           <div class="mt-4 text-cyan-400 group-hover:text-black font-bold text-xs uppercase tracking-tighter">Enter
             Console →</div>
@@ -387,36 +387,40 @@
     transform-style: preserve-3d;
   }
 
-  /* Parallax Elements */
+  .dark .integration-icon-card {
+    background: rgba(15, 23, 42, 0.78);
+  }
 
   /* High-Drama 3D Motion Cards */
   .motion-card-3d {
-    background: rgba(15, 23, 42, 0.85);
-    /* Darker for better contrast */
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(28px);
     border: 1px solid rgba(34, 211, 238, 0.2);
     transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.4s ease, border-color 0.4s ease;
     transform-style: preserve-3d;
     perspective: 1200px;
+    box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark .motion-card-3d {
+    background: rgba(15, 23, 42, 0.85); /* Darker for better contrast */
     box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.8);
   }
 
-  /* Improved Card Text Visibility */
-  .motion-card-3d p,
-  .motion-card-3d .text-slate-700,
-  .motion-card-3d .text-slate-400 {
-    color: #e2e8f0 !important;
-    /* Slate 200 for legibility */
+  /* Improved Card Text Visibility in Dark Mode */
+  .dark .motion-card-3d p,
+  .dark .motion-card-3d .text-slate-700,
+  .dark .motion-card-3d .text-slate-400 {
+    color: #e2e8f0 !important; /* Slate 200 for legibility */
   }
 
-  .motion-card-3d h3,
-  .motion-card-3d h4 {
+  .dark .motion-card-3d h3,
+  .dark .motion-card-3d h4 {
     color: #ffffff !important;
   }
 
-  .motion-card-3d p {
-    color: #f1f5f9 !important;
-    /* Slate 100 - Peak legibility */
+  .dark .motion-card-3d p {
+    color: #f1f5f9 !important; /* Slate 100 - Peak legibility */
     font-weight: 600;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
@@ -512,13 +516,13 @@
 
     items.forEach((item) => {
       const card = document.createElement("div");
-      card.className = "integration-icon-card group rounded-[1.5rem] border border-slate-800/80 p-4 transition-all duration-300";
+      card.className = "integration-icon-card group rounded-[1.5rem] border border-slate-200 dark:border-slate-800/80 p-4 transition-all duration-300";
       card.innerHTML = `
         <div class="flex h-full flex-col items-center justify-center text-center">
-          <div class="flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-slate-700/70 bg-slate-950/80 p-3 shadow-inner shadow-slate-950/40">
+          <div class="flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-slate-300 dark:border-slate-700/70 bg-slate-50 dark:bg-slate-950/80 p-3 shadow-inner shadow-slate-950/40">
             <img src="${item.logo}" alt="${item.name}" class="h-8 w-8 object-contain" loading="lazy">
           </div>
-          <h3 class="mt-4 text-sm font-black tracking-tight text-white sm:text-base">${item.name}</h3>
+          <h3 class="mt-4 text-sm font-black tracking-tight text-slate-900 dark:text-white sm:text-base">${item.name}</h3>
         </div>
       `;
       fragment.appendChild(card);
@@ -600,7 +604,7 @@
   <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
 
     <div data-aos="fade-up"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
 
       <div
         class="absolute inset-0 bg-gradient-to-br from-cyan-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl">
@@ -633,7 +637,7 @@
     </div>
 
     <div data-aos="fade-up" data-aos-delay="100"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-blue-500/30 hover:border-blue-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-blue-500/30 hover:border-blue-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
       <div
         class="absolute inset-0 bg-gradient-to-br from-blue-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl">
       </div>
@@ -659,7 +663,7 @@
     </div>
 
     <div data-aos="fade-up" data-aos-delay="200"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-purple-500/30 hover:border-purple-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-purple-500/30 hover:border-purple-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
       <div
         class="absolute inset-0 bg-gradient-to-br from-purple-400/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl">
       </div>
@@ -685,7 +689,7 @@
     </div>
 
     <div data-aos="fade-up" data-aos-delay="300"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-cyan-500/30 hover:border-cyan-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
       <div class="relative w-16 h-16 mb-8">
         <div
           class="relative w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-3xl transition-transform group-hover:scale-110 shadow-md">
@@ -702,7 +706,7 @@
     </div>
 
     <div data-aos="fade-up" data-aos-delay="400"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-blue-500/30 hover:border-blue-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-blue-500/30 hover:border-blue-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
       <div class="relative w-16 h-16 mb-8">
         <div
           class="relative w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-3xl transition-transform group-hover:scale-110 shadow-md">
@@ -719,7 +723,7 @@
     </div>
 
     <div data-aos="fade-up" data-aos-delay="500"
-      class="motion-card-3d group relative p-8 bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-red-500/30 hover:border-red-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
+      class="motion-card-3d group relative p-8 bg-white dark:bg-slate-900/10 backdrop-blur-xl rounded-3xl border border-red-500/30 hover:border-red-400 transition-all duration-500 hover:-translate-y-3 shadow-sm hover:shadow-2xl">
       <div class="relative w-16 h-16 mb-8">
         <div
           class="relative w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center text-3xl transition-transform group-hover:scale-110 shadow-md">
@@ -740,20 +744,20 @@
 
 <!-- CTA -->
 <section
-  class="px-10 py-32 text-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+  class="px-10 py-32 text-center bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative overflow-hidden">
   <div
-    class="parallax-layer absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.1),transparent_70%)]"
+    class="parallax-layer absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.05),transparent_70%)] dark:bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.1),transparent_70%)]"
     data-speed="0.2"></div>
 
-  <h2 data-aos="fade-up" class="text-4xl md:text-6xl font-black mb-6 tracking-tighter text-white">Your Data. <span
-      class="gradient-text-vibrant">One Platform.</span></h2>
-  <p data-aos="fade-up" data-aos-delay="150" class="text-slate-400 max-w-xl mx-auto mb-10 text-lg">
+  <h2 data-aos="fade-up" class="text-4xl md:text-6xl font-black mb-6 tracking-tighter text-slate-900 dark:text-white">Your Data. <span
+      class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-600 dark:gradient-text-vibrant">One Platform.</span></h2>
+  <p data-aos="fade-up" data-aos-delay="150" class="text-slate-600 dark:text-slate-400 max-w-xl mx-auto mb-10 text-lg">
     Build your organization’s data backbone with the precision of Segmento Collector.
   </p>
   <div data-aos="zoom-in" data-aos-delay="300">
     <a href="/tracking"
-      class="group relative inline-flex items-center px-12 py-5 bg-cyan-400 text-black rounded-2xl font-black transition-all hover:shadow-[0_0_40px_rgba(34,211,238,0.6)] hover:scale-105 active:scale-95 overflow-hidden">
-      <span class="relative z-10 transition-colors group-hover:text-slate-950">Launch Platform</span>
+      class="group relative inline-flex items-center px-12 py-5 bg-cyan-600 dark:bg-cyan-400 text-white dark:text-black rounded-2xl font-black transition-all hover:shadow-[0_0_40px_rgba(34,211,238,0.6)] hover:scale-105 active:scale-95 overflow-hidden">
+      <span class="relative z-10 transition-colors group-hover:text-cyan-50 dark:group-hover:text-slate-950">Launch Platform</span>
       <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity"></div>
     </a>
   </div>

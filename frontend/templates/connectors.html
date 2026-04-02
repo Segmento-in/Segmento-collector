@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 
-<section class="px-6 py-24 bg-slate-900 min-h-screen relative overflow-hidden">
+<section class="px-6 py-24 bg-white dark:bg-slate-900 min-h-screen relative overflow-hidden">
 
   <div
     class="absolute inset-0 bg-[linear-gradient(to_right,#083344_1px,transparent_1px),linear-gradient(to_bottom,#083344_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]">
   </div>
-  <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-blue-500/10 blur-3xl text-white">
+  <div class="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 via-transparent to-blue-500/10 blur-3xl text-slate-900 dark:text-white">
   </div>
 
   <div
@@ -41,11 +41,11 @@
         Enterprise Integration Hub
       </div>
 
-      <h1 class="text-6xl md:text-8xl font-black text-white mb-8 tracking-tighter leading-none">
+      <h1 class="text-6xl md:text-8xl font-black text-slate-900 dark:text-white mb-8 tracking-tighter leading-none">
         Data <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Connectors</span>
       </h1>
 
-      <p class="text-slate-300 max-w-3xl mx-auto text-lg md:text-xl font-medium leading-relaxed">
+      <p class="text-slate-600 dark:text-slate-300 max-w-3xl mx-auto text-lg md:text-xl font-medium leading-relaxed">
         Unlock the power of your data with our expansive library of <span class="text-cyan-400 font-bold">30+
           specialized categories</span>.
         Seamlessly bridge Segmento with global social networks, cloud infrastructure, and enterprise analytics.
@@ -54,34 +54,34 @@
     </div>
 
     <div class="mb-16">
-      <div class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-2 shadow-2xl">
+      <div class="bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-2 shadow-2xl">
         <div class="flex flex-col md:flex-row items-center gap-2">
 
           <div class="relative w-full md:flex-1 group">
             <div
-              class="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-400 group-focus-within:text-cyan-400 transition-colors">
+              class="absolute inset-y-0 left-6 flex items-center pointer-events-none text-slate-500 dark:text-slate-400 group-focus-within:text-cyan-400 transition-colors">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
             <input id="searchInput" type="text" placeholder="Search through our ecosystem..."
-              class="w-full bg-transparent border-none rounded-full pl-14 pr-6 py-5 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-cyan-500/20 outline-none text-lg transition-all">
+              class="w-full bg-transparent border-none rounded-full pl-14 pr-6 py-5 text-slate-900 dark:text-white placeholder:text-slate-500 focus:ring-2 focus:ring-cyan-500/20 outline-none text-lg transition-all">
           </div>
 
           <div class="hidden md:block w-px h-10 bg-white/10"></div>
 
           <div class="relative w-full md:w-72 group">
             <div
-              class="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-400 transition-colors">
+              class="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-500 dark:text-slate-400 group-focus-within:text-indigo-400 transition-colors">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </div>
             <select id="categoryFilter"
-              class="w-full bg-transparent border-none rounded-full pl-14 pr-10 py-5 text-white appearance-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20 outline-none font-semibold transition-all">
+              class="w-full bg-transparent border-none rounded-full pl-14 pr-10 py-5 text-slate-900 dark:text-white appearance-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20 outline-none font-semibold transition-all">
             </select>
-            <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-slate-400">
+            <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-slate-500 dark:text-slate-400">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
@@ -90,7 +90,7 @@
 
           <div class="w-full md:w-auto p-1">
             <button
-              class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-full shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-95">
+              class="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-900 dark:text-white font-bold rounded-full shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-95">
               Explore
             </button>
           </div>
@@ -102,10 +102,10 @@
     </div>
 
     <div id="authGateModal" class="fixed inset-0 z-50 hidden items-center justify-center px-6">
-      <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onclick="closeAuthGate()"></div>
+      <div class="absolute inset-0 bg-slate-50 dark:bg-slate-950/70 backdrop-blur-sm" onclick="closeAuthGate()"></div>
       <div
-        class="relative w-full max-w-md rounded-3xl border border-cyan-400/20 bg-slate-900/90 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
-        <button onclick="closeAuthGate()" class="absolute right-4 top-4 text-slate-400 hover:text-white"
+        class="relative w-full max-w-md rounded-3xl border border-cyan-400/20 bg-white dark:bg-slate-900/90 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
+        <button onclick="closeAuthGate()" class="absolute right-4 top-4 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white"
           aria-label="Close">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -120,8 +120,8 @@
           </svg>
         </div>
 
-        <h3 class="text-2xl font-black text-white">Create a free account to access this connector</h3>
-        <p class="mt-3 text-sm text-slate-300">Connector setup and sync controls are available after you sign up or
+        <h3 class="text-2xl font-black text-slate-900 dark:text-white">Create a free account to access this connector</h3>
+        <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">Connector setup and sync controls are available after you sign up or
           log
           in.</p>
 
@@ -130,7 +130,7 @@
             class="rounded-xl bg-cyan-400 px-4 py-3 text-center text-sm font-extrabold text-slate-900 hover:bg-cyan-300 transition-colors">Sign
             Up - It's Free</a>
           <a id="authGateLogin" href="/login"
-            class="rounded-xl border border-slate-600 px-4 py-3 text-center text-sm font-bold text-white hover:border-cyan-300 hover:text-cyan-300 transition-colors">Log
+            class="rounded-xl border border-slate-300 dark:border-slate-600 px-4 py-3 text-center text-sm font-bold text-slate-900 dark:text-white hover:border-cyan-300 hover:text-cyan-300 transition-colors">Log
             In</a>
         </div>
       </div>
@@ -267,14 +267,14 @@
     </p>
 
     <div class="mb-8 p-4 bg-slate-50/50 rounded-2xl border border-slate-100 shadow-[inset_2px_2px_5px_#e2e8f0,inset_-2px_-2px_5px_#ffffff]">
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Captured Data</p>
+        <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Captured Data</p>
         <ul class="text-xs text-slate-600 space-y-2">
           ${dataPreview}
         </ul>
     </div>
 
     <button
-      class="view-btn w-full py-3.5 bg-slate-900 text-white rounded-2xl group-hover:bg-cyan-400 group-hover:text-black group-hover:shadow-[4px_4px_10px_#cbd5e1] transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 transform-gpu"
+      class="view-btn w-full py-3.5 bg-white dark:bg-slate-900 text-slate-900 dark:text-white rounded-2xl group-hover:bg-cyan-400 group-hover:text-black group-hover:shadow-[4px_4px_10px_#cbd5e1] transition-all duration-300 font-bold text-sm flex items-center justify-center gap-2 transform-gpu"
     >
       View Connector
       <svg class="w-4 h-4 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>

@@ -12,34 +12,71 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+
     <style>
         :root {
             --ai-width: 30%;
+            /* Light Theme Variables */
+            --bg-body: #f8fafc; /* slate-50 */
+            --text-body: #0f172a; /* slate-900 */
+            --nav-bg: rgba(255, 255, 255, 0.7);
+            --nav-border: rgba(0, 0, 0, 0.05);
+            --issue-panel-bg: rgba(255, 255, 255, 0.9);
+            --issue-panel-border: rgba(148, 163, 184, 0.2);
+            --issue-item-bg: rgba(241, 245, 249, 0.55); /* slate-100 */
+            --issue-item-border: rgba(148, 163, 184, 0.15);
+            --ai-panel-bg: rgba(255, 255, 255, 0.95);
+            --ai-panel-border: rgba(148, 163, 184, 0.15);
+            --footer-bg: #f8fafc;
+            --footer-border: rgba(0, 0, 0, 0.05);
+        }
+
+        .dark {
+            /* Dark Theme Variables */
+            --bg-body: #020617; /* slate-950 */
+            --text-body: #f8fafc; /* slate-50 */
+            --nav-bg: rgba(2, 6, 23, 0.7);
+            --nav-border: rgba(255, 255, 255, 0.05);
+            --issue-panel-bg: rgba(2, 6, 23, 0.9);
+            --issue-panel-border: rgba(148, 163, 184, 0.2);
+            --issue-item-bg: rgba(15, 23, 42, 0.55); /* slate-900 */
+            --issue-item-border: rgba(148, 163, 184, 0.15);
+            --ai-panel-bg: rgba(2, 6, 23, 0.95);
+            --ai-panel-border: rgba(148, 163, 184, 0.15);
+            --footer-bg: #020617;
+            --footer-border: rgba(255, 255, 255, 0.05);
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #020617;
-            /* Slate 950 */
-            color: #f8fafc;
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Glassmorphism Navbar */
         .glass-nav {
-            background: rgba(2, 6, 23, 0.7);
+            background: var(--nav-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: width 0.3s ease;
+            border-bottom: 1px solid var(--nav-border);
+            transition: width 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .nav-link {
             font-size: 0.875rem;
             font-weight: 600;
-            color: #94a3b8;
-            /* Slate 400 */
+            color: #64748b; /* slate-500 */
             transition: all 0.3s ease;
             position: relative;
+        }
+        .dark .nav-link {
+            color: #94a3b8; /* slate-400 */
         }
 
         .nav-link:hover {
@@ -72,15 +109,17 @@
         }
 
         .issue-center-panel {
-            background: rgba(2, 6, 23, 0.9);
+            background: var(--issue-panel-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(148, 163, 184, 0.2);
+            border: 1px solid var(--issue-panel-border);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .issue-item {
-            border: 1px solid rgba(148, 163, 184, 0.15);
-            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid var(--issue-item-border);
+            background: var(--issue-item-bg);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
         .issue-dot-error {
@@ -110,9 +149,9 @@
         #ai-panel {
             width: 0;
             overflow: hidden;
-            transition: width 0.3s ease;
-            border-left: 1px solid rgba(148, 163, 184, 0.15);
-            background: rgba(2, 6, 23, 0.95);
+            transition: width 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+            border-left: 1px solid var(--ai-panel-border);
+            background: var(--ai-panel-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             position: fixed;
@@ -160,6 +199,14 @@
             transition: none !important;
         }
     </style>
+    <script>
+        // Check local storage for theme preference, and default to dark if not set
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage))) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
 
 <body class="antialiased">
@@ -173,9 +220,9 @@
                         <img src="/static/logo.png" alt="Segmento Logo"
                             class="w-14 h-14 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.5)] brightness-110 group-hover:scale-110 transition-all duration-500">
                         <div class="flex flex-col">
-                            <span class="text-xl font-black tracking-tight leading-none text-white">Segmento</span>
+                            <span class="text-xl font-black tracking-tight leading-none text-slate-900 dark:text-white">Segmento</span>
                             <span
-                                class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest mt-1">Collector</span>
+                                class="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase tracking-widest mt-1">Collector</span>
                         </div>
                     </a>
 
@@ -186,9 +233,14 @@
                     </div>
 
                     <div class="flex items-center gap-6">
+                        <!-- Theme Toggle Button -->
+                        <button id="theme-toggle" type="button" class="text-slate-500 dark:text-slate-400 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-100 dark:bg-slate-800">
+                            <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                            <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 011.415 0l.708.708a1 1 0 01-1.414 1.414l-.708-.708a1 1 0 010-1.414zM16 10a1 1 0 011 1h1a1 1 0 110-2h-1a1 1 0 01-1 1zm-4.22 4.22a1 1 0 010 1.415l-.708.708a1 1 0 01-1.414-1.414l.708-.708a1 1 0 011.414 0zM10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-4.22-4.22a1 1 0 010-1.415l-.708-.708a1 1 0 011.414-1.414l.708.708a1 1 0 01-1.414 1.414zM4 10a1 1 0 01-1-1H2a1 1 0 110 2h1a1 1 0 011-1zm4.22-4.22a1 1 0 011.415 0l.708-.708a1 1 0 01-1.414-1.414l-.708.708a1 1 0 010 1.414zM10 5a5 5 0 100 10 5 5 0 000-10z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                        </button>
                         <!-- AI Companion Toggle Button -->
                         <button id="ai-toggle-btn"
-                            class="text-xs font-bold text-cyan-400 border border-cyan-400/30 hover:bg-cyan-400/10 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2">
+                            class="text-xs font-bold text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 dark:border-cyan-400/30 hover:bg-cyan-500/10 dark:hover:bg-cyan-400/10 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M13 10V3L4 14h7v7l9-11h-7z"></path>
@@ -197,19 +249,19 @@
                         </button>
                         {% if is_logged_in %}
                         <a href="/usage"
-                            class="text-sm font-bold text-slate-400 hover:text-white transition-colors">Usage</a>
+                            class="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white transition-colors">Usage</a>
                         <a href="/account"
-                            class="text-sm font-bold text-slate-400 hover:text-white transition-colors">Account &
+                            class="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white transition-colors">Account &
                             Billing</a>
                         <a href="/logout"
-                            class="btn-premium px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl border border-slate-700">
+                            class="btn-premium px-5 py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-xs font-bold rounded-xl border border-slate-300 dark:border-slate-700">
                             Logout
                         </a>
                         {% else %}
                         <a href="/login"
-                            class="text-sm font-bold text-slate-400 hover:text-white transition-colors">Login</a>
+                            class="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-900 dark:text-white transition-colors">Login</a>
                         <a href="/signup"
-                            class="btn-premium px-6 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-cyan-500/10">
+                            class="btn-premium px-6 py-2.5 bg-cyan-500 hover:bg-cyan-600 dark:hover:bg-cyan-400 text-white dark:text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-cyan-500/10">
                             Get Started
                         </a>
                         {% endif %}
@@ -245,20 +297,20 @@
             </div>
 
             <button id="issueCenterToggle"
-                class="fixed bottom-8 right-8 z-[90] px-4 py-3 rounded-xl bg-slate-900/90 text-slate-100 border border-slate-700 hover:border-cyan-400/50 shadow-xl text-xs font-bold tracking-widest uppercase flex items-center gap-2">
+                class="fixed bottom-8 right-8 z-[90] px-4 py-3 rounded-xl bg-white dark:bg-slate-900/90 text-slate-100 border border-slate-300 dark:border-slate-700 hover:border-cyan-400/50 shadow-xl text-xs font-bold tracking-widest uppercase flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
                 Issue Center
             </button>
 
             <div id="issueCenterPanel"
                 class="issue-center-panel fixed right-6 bottom-24 z-[95] w-[min(94vw,30rem)] max-h-[70vh] rounded-2xl shadow-2xl hidden overflow-hidden">
-                <div class="px-5 py-4 border-b border-slate-700/60 flex items-center justify-between">
+                <div class="px-5 py-4 border-b border-slate-300 dark:border-slate-700/60 flex items-center justify-between">
                     <div>
-                        <h3 class="text-sm font-bold text-white tracking-wide">Runtime Issues</h3>
-                        <p class="text-xs text-slate-400">Connector sync, auth, and API errors</p>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white tracking-wide">Runtime Issues</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Connector sync, auth, and API errors</p>
                     </div>
                     <button id="issueCenterClear"
-                        class="text-xs text-slate-300 hover:text-white font-semibold">Clear</button>
+                        class="text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white font-semibold">Clear</button>
                 </div>
                 <div id="issueCenterList" class="p-4 space-y-3 overflow-y-auto max-h-[58vh]"></div>
             </div>
@@ -269,7 +321,7 @@
                 {% block content %}{% endblock %}
             </main>
 
-            <footer class="border-t border-white/5 py-12 mt-20 text-center relative z-20 bg-[#020617]">
+            <footer class="border-t border-slate-200 dark:border-white/5 py-12 mt-20 text-center relative z-20 bg-[#020617]">
                 <div class="flex justify-center mb-10">
                     <img src="/static/logo.png" alt="Segmento Logo"
                         class="h-16 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.3)] filter brightness-90 hover:brightness-110 transition-all duration-500">
@@ -403,13 +455,13 @@
                         if (!toastStack) return;
                         const cls = classify(evt.level);
                         const toast = document.createElement('div');
-                        toast.className = 'pointer-events-auto rounded-xl border border-slate-700/70 bg-slate-900/95 p-4 shadow-2xl';
+                        toast.className = 'pointer-events-auto rounded-xl border border-slate-300 dark:border-slate-700/70 bg-white dark:bg-slate-900/95 p-4 shadow-2xl';
                         toast.innerHTML = `
                     <div class="flex items-start gap-3">
                         <span class="w-2.5 h-2.5 rounded-full mt-1 ${cls.dot}"></span>
                         <div class="min-w-0">
                             <p class="text-sm font-bold ${cls.text}">${evt.title}</p>
-                            <p class="text-xs text-slate-300 mt-1 break-words">${evt.message}</p>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 mt-1 break-words">${evt.message}</p>
                             <p class="text-[10px] text-slate-500 mt-2 uppercase tracking-wider">${evt.source} • ${evt.at}</p>
                         </div>
                     </div>`;
@@ -426,7 +478,7 @@
                         if (!list) return;
                         if (!events.length) {
                             list.innerHTML = `<div class="issue-item rounded-xl p-4">
-                        <p class="text-xs text-slate-400">No issues captured in this session.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">No issues captured in this session.</p>
                     </div>`;
                             return;
                         }
@@ -442,7 +494,7 @@
                             </div>
                             <p class="text-[10px] text-slate-500">${evt.at}</p>
                         </div>
-                        <p class="text-xs text-slate-300 mt-2 break-words">${evt.message}</p>
+                        <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 break-words">${evt.message}</p>
                         <p class="text-[10px] text-slate-500 mt-2 uppercase tracking-wider">${evt.source}</p>
                         ${statusLine}
                     </div>`;
@@ -642,19 +694,19 @@
 
         <div id="ai-panel">
             <div id="ai-resizer"></div>
-            <div class="px-5 py-4 border-b border-slate-700/60 flex items-center justify-between relative z-20">
-                <h3 class="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+            <div class="px-5 py-4 border-b border-slate-300 dark:border-slate-700/60 flex items-center justify-between relative z-20">
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white tracking-wide flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                     AI Companion
                 </h3>
                 <div class="flex items-center gap-2">
                     <button id="ai-new-btn"
-                        class="text-xs font-semibold px-2 py-1 rounded-md bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition border border-slate-700/50 shadow-sm">New
+                        class="text-xs font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-700 transition border border-slate-300 dark:border-slate-700/50 shadow-sm">New
                         Chat</button>
                     <button id="ai-see-all-btn"
-                        class="text-xs font-semibold px-2 py-1 rounded-md bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition border border-slate-700/50 shadow-sm">Old
+                        class="text-xs font-semibold px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:text-white hover:bg-slate-700 transition border border-slate-300 dark:border-slate-700/50 shadow-sm">Old
                         Chats</button>
-                    <button id="ai-close-btn" class="text-xs text-slate-400 hover:text-white transition-colors ml-1">
+                    <button id="ai-close-btn" class="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors ml-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12"></path>
@@ -665,12 +717,12 @@
 
             <!-- Conversation Overlay -->
             <div id="ai-conversations-overlay"
-                class="absolute inset-x-0 inset-y-0 z-[60] bg-[#020617]/90 backdrop-blur-xl flex flex-col opacity-0 scale-95 pointer-events-none transition-all duration-300 ease-out rounded-l-xl overflow-hidden shadow-2xl border-l border-white/5">
+                class="absolute inset-x-0 inset-y-0 z-[60] bg-[#020617]/90 backdrop-blur-xl flex flex-col opacity-0 scale-95 pointer-events-none transition-all duration-300 ease-out rounded-l-xl overflow-hidden shadow-2xl border-l border-slate-200 dark:border-white/5">
                 <!-- Close button for overlay is here -->
-                <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
-                    <h3 class="text-xs font-bold text-slate-300 tracking-wider uppercase">Select a conversation</h3>
+                <div class="px-5 py-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between">
+                    <h3 class="text-xs font-bold text-slate-600 dark:text-slate-300 tracking-wider uppercase">Select a conversation</h3>
                     <button id="ai-overlay-close-btn"
-                        class="text-xs text-slate-500 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10">
+                        class="text-xs text-slate-500 hover:text-slate-900 dark:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12"></path>
@@ -683,15 +735,15 @@
                 </div>
             </div>
             <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4">
-                <div class="bg-slate-800/50 rounded-xl p-3 border border-slate-700/50">
-                    <p class="text-xs text-slate-300">Hello! I'm your Segmento AI Companion. How can I assist you with
+                <div class="bg-slate-100 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-300 dark:border-slate-700/50">
+                    <p class="text-xs text-slate-600 dark:text-slate-300">Hello! I'm your Segmento AI Companion. How can I assist you with
                         your data pipeline today?</p>
                 </div>
             </div>
-            <div class="p-4 border-t border-slate-700/60 bg-slate-900/50">
+            <div class="p-4 border-t border-slate-300 dark:border-slate-700/60 bg-white dark:bg-slate-900/50">
                 <div class="flex items-center gap-2">
                     <textarea id="ai-chat-input" placeholder="Ask anything..." rows="1"
-                        class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 transition-colors resize-none overflow-hidden h-[34px] min-h-[34px] max-h-[120px] pt-[7px] leading-relaxed"></textarea>
+                        class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-cyan-400 transition-colors resize-none overflow-hidden h-[34px] min-h-[34px] max-h-[120px] pt-[7px] leading-relaxed"></textarea>
                     <button id="ai-send-btn"
                         class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 p-2 rounded-lg transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -704,6 +756,36 @@
         </div>
     </div> <!-- end app-container -->
 
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage))) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        themeToggleBtn.addEventListener('click', function() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            }
+        });
+    </script>
 </body>
 
 </html>

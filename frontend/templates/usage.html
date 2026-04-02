@@ -150,7 +150,7 @@
             <div>
                 <span class="text-cyan-400 font-bold text-xs uppercase tracking-[0.45em] mb-3 block">Platform
                     Pulse</span>
-                <h1 class="text-5xl md:text-6xl font-black text-white tracking-tight">
+                <h1 class="text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight">
                     Usage <span class="relative inline-block">
                         Dashboard
                         <svg class="absolute -bottom-3 left-0 w-full h-3" viewBox="0 0 120 8"
@@ -159,7 +159,7 @@
                         </svg>
                     </span>
                 </h1>
-                <p class="text-slate-300 mt-5 max-w-2xl text-lg">
+                <p class="text-slate-600 dark:text-slate-300 mt-5 max-w-2xl text-lg">
                     Real-time overview of your data flows, sync health & platform activity.
                 </p>
             </div>
@@ -171,7 +171,7 @@
                         <div class="absolute inset-0 bg-green-400 blur-md rounded-full opacity-40 animate-ping"></div>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Status</p>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Status</p>
                         <p class="text-sm font-bold text-green-400">HEALTHY</p>
                     </div>
                 </div>
@@ -182,7 +182,7 @@
                         <div class="absolute inset-0 bg-cyan-400 blur-md rounded-full opacity-40 animate-ping"></div>
                     </div>
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase">Data Freshness</p>
+                        <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Data Freshness</p>
                         <p id="dataFreshness" class="text-xs font-bold text-cyan-400">Loading...</p>
                     </div>
                 </div>
@@ -224,7 +224,7 @@
                     </svg>
                     <div class="absolute inset-0 flex flex-col items-center justify-center">
                         <div id="automationScore" class="text-4xl font-black text-cyan-400">—%</div>
-                        <div class="text-xs text-slate-400 -mt-1">Scheduled</div>
+                        <div class="text-xs text-slate-500 dark:text-slate-400 -mt-1">Scheduled</div>
                     </div>
                 </div>
                 <p class="text-center text-slate-500 text-xs mt-5 italic">Maturity of your pipelines</p>
@@ -240,11 +240,11 @@
             </div>
             <div class="flex items-center gap-4 mb-8">
                 <div class="h-8 w-1 bg-cyan-500 shadow-[0_0_15px_#22d3ee]"></div>
-                <h2 class="text-2xl font-bold text-white tracking-tight">Intelligence Feed</h2>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Intelligence Feed</h2>
             </div>
             <div id="usageInsights" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Original placeholder kept – will be replaced by JS -->
-                <div class="flex items-center gap-3 text-slate-400 animate-pulse">
+                <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 animate-pulse">
                     <div class="w-2 h-2 bg-slate-500 rounded-full"></div>
                     Parsing performance logs...
                 </div>
@@ -255,7 +255,7 @@
         <div class="grid lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 premium-card p-9 md:p-11" data-aos="fade-right">
                 <div class="flex justify-between items-center mb-10">
-                    <h2 class="text-2xl font-bold text-white">Data Throughput</h2>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Data Throughput</h2>
                     <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Records by Source</span>
                 </div>
                 <div class="h-[380px]">
@@ -264,7 +264,7 @@
             </div>
 
             <div class="premium-card p-9 md:p-11" data-aos="fade-left">
-                <h2 class="text-2xl font-bold text-white mb-10">Pipeline Automation</h2>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-10">Pipeline Automation</h2>
                 <div class="h-[340px]">
                     <canvas id="syncPie"></canvas>
                 </div>
@@ -275,7 +275,7 @@
         <div class="grid lg:grid-cols-2 gap-8" data-aos="fade-up">
             <div class="premium-card p-9 md:p-11">
                 <div class="flex justify-between items-center mb-10">
-                    <h2 class="text-2xl font-bold text-white">Daily Usage</h2>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Daily Usage</h2>
                     <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Last 14 Days</span>
                 </div>
                 <div class="h-[300px]">
@@ -285,7 +285,7 @@
 
             <div class="premium-card p-9 md:p-11">
                 <div class="flex justify-between items-center mb-10">
-                    <h2 class="text-2xl font-bold text-white">Top Connectors</h2>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Top Connectors</h2>
                     <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">By Records Synced</span>
                 </div>
                 <div class="h-[300px]">
@@ -298,7 +298,7 @@
 
         <div class="grid lg:grid-cols-2 gap-8">
             <div class="premium-card p-8 h-fit">
-                <h2 class="text-xl font-bold text-white mb-8 flex items-center gap-2">
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-2">
                     <span class="w-2 h-2 bg-cyan-500 rounded-full"></span>
                     Data Delivery
                 </h2>
@@ -306,34 +306,34 @@
                     <table class="w-full text-sm premium-table">
                         <thead>
                             <tr
-                                class="text-slate-400 text-[11px] font-black uppercase tracking-widest border-b border-white/10">
+                                class="text-slate-500 dark:text-slate-400 text-[11px] font-black uppercase tracking-widest border-b border-slate-200 dark:border-white/10">
                                 <th class="text-left py-5 px-4">Node</th>
                                 <th class="text-center py-5 px-4">Payload (Rows)</th>
                                 <th class="text-right py-5 px-4">Timestamp</th>
                             </tr>
                         </thead>
-                        <tbody id="destinationTable" class="text-slate-200"></tbody>
+                        <tbody id="destinationTable" class="text-slate-700 dark:text-slate-200"></tbody>
                     </table>
                 </div>
             </div>
 
             <div class="space-y-8">
                 <div class="premium-card p-10">
-                    <h2 class="text-xl font-bold text-white mb-8">Pipeline Activity</h2>
+                    <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-8">Pipeline Activity</h2>
                     <div class="grid grid-cols-2 gap-10">
                         <div class="relative">
                             <div class="stat-label">Initial Contact</div>
-                            <div id="firstConnected" class="text-lg text-white font-medium mt-2">--</div>
+                            <div id="firstConnected" class="text-lg text-slate-900 dark:text-white font-medium mt-2">--</div>
                         </div>
                         <div class="relative">
                             <div class="stat-label">Last Successful Push</div>
                             <div id="lastSync" class="text-lg text-cyan-400 font-medium mt-2">--</div>
                         </div>
-                        <div class="pt-6 border-t border-white/5">
+                        <div class="pt-6 border-t border-slate-200 dark:border-white/5">
                             <div class="stat-label">Total Executions</div>
-                            <div id="totalRuns" class="text-3xl font-black text-white mt-2">--</div>
+                            <div id="totalRuns" class="text-3xl font-black text-slate-900 dark:text-white mt-2">--</div>
                         </div>
-                        <div class="pt-6 border-t border-white/5">
+                        <div class="pt-6 border-t border-slate-200 dark:border-white/5">
                             <div class="stat-label text-red-400/80">Logged Failures</div>
                             <div id="failedRuns" class="text-3xl font-black text-red-400 mt-2">--</div>
                         </div>
@@ -343,13 +343,13 @@
                 <div class="grid grid-cols-2 gap-8">
                     <div class="premium-card p-8 bg-opacity-40">
                         <div class="stat-label">Engine Scheduler</div>
-                        <div id="scheduledJobs" class="text-3xl font-black text-white mt-2">--</div>
+                        <div id="scheduledJobs" class="text-3xl font-black text-slate-900 dark:text-white mt-2">--</div>
                         <div class="text-[10px] text-slate-500 font-bold uppercase mt-2 tracking-tighter">Active
                             Background Tasks</div>
                     </div>
                     <div class="premium-card p-8 bg-opacity-40">
                         <div class="stat-label">API Gateway</div>
-                        <div id="apiCalls" class="text-3xl font-black text-white mt-2">--</div>
+                        <div id="apiCalls" class="text-3xl font-black text-slate-900 dark:text-white mt-2">--</div>
                         <div class="text-[10px] text-slate-500 font-bold uppercase mt-2 tracking-tighter">Request
                             Consumption</div>
                     </div>
@@ -361,13 +361,13 @@
             data-aos="fade-up">
             <div class="flex flex-col md:flex-row justify-between items-center gap-8">
                 <div class="text-center md:text-left">
-                    <h2 class="text-2xl font-black text-white mb-2">Organization Profile</h2>
-                    <p class="text-slate-400 text-sm">Managing your enterprise identity and session security.</p>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Organization Profile</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Managing your enterprise identity and session security.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-x-12 gap-y-6">
                     <div>
                         <span class="stat-label">Registered Entity</span>
-                        <p id="companyName" class="text-white font-bold text-lg mt-1">--</p>
+                        <p id="companyName" class="text-slate-900 dark:text-white font-bold text-lg mt-1">--</p>
                     </div>
                     <div>
                         <span class="stat-label">Access Level</span>
@@ -377,9 +377,9 @@
                 </div>
             </div>
             <div
-                class="mt-10 pt-10 border-t border-white/5 flex flex-wrap justify-between text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">
-                <div>Account Age: <span id="accountAge" class="text-white ml-2">-- Days</span></div>
-                <div>Registry Date: <span id="accountCreated" class="text-white ml-2">--</span></div>
+                class="mt-10 pt-10 border-t border-slate-200 dark:border-white/5 flex flex-wrap justify-between text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+                <div>Account Age: <span id="accountAge" class="text-slate-900 dark:text-white ml-2">-- Days</span></div>
+                <div>Registry Date: <span id="accountCreated" class="text-slate-900 dark:text-white ml-2">--</span></div>
                 <div>Live Sessions: <span id="totalSessions" class="text-cyan-400 ml-2">--</span></div>
             </div>
         </div>

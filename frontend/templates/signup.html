@@ -97,7 +97,7 @@
 
     <main class="min-h-screen flex flex-col lg:flex-row">
 
-        <div class="hidden lg:flex w-[40%] bg-slate-950 fixed h-full flex-col justify-center px-16 overflow-hidden">
+        <div class="hidden lg:flex w-[40%] bg-slate-50 dark:bg-slate-950 fixed h-full flex-col justify-center px-16 overflow-hidden">
             <div class="data-node w-32 h-32 top-12 left-10" style="animation-delay: 0s; opacity: 0.8;"></div>
             <div class="data-node w-24 h-24 bottom-24 right-12" style="animation-delay: -3s; opacity: 0.6;"></div>
 
@@ -105,13 +105,13 @@
                 <div class="flex items-center gap-2 mb-12 animate-fade-in-down">
                     <img src="/static/logo.png" alt="Segmento Logo"
                         class="w-12 h-12 rounded object-contain bg-white shadow-lg shadow-cyan-500/20">
-                    <span class="text-xl font-bold tracking-tight text-white">Segmento Collector</span>
+                    <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Segmento Collector</span>
                 </div>
-                <h1 class="text-5xl font-extrabold text-white leading-[1.1] mb-6">
+                <h1 class="text-5xl font-extrabold text-slate-900 dark:text-white leading-[1.1] mb-6">
                     Modern data pipelines <br />
                     <span class="text-cyan-400">at your fingertips.</span>
                 </h1>
-                <p class="text-slate-400 text-lg max-w-md leading-relaxed">
+                <p class="text-slate-500 dark:text-slate-400 text-lg max-w-md leading-relaxed">
                     Automate your data collection and synchronization in minutes, not months.
                 </p>
             </div>
@@ -130,7 +130,7 @@
                 </div>
 
                 <div class="text-sm font-medium">
-                    <span class="text-slate-400 mr-2">Already have an account?</span>
+                    <span class="text-slate-500 dark:text-slate-400 mr-2">Already have an account?</span>
                     <a href="/login?next={{ next_url }}&auth_required={{ auth_required }}"
                         class="text-cyan-600 hover:text-cyan-500 font-bold border-b-2 border-cyan-100 pb-0.5">Login</a>
                 </div>
@@ -160,12 +160,12 @@
                             Personal Details</h3>
                         <div class="grid grid-cols-2 gap-6">
                             <div class="space-y-1.5">
-                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">First
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">First
                                     Name</label>
                                 <input name="first_name" required class="input-premium" placeholder="Elon">
                             </div>
                             <div class="space-y-1.5">
-                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Last
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Last
                                     Name</label>
                                 <input name="last_name" required class="input-premium" placeholder="Musk">
                             </div>
@@ -173,7 +173,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="space-y-1.5">
-                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Work
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Work
                                     Email</label>
                                 <input name="email" type="email" required class="input-premium"
                                     placeholder="name@company.com">
@@ -181,7 +181,7 @@
                             </div>
                             <div class="space-y-1.5">
                                 <label
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                                    class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Password</label>
                                 <input id="passwordInput" name="password" type="password" required class="input-premium"
                                     placeholder="••••••••">
                                 <div class="flex gap-4 mt-2 ml-1">
@@ -203,7 +203,7 @@
                             <label for="individualToggle" class="text-sm font-bold text-slate-700 cursor-pointer">I am
                                 signing up as an individual</label>
                         </div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase">Step 1 of 2</span>
+                        <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Step 1 of 2</span>
                     </div>
 
                     <div id="companyFields" class="space-y-6">
@@ -213,13 +213,13 @@
                         <div class="grid grid-cols-2 gap-6">
                             <div class="space-y-1.5">
                                 <label
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Company
+                                    class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Company
                                     Name</label>
                                 <input name="company_name" class="input-premium" placeholder="Tesla Inc.">
                             </div>
                             <div class="space-y-1.5">
                                 <label
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Employee
+                                    class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Employee
                                     Size</label>
                                 <select name="company_size" class="input-premium bg-white">
                                     <option value="">Select range...</option>
@@ -230,18 +230,18 @@
                             </div>
                             <div class="space-y-1.5">
                                 <label
-                                    class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Country</label>
+                                    class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Country</label>
                                 <input name="country" class="input-premium" placeholder="United States">
                             </div>
                             <div class="space-y-1.5">
-                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Phone
+                                <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Phone
                                     Number</label>
                                 <input name="phone" class="input-premium" placeholder="+1...">
                             </div>
                         </div>
 
                         <div class="space-y-2">
-                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Company
+                            <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Company
                                 Logo</label>
                             <label
                                 class="flex flex-col items-center justify-center w-full p-6 border-2 border-slate-200 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 hover:border-cyan-300 transition-all group">
@@ -262,7 +262,7 @@
 
                     <div class="pt-4">
                         <button type="submit"
-                            class="w-full bg-slate-950 text-white py-4 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all transform active:scale-[0.98] shadow-2xl shadow-slate-300">
+                            class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white py-4 rounded-xl font-bold text-sm hover:bg-slate-100 dark:bg-slate-800 transition-all transform active:scale-[0.98] shadow-2xl shadow-slate-300">
                             Create Professional Account
                         </button>
                     </div>
@@ -270,7 +270,7 @@
                     <div class="relative flex items-center justify-center py-4">
                         <div class="absolute w-full border-t border-slate-100"></div>
                         <span
-                            class="relative px-6 bg-white text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Social
+                            class="relative px-6 bg-white text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Social
                             Connect</span>
                     </div>
 
@@ -288,7 +288,7 @@
                     </div>
 
                     <footer class="text-center pt-8">
-                        <p class="text-[11px] text-slate-400 leading-relaxed px-12">
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed px-12">
                             By creating an account, you agree to Segmento's <br />
                             <a href="#" class="text-slate-950 underline font-extrabold">Terms of Service</a> and <a
                                 href="#" class="text-slate-900 underline font-extrabold">Privacy Policy</a>.
