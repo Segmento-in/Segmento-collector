@@ -75,7 +75,7 @@
 
     <main class="min-h-screen flex flex-col lg:flex-row">
 
-        <div class="hidden lg:flex w-[40%] bg-slate-950 fixed h-full flex-col justify-center px-16 overflow-hidden">
+        <div class="hidden lg:flex w-[40%] bg-slate-50 dark:bg-slate-950 fixed h-full flex-col justify-center px-16 overflow-hidden">
             <div class="data-node w-32 h-32 top-12 left-10" style="animation-delay: 0s; opacity: 0.8;"></div>
             <div class="data-node w-24 h-24 bottom-24 right-12" style="animation-delay: -3s; opacity: 0.6;"></div>
 
@@ -83,13 +83,13 @@
                 <div class="flex items-center gap-2 mb-12 animate-fade-in-down">
                     <img src="/static/logo.png" alt="Segmento Logo"
                         class="w-12 h-12 rounded object-contain bg-white shadow-lg shadow-cyan-500/20">
-                    <span class="text-xl font-bold tracking-tight text-white">Segmento Collector</span>
+                    <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Segmento Collector</span>
                 </div>
-                <h1 class="text-5xl font-extrabold text-white leading-[1.1] mb-6">
+                <h1 class="text-5xl font-extrabold text-slate-900 dark:text-white leading-[1.1] mb-6">
                     Welcome back <br />
                     <span class="text-cyan-400">to the pipeline.</span>
                 </h1>
-                <p class="text-slate-400 text-lg max-w-md leading-relaxed">
+                <p class="text-slate-500 dark:text-slate-400 text-lg max-w-md leading-relaxed">
                     Log in to manage your data connectors and monitor your synchronization tasks.
                 </p>
             </div>
@@ -102,7 +102,7 @@
             <header
                 class="w-full lg:hidden px-8 py-8 flex justify-between items-center absolute top-0 w-full animate-fade-in">
                 <a href="/"
-                    class="flex items-center text-sm font-bold text-slate-400 hover:text-cyan-500 transition-colors mr-4 group">
+                    class="flex items-center text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-cyan-500 transition-colors mr-4 group">
                     <svg class="w-4 h-4 mr-1 group-hover:-translate-x-1 transition-transform" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -158,7 +158,7 @@
                     <input type="hidden" name="next" value="{{ next_url }}">
                     <input type="hidden" name="auth_required" value="{{ auth_required }}">
                     <div class="space-y-1.5">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Work
+                        <label class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Work
                             Email</label>
                         <input name="email" type="email" required class="input-premium" placeholder="name@company.com">
                     </div>
@@ -166,7 +166,7 @@
                     <div class="space-y-1.5">
                         <div class="flex justify-between items-center">
                             <label
-                                class="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                                class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Password</label>
                             <a href="#"
                                 class="text-[11px] font-bold text-cyan-600 uppercase hover:text-cyan-500 transition-colors">Forgot
                                 Password?</a>
@@ -176,7 +176,7 @@
 
                     <div class="pt-2">
                         <button type="submit"
-                            class="w-full bg-slate-950 text-white py-4 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all transform active:scale-[0.98] shadow-2xl shadow-slate-200">
+                            class="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white py-4 rounded-xl font-bold text-sm hover:bg-slate-100 dark:bg-slate-800 transition-all transform active:scale-[0.98] shadow-2xl shadow-slate-200">
                             Log In
                         </button>
                     </div>
@@ -184,7 +184,7 @@
                     <div class="relative flex items-center justify-center py-4">
                         <div class="absolute w-full border-t border-slate-100"></div>
                         <span
-                            class="relative px-6 bg-white text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Or
+                            class="relative px-6 bg-white text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Or
                             continue with</span>
                     </div>
 

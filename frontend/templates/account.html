@@ -144,10 +144,10 @@
         <div class="space-y-4" data-aos="fade-down">
             <span class="text-cyan-400 font-bold text-xs uppercase tracking-[0.45em] mb-3 block">Billing
                 Portfolio</span>
-            <h1 class="text-5xl md:text-6xl font-black text-white tracking-tight leading-tight">
+            <h1 class="text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                 Account & <span class="text-cyan-400">Billing</span>
             </h1>
-            <p class="text-slate-300 max-w-2xl text-lg leading-relaxed">
+            <p class="text-slate-600 dark:text-slate-300 max-w-2xl text-lg leading-relaxed">
                 Manage your subscription, billing cycles and account usage in one central place.
             </p>
         </div>
@@ -181,9 +181,9 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
                     <div class="h-8 w-1 bg-cyan-500 shadow-[0_0_15px_#22d3ee]"></div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">Subscription Plans</h2>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Subscription Plans</h2>
                 </div>
-                <div class="flex p-1 bg-slate-900/50 backdrop-blur-md rounded-2xl border border-white/5 w-fit">
+                <div class="flex p-1 bg-white dark:bg-slate-900/50 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 w-fit">
                     <button class="cycle-tab active" onclick="switchPlanCycle('daily', this)">Daily</button>
                     <button class="cycle-tab" onclick="switchPlanCycle('weekly', this)">Weekly</button>
                     <button class="cycle-tab" onclick="switchPlanCycle('monthly', this)">Monthly</button>
@@ -195,27 +195,27 @@
                 <!-- Plans will be injected or toggled via JS -->
                 <!-- Starter -->
                 <div class="premium-card p-10 flex flex-col plan-card" data-plan="starter">
-                    <div class="stat-label text-slate-400 mb-2">Starter</div>
+                    <div class="stat-label text-slate-500 dark:text-slate-400 mb-2">Starter</div>
                     <div class="text-xs text-cyan-400 font-bold uppercase tracking-widest mb-4 cycle-label">Monthly Plan
                     </div>
-                    <div class="text-4xl font-black text-white price-value">₹0<span
+                    <div class="text-4xl font-black text-slate-900 dark:text-white price-value">₹0<span
                             class="text-lg text-slate-500 font-medium">/mo</span></div>
                     <div class="mt-8 space-y-4 flex-grow">
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="connector-limit">5</span> Connectors
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="destination-limit">2</span> Destinations
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -224,7 +224,7 @@
                         </div>
                     </div>
                     <button
-                        class="mt-10 py-3 rounded-xl bg-slate-800 text-white font-bold text-sm hover:bg-slate-700 transition-all">Downgrade</button>
+                        class="mt-10 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm hover:bg-slate-700 transition-all">Downgrade</button>
                 </div>
 
                 <!-- Pro -->
@@ -232,24 +232,24 @@
                     <div class="stat-label text-cyan-400 mb-2">Pro</div>
                     <div class="text-xs text-cyan-400 font-bold uppercase tracking-widest mb-4 cycle-label">Monthly Plan
                     </div>
-                    <div class="text-4xl font-black text-white price-value">₹99<span
+                    <div class="text-4xl font-black text-slate-900 dark:text-white price-value">₹99<span
                             class="text-lg text-slate-500 font-medium">/mo</span></div>
                     <div class="mt-8 space-y-4 flex-grow">
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="connector-limit">Unlimited</span> Connectors
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             <span class="destination-limit">8</span> Destinations
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -264,26 +264,26 @@
 
                 <!-- Enterprise -->
                 <div class="premium-card p-10 flex flex-col plan-card" data-plan="enterprise">
-                    <div class="stat-label text-slate-400 mb-2">Enterprise</div>
+                    <div class="stat-label text-slate-500 dark:text-slate-400 mb-2">Enterprise</div>
                     <div class="text-xs text-cyan-400 font-bold uppercase tracking-widest mb-4 cycle-label">Yearly Plan
                     </div>
-                    <div class="text-4xl font-black text-white price-value">Custom</div>
+                    <div class="text-4xl font-black text-slate-900 dark:text-white price-value">Custom</div>
                     <div class="mt-8 space-y-4 flex-grow">
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             Custom Limits
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
                             </svg>
                             Dedicated Support
                         </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                        <div class="flex items-center gap-3 text-sm text-slate-600 dark:text-slate-300">
                             <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M5 13l4 4L19 7"></path>
@@ -292,7 +292,7 @@
                         </div>
                     </div>
                     <button
-                        class="mt-10 py-3 rounded-xl bg-slate-800 text-white font-bold text-sm hover:bg-slate-700 transition-all">Contact
+                        class="mt-10 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm hover:bg-slate-700 transition-all">Contact
                         Us</button>
                 </div>
             </div>
@@ -302,13 +302,13 @@
         <div class="space-y-8">
             <div class="flex items-center gap-4">
                 <div class="h-8 w-1 bg-cyan-500 shadow-[0_0_15px_#22d3ee]"></div>
-                <h2 class="text-2xl font-bold text-white tracking-tight">Usage Overview</h2>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Usage Overview</h2>
             </div>
 
             <div class="grid grid-cols-1 gap-8">
                 <div class="premium-card p-9 md:p-11" data-aos="fade-up">
                     <div class="flex justify-between items-center mb-10">
-                        <h3 class="text-xl font-bold text-white">Platform Resource Consumption</h3>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Platform Resource Consumption</h3>
                         <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Usage vs Plan
                             Limits</span>
                     </div>
@@ -321,7 +321,7 @@
 
         <!-- Billing History -->
         <div class="premium-card p-8 overflow-hidden" data-aos="fade-up">
-            <h2 class="text-xl font-bold text-white mb-8 flex items-center gap-2">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-2">
                 <span class="w-2 h-2 bg-cyan-500 rounded-full"></span>
                 Billing History
             </h2>
@@ -337,7 +337,7 @@
                             <th class="text-right">Invoice</th>
                         </tr>
                     </thead>
-                    <tbody class="text-slate-200">
+                    <tbody class="text-slate-700 dark:text-slate-200">
                         <tr class="hover:bg-white/5 transition-all">
                             <td>Mar 01, 2026</td>
                             <td>Monthly</td>
@@ -378,13 +378,13 @@
             data-aos="fade-up">
             <div class="flex flex-col md:flex-row justify-between items-center gap-8">
                 <div class="text-center md:text-left">
-                    <h2 class="text-2xl font-black text-white mb-2">Organization Profile</h2>
-                    <p class="text-slate-400 text-sm">Managing your enterprise identity and billing entities.</p>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Organization Profile</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm">Managing your enterprise identity and billing entities.</p>
                 </div>
                 <div class="grid grid-cols-2 gap-x-12 gap-y-6">
                     <div>
                         <span class="stat-label">Registered Entity</span>
-                        <p id="companyName" class="text-white font-bold text-lg mt-1">--</p>
+                        <p id="companyName" class="text-slate-900 dark:text-white font-bold text-lg mt-1">--</p>
                     </div>
                     <div>
                         <span class="stat-label">Account Type</span>
@@ -394,8 +394,8 @@
                 </div>
             </div>
             <div
-                class="mt-10 pt-10 border-t border-white/5 flex flex-wrap justify-between text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">
-                <div>Registry Date: <span id="accountCreated" class="text-white ml-2">--</span></div>
+                class="mt-10 pt-10 border-t border-slate-200 dark:border-white/5 flex flex-wrap justify-between text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+                <div>Registry Date: <span id="accountCreated" class="text-slate-900 dark:text-white ml-2">--</span></div>
                 <div>Live Sessions: <span id="totalSessions" class="text-cyan-400 ml-2">--</span></div>
                 <div>Tax ID: <span class="text-cyan-400 ml-2">US-8429-SEG</span></div>
             </div>

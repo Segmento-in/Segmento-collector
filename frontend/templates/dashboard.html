@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
 
-<section class="px-6 py-12 bg-slate-900 min-h-screen relative overflow-hidden">
+<section class="px-6 py-12 bg-white dark:bg-slate-900 min-h-screen relative overflow-hidden">
   <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full -z-0"></div>
 
   <div class="max-w-7xl mx-auto relative z-10">
     
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
       <div>
-        <h1 class="text-4xl font-black text-white tracking-tight">
+        <h1 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
           Web Tracking <span class="text-cyan-400">Dashboard</span>
         </h1>
-        <p class="text-slate-400 mt-2 font-medium">
+        <p class="text-slate-500 dark:text-slate-400 mt-2 font-medium">
           Real-time insights across your tracked domains.
         </p>
       </div>
       
-      <div class="flex flex-wrap gap-3 p-2 bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-2xl shadow-xl">
-        <select id="domainSelect" class="bg-slate-900 border border-slate-700 rounded-xl text-white text-sm px-4 py-2.5 focus:border-cyan-400 outline-none transition-all cursor-pointer">
+      <div class="flex flex-wrap gap-3 p-2 bg-slate-100 dark:bg-slate-800/40 backdrop-blur-md border border-slate-300 dark:border-slate-700/50 rounded-2xl shadow-xl">
+        <select id="domainSelect" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm px-4 py-2.5 focus:border-cyan-400 outline-none transition-all cursor-pointer">
           <option value="">Select Website</option>
         </select>
 
-        <select id="tableSelect" class="bg-slate-900 border border-slate-700 rounded-xl text-white text-sm px-4 py-2.5 focus:border-cyan-400 outline-none transition-all cursor-pointer">
+        <select id="tableSelect" class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white text-sm px-4 py-2.5 focus:border-cyan-400 outline-none transition-all cursor-pointer">
           <option value="visits">Visits</option>
           <option value="events">Events</option>
           <option value="identities">Identities</option>
@@ -31,7 +31,7 @@
           Load Data
         </button>
 
-        <button onclick="exportToCSV()" class="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition-all flex items-center gap-2">
+        <button onclick="exportToCSV()" class="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-900 dark:text-white rounded-xl font-bold transition-all flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
           </svg>
@@ -41,24 +41,24 @@
     </div>
 
     <div id="statSummary" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 hidden">
-      <div class="p-6 bg-slate-800/30 border border-white/5 rounded-3xl backdrop-blur-sm">
+      <div class="p-6 bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5 rounded-3xl backdrop-blur-sm">
         <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Total Records</p>
-        <h3 id="recordCount" class="text-3xl font-black text-white">0</h3>
+        <h3 id="recordCount" class="text-3xl font-black text-slate-900 dark:text-white">0</h3>
       </div>
-      <div class="p-6 bg-slate-800/30 border border-white/5 rounded-3xl backdrop-blur-sm">
+      <div class="p-6 bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5 rounded-3xl backdrop-blur-sm">
         <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Active View</p>
         <h3 id="activeViewName" class="text-3xl font-black text-cyan-400">---</h3>
       </div>
-      <div class="p-6 bg-slate-800/30 border border-white/5 rounded-3xl backdrop-blur-sm">
+      <div class="p-6 bg-slate-100 dark:bg-slate-800/30 border border-slate-200 dark:border-white/5 rounded-3xl backdrop-blur-sm">
         <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">System Status</p>
         <div class="flex items-center gap-2 mt-2">
           <div class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></div>
-          <h3 class="text-xl font-black text-white">Live Monitoring</h3>
+          <h3 class="text-xl font-black text-slate-900 dark:text-white">Live Monitoring</h3>
         </div>
       </div>
     </div>
 
-    <div id="tableContainer" class="rounded-3xl border border-slate-800 bg-slate-900/50 shadow-2xl overflow-hidden transition-all">
+    <div id="tableContainer" class="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-2xl overflow-hidden transition-all">
       <div class="p-20 text-center text-slate-500">
         <div class="text-4xl mb-4">📊</div>
         <p>Select a domain and click <strong>Load Data</strong> to populate the dashboard.</p>
@@ -75,8 +75,8 @@
   .overflow-x-auto::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
   .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
 
-  th { @apply px-4 py-4 text-left font-black tracking-wider border-b border-slate-700/50; }
-  td { @apply px-4 py-4 text-slate-300 border-b border-slate-800/50; }
+  th { @apply px-4 py-4 text-left font-black tracking-wider border-b border-slate-300 dark:border-slate-700/50; }
+  td { @apply px-4 py-4 text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800/50; }
   tr:hover { @apply bg-white/5 transition-colors; }
 </style>
 
@@ -168,7 +168,7 @@ function renderVisits(data) {
   let html = `
     <div class="overflow-x-auto">
       <table class="w-full text-[11px] leading-tight">
-        <thead class="bg-slate-800/80 text-cyan-400 uppercase">
+        <thead class="bg-slate-100 dark:bg-slate-800/80 text-cyan-400 uppercase">
           <tr>
             <th>UID</th><th>Domain</th><th>Browser</th><th>OS</th><th>Device</th><th>IP</th>
             <th>Screen</th><th>Lang</th><th>TZ</th><th>Page</th><th>Agent</th><th>Identity</th>
@@ -182,16 +182,16 @@ function renderVisits(data) {
       <tr>
         <td class="text-cyan-500/70 font-mono">${v[0]}</td>
         <td>${v[1]}</td>
-        <td><span class="px-2 py-0.5 bg-slate-800 rounded text-slate-300">${v[2]}</span></td>
+        <td><span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-600 dark:text-slate-300">${v[2]}</span></td>
         <td>${v[3]}</td>
         <td>${v[4]}</td>
         <td class="font-mono opacity-60">${v[5]}</td>
         <td>${v[6]}</td><td>${v[7]}</td><td>${v[8]}</td>
-        <td class="truncate max-w-[120px] text-white" title="${v[10]}">${v[10]}</td>
+        <td class="truncate max-w-[120px] text-slate-900 dark:text-white" title="${v[10]}">${v[10]}</td>
         <td class="truncate max-w-[100px] opacity-40">${v[11]}</td>
-        <td><div class="font-bold text-white">${v[12] || ""}</div><div class="text-[10px] text-slate-500">${v[17] || ""}</div></td>
+        <td><div class="font-bold text-slate-900 dark:text-white">${v[12] || ""}</div><div class="text-[10px] text-slate-500">${v[17] || ""}</div></td>
         <td>${v[15] || ""}, ${v[16] || ""}</td>
-        <td class="whitespace-nowrap font-mono text-slate-400">${v[18]}</td>
+        <td class="whitespace-nowrap font-mono text-slate-500 dark:text-slate-400">${v[18]}</td>
       </tr>`;
   });
   html += "</tbody></table></div>";
@@ -202,7 +202,7 @@ function renderEvents(data) {
   let html = `
     <div class="overflow-x-auto">
       <table class="w-full text-xs">
-        <thead class="bg-slate-800/80 text-cyan-400 uppercase">
+        <thead class="bg-slate-100 dark:bg-slate-800/80 text-cyan-400 uppercase">
           <tr>
             <th>UID</th><th>Domain</th><th>Event</th><th>Device</th><th>Session</th><th>Meta</th><th>Time</th>
           </tr>
@@ -217,8 +217,8 @@ function renderEvents(data) {
         <td><span class="px-3 py-1 bg-cyan-400/10 text-cyan-400 rounded-full font-black text-[10px] uppercase">${e[2]}</span></td>
         <td>${e[3]}</td>
         <td class="font-mono text-slate-500">${e[4]}</td>
-        <td class="font-mono text-[10px] text-slate-400 max-w-[250px] truncate" title="${e[5]}">${e[5]}</td>
-        <td class="whitespace-nowrap font-mono text-slate-400">${e[6]}</td>
+        <td class="font-mono text-[10px] text-slate-500 dark:text-slate-400 max-w-[250px] truncate" title="${e[5]}">${e[5]}</td>
+        <td class="whitespace-nowrap font-mono text-slate-500 dark:text-slate-400">${e[6]}</td>
       </tr>`;
   });
   html += "</tbody></table></div>";
@@ -229,7 +229,7 @@ function renderIdentities(data) {
   let html = `
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead class="bg-slate-800/80 text-cyan-400 uppercase">
+        <thead class="bg-slate-100 dark:bg-slate-800/80 text-cyan-400 uppercase">
           <tr>
             <th>UID</th><th>Email</th><th>Device</th><th>Session</th><th>External ID</th><th>Created</th>
           </tr>
@@ -240,11 +240,11 @@ function renderIdentities(data) {
     html += `
       <tr>
         <td class="text-cyan-500/70 font-mono">${i[0]}</td>
-        <td class="text-white font-bold">${i[1] || "---"}</td>
+        <td class="text-slate-900 dark:text-white font-bold">${i[1] || "---"}</td>
         <td>${i[2]}</td>
         <td class="font-mono text-slate-500">${i[3]}</td>
-        <td class="text-slate-400">${i[4] || "---"}</td>
-        <td class="font-mono text-slate-400">${i[5]}</td>
+        <td class="text-slate-500 dark:text-slate-400">${i[4] || "---"}</td>
+        <td class="font-mono text-slate-500 dark:text-slate-400">${i[5]}</td>
       </tr>`;
   });
   html += "</tbody></table></div>";
