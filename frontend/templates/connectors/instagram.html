@@ -121,7 +121,7 @@
                 <li class="flex items-start gap-3 text-[11px] text-slate-500 dark:text-slate-400">
                   <span class="w-1.5 h-1.5 rounded-full bg-pink-500 mt-1.5 shrink-0"></span>
                   <span>Add redirect URI: <code
-                      class="bg-white dark:bg-slate-900 px-1 rounded">http://localhost:4000/instagram/callback</code></span>
+                      class="bg-white dark:bg-slate-900 px-1 rounded">/_backend/instagram/callback</code></span>
                 </li>
               </ul>
             </div>
@@ -753,8 +753,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function saveCredentials() {
-    const clientId = document.getElementById("clientId").value.trim();
-    const clientSecret = document.getElementById("clientSecret").value.trim();
+    const clientId = getFieldValue("clientId");
+    const clientSecret = getFieldValue("clientSecret");
     if (!clientId || !clientSecret) { alert("Credentials required"); return; }
     try {
       const res = await fetch("/connectors/instagram/save_app", {

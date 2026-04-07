@@ -332,6 +332,16 @@
             </footer>
 
             <script>
+                // Shared helper for safe field access
+                function getFieldValue(id) {
+                    const el = document.getElementById(id);
+                    if (!el) {
+                        console.warn("Element not found:", id);
+                        return "";
+                    }
+                    return el.value ? el.value.trim() : "";
+                }
+
                 // Scroll to top button visibility
                 window.addEventListener('scroll', () => {
                     const btn = document.getElementById('scrollTopBtn');

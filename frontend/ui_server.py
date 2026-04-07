@@ -28,43 +28,15 @@ app = Flask(
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "..", "identity.db")
 
-# ================= AUTO COOKIE FORWARD =================
-
-_original_get = requests.get
-_original_post = requests.post
-
-
-def forwarded_get(url, *args, **kwargs):
-    if "localhost:4000" in url:
-        kwargs.setdefault("cookies", request.cookies)
-        kwargs.setdefault(
-            "headers",
-            {"Cookie": request.headers.get("Cookie", "")}
-        )
-    return _original_get(url, *args, **kwargs)
-
-
-def forwarded_post(url, *args, **kwargs):
-    if "localhost:4000" in url:
-        kwargs.setdefault("cookies", request.cookies)
-        kwargs.setdefault(
-            "headers",
-            {"Cookie": request.headers.get("Cookie", "")}
-        )
-    return _original_post(url, *args, **kwargs)
-
-
-# override requests globally
-requests.get = forwarded_get
-requests.post = forwarded_post
-
-# ================= AUTH UTILITIES =================
+# ================= AUTH UTILITIES =================# ================= AUTH UTILITIES =================
 
 def get_google_status(source):
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        f"http://localhost:4000/api/status/{source}",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/{source}",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     try:
@@ -78,10 +50,11 @@ def logged_in():
         if "segmento_session" not in request.cookies:
             return False
 
+        base = request.host_url.rstrip("/")
         r = requests.get(
-            "http://localhost:4000/auth/me",
+            f"{base}/_backend/auth/me",
             cookies=request.cookies,
-            timeout=2
+            headers={"Cookie": request.headers.get("Cookie", "")}, timeout=2
         )
 
         return r.status_code == 200
@@ -121,6 +94,94 @@ def login_page():
         return redirect("/")
     return render_template("login.html", next_url=request.args.get("next", ""), auth_required=request.args.get("auth_required", ""))
 
+@app.route("/auth/login", methods=["POST"])
+def ui_login():
+    """
+    Frontend Proxy for Login.
+    Ensures that authentication cookies are set within the frontend context.
+    """
+    base = request.host_url.rstrip("/")
+    
+    # Forward the credentials to the backend API
+    r = requests.post(
+        f"{base}/_backend/auth/login",
+        data=request.form,
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")},
+        allow_redirects=False
+    )
+    
+    # Handle authentication failure (backend redirecting with error=1)
+    location = r.headers.get("Location", "")
+    if r.status_code == 302 and "error=1" in location:
+        return redirect("/login?error=1")
+        
+    # Default success redirect
+    resp = redirect("/")
+
+    # Explicitly copy authentication cookies from the backend response
+    # to ensure they are available in the browser context.
+    for cookie in r.cookies:
+        resp.set_cookie(
+            cookie.name,
+            cookie.value,
+            expires=cookie.expires,
+            path=cookie.path,
+            domain=cookie.domain,
+            secure=cookie.secure,
+            httponly=True,  # Ensure HttpOnly is preserved for session security
+            samesite='Lax'
+        )
+
+    return resp
+
+@app.route("/oauth/callback")
+def unified_oauth_callback_proxy():
+    """
+    Unified OAuth Callback Proxy.
+    Receives callbacks from all OAuth providers and forwards them to the backend server.
+    """
+    base = request.host_url.rstrip("/")
+    params = request.args.to_dict()
+    
+    # Forward the callback request to the backend unified callback endpoint
+    r = requests.get(
+        f"{base}/_backend/oauth/callback",
+        params=params,
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")},
+        allow_redirects=False
+    )
+    
+    # If the backend returned a redirect, forward it to the browser
+    if r.status_code in [301, 302, 303, 307, 308]:
+        resp = redirect(r.headers.get("Location", "/"))
+    else:
+        # Otherwise, wrap the result in a Flask response
+        from flask import make_response
+        resp = make_response(r.text, r.status_code)
+        for key, value in r.headers.items():
+            # Filter out sensitive or hop-by-hop headers
+            if key.lower() not in ["content-length", "transfer-encoding", "content-encoding", "set-cookie", "content-type"]:
+                resp.headers[key] = value
+        if "Content-Type" in r.headers:
+            resp.headers["Content-Type"] = r.headers["Content-Type"]
+
+    # Explicitly copy any Set-Cookie headers from the backend
+    for cookie in r.cookies:
+        resp.set_cookie(
+            cookie.name,
+            cookie.value,
+            expires=cookie.expires,
+            path=cookie.path,
+            domain=cookie.domain,
+            secure=cookie.secure,
+            httponly=True,
+            samesite='Lax'
+        )
+
+    return resp
+
 @app.context_processor
 def inject_auth_status():
     return dict(is_logged_in=logged_in())
@@ -128,14 +189,16 @@ def inject_auth_status():
 @app.route("/logout")
 def ui_logout():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/auth/logout",
-        cookies=request.cookies
+        f"{base}/_backend/auth/logout",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     resp = redirect("/")
 
-    resp.delete_cookie("segmento_session")
+    resp.delete_cookie("segmento_session", path="/")
 
     return resp
 
@@ -159,12 +222,10 @@ def connectors():
 
 # ================= PROXY UTILITIES =================
 
-IDENTITY = "http://localhost:4000"
-
-
 def proxy_get(path, **kwargs):
+    base = request.host_url.rstrip("/")
     return requests.get(
-        f"{IDENTITY}{path}",
+        f"{base}/_backend{path}",
         cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")},
         **kwargs
@@ -172,8 +233,9 @@ def proxy_get(path, **kwargs):
 
 
 def proxy_post(path, **kwargs):
+    base = request.host_url.rstrip("/")
     return requests.post(
-        f"{IDENTITY}{path}",
+        f"{base}/_backend{path}",
         cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")},
         **kwargs
@@ -267,9 +329,11 @@ def socialinsider_disconnect():
 @app.route("/api/status/<source>")
 def generic_google_status(source):
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        f"http://localhost:4000/api/status/{source}",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/{source}",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     try:
@@ -283,9 +347,11 @@ def generic_google_status(source):
 @app.route("/connectors/<source>/job/save", methods=["POST"])
 def ui_save_job(source):
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        f"http://localhost:4000/google/job/save/{source}",
-        json=request.json
+        f"{base}/_backend/google/job/save/{source}",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json())
@@ -293,8 +359,11 @@ def ui_save_job(source):
 @app.route("/connectors/<source>/job/get")
 def ui_get_job(source):
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        f"http://localhost:4000/google/job/get/{source}"
+        f"{base}/_backend/google/job/get/{source}",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -302,9 +371,11 @@ def ui_get_job(source):
 @app.route("/connectors/<source>/disconnect")
 def ui_disconnect(source):
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        f"http://localhost:4000/connectors/{source}/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/{source}/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -319,7 +390,7 @@ def github_page():
 
 @app.route("/connectors/github/connect")
 def github_connect():
-    return redirect("http://localhost:4000/github/connect")
+    return redirect("/_backend/github/connect")
 
 @app.route("/connectors/github/sync")
 def github_sync():
@@ -373,10 +444,11 @@ def github_job_save_proxy():
 @app.route("/connectors/github/save_app", methods=["POST"])
 def github_save_app_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/github/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/github/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -390,7 +462,7 @@ def instagram_page():
 
 @app.route("/connectors/instagram/connect")
 def instagram_connect():
-    return redirect("http://localhost:4000/instagram/connect")
+    return redirect("/_backend/instagram/connect")
 
 @app.route("/connectors/instagram/sync")
 def instagram_sync():
@@ -411,10 +483,11 @@ def instagram_job_save_proxy():
 @app.route("/connectors/instagram/save_app", methods=["POST"])
 def instagram_save_app_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/instagram/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/instagram/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -433,7 +506,7 @@ def tiktok_page():
 
 @app.route("/connectors/tiktok/connect")
 def tiktok_connect():
-    return redirect("http://localhost:4000/connectors/tiktok/connect")
+    return redirect("/_backend/connectors/tiktok/connect")
 
 @app.route("/connectors/tiktok/sync")
 def tiktok_sync():
@@ -453,10 +526,11 @@ def tiktok_job_save_proxy():
 
 @app.route("/connectors/tiktok/save_app", methods=["POST"])
 def tiktok_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/tiktok/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/tiktok/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -495,10 +569,11 @@ def taboola_job_save_proxy():
 
 @app.route("/connectors/taboola/save_app", methods=["POST"])
 def taboola_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/taboola/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/taboola/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -537,10 +612,11 @@ def outbrain_job_save_proxy():
 
 @app.route("/connectors/outbrain/save_app", methods=["POST"])
 def outbrain_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/outbrain/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/outbrain/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -579,10 +655,11 @@ def similarweb_job_save_proxy():
 
 @app.route("/connectors/similarweb/save_app", methods=["POST"])
 def similarweb_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/similarweb/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/similarweb/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -600,7 +677,7 @@ def x_page():
 
 @app.route("/connectors/x/connect")
 def x_connect():
-    return redirect("http://localhost:4000/connectors/x/connect")
+    return redirect("/_backend/connectors/x/connect")
 
 @app.route("/connectors/x/sync")
 def x_sync():
@@ -620,10 +697,11 @@ def x_job_save_proxy():
 
 @app.route("/connectors/x/save_app", methods=["POST"])
 def x_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/x/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/x/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -641,7 +719,7 @@ def linkedin_page():
 
 @app.route("/connectors/linkedin/connect")
 def linkedin_connect():
-    return redirect("http://localhost:4000/connectors/linkedin/connect")
+    return redirect("/_backend/connectors/linkedin/connect")
 
 @app.route("/connectors/linkedin/sync")
 def linkedin_sync():
@@ -661,10 +739,11 @@ def linkedin_job_save_proxy():
 
 @app.route("/connectors/linkedin/save_app", methods=["POST"])
 def linkedin_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/linkedin/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/linkedin/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -713,10 +792,11 @@ def slack_job_save_proxy():
 
 @app.route("/connectors/slack/save_app", methods=["POST"])
 def slack_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/slack/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/slack/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -738,26 +818,31 @@ def whatsapp_connect():
 
 @app.route("/connectors/whatsapp/disconnect")
 def whatsapp_disconnect():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/whatsapp/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/whatsapp/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 @app.route("/connectors/whatsapp/save_app", methods=["POST"])
 def whatsapp_save_config_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/whatsapp/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/whatsapp/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/whatsapp/sync")
 def whatsapp_sync():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/whatsapp/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/whatsapp/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
@@ -771,9 +856,11 @@ def reddit_page():
 @app.route("/connectors/reddit/connect")
 def reddit_connect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/reddit/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/reddit/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json()), r.status_code
@@ -781,9 +868,11 @@ def reddit_connect():
 @app.route("/connectors/reddit/disconnect")
 def reddit_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/reddit/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/reddit/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -791,10 +880,11 @@ def reddit_disconnect():
 @app.route("/connectors/reddit/save_config", methods=["POST"])
 def reddit_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/reddit/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/reddit/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -802,9 +892,11 @@ def reddit_save_config_proxy():
 @app.route("/connectors/reddit/sync")
 def reddit_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/reddit/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/reddit/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -818,9 +910,11 @@ def reddit_dashboard():
 @app.route("/api/status/reddit")
 def reddit_status():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/reddit",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/reddit",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -828,9 +922,11 @@ def reddit_status():
 @app.route("/connectors/reddit/job/get")
 def reddit_job_get():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/reddit/job/get",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/reddit/job/get",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -838,10 +934,11 @@ def reddit_job_get():
 @app.route("/connectors/reddit/job/save", methods=["POST"])
 def reddit_job_save():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/reddit/job/save",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/reddit/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json())
@@ -883,9 +980,11 @@ def medium_page():
 @app.route("/connectors/medium/connect")
 def medium_connect_proxy():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/medium/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/medium/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/medium")
@@ -893,10 +992,11 @@ def medium_connect_proxy():
 @app.route("/connectors/medium/save_config", methods=["POST"])
 def medium_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/medium/save_config",
-        json=request.json,
-        cookies=request.cookies
+        f"{base}/_backend/connectors/medium/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     try:
@@ -910,9 +1010,11 @@ def medium_save_config_proxy():
 @app.route("/connectors/medium/sync")
 def medium_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/medium/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/medium/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -926,9 +1028,11 @@ def medium_dashboard():
 @app.route("/api/status/medium")
 def medium_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/medium",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/medium",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -958,10 +1062,11 @@ def gitlab_page():
 @app.route("/connectors/gitlab/save_app", methods=["POST"])
 def gitlab_save_app_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/gitlab/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/gitlab/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -969,9 +1074,11 @@ def gitlab_save_app_proxy():
 @app.route("/api/status/gitlab")
 def gitlab_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/gitlab",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/gitlab",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -979,9 +1086,11 @@ def gitlab_status_proxy():
 @app.route("/connectors/gitlab/job/get")
 def gitlab_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/gitlab/job/get",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/gitlab/job/get",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -990,27 +1099,29 @@ def gitlab_job_get_proxy():
 @app.route("/connectors/gitlab/job/save", methods=["POST"])
 def gitlab_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/gitlab/job/save",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/gitlab/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json())
 
 @app.route("/connectors/gitlab/connect")
 def gitlab_connect():
-    return redirect("http://localhost:4000/gitlab/connect")
+    return redirect("/_backend/gitlab/connect")
 
 
 @app.route("/connectors/gitlab/sync")
 def gitlab_sync():
 
     try:
+        base = request.host_url.rstrip("/")
         r = requests.get(
-            "http://localhost:4000/connectors/gitlab/sync",
+            f"{base}/_backend/connectors/gitlab/sync",
             cookies=request.cookies,
-            timeout=300
+            headers={"Cookie": request.headers.get("Cookie", "")}, timeout=300
         )
 
         return jsonify(r.json()), r.status_code
@@ -1061,9 +1172,11 @@ def devto_page():
 @app.route("/api/status/devto")
 def devto_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/devto",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/devto",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1071,9 +1184,11 @@ def devto_status_proxy():
 @app.route("/connectors/devto/connect")
 def devto_connect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/devto/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/devto/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/devto")
@@ -1082,9 +1197,11 @@ def devto_connect():
 @app.route("/connectors/devto/disconnect")
 def devto_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/devto/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/devto/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1093,9 +1210,11 @@ def devto_disconnect():
 @app.route("/connectors/devto/sync")
 def devto_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/devto/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/devto/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1108,9 +1227,11 @@ def devto_dashboard():
 @app.route("/connectors/devto/job/get")
 def devto_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/devto/job/get",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/devto/job/get",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1119,10 +1240,11 @@ def devto_job_get_proxy():
 @app.route("/connectors/devto/job/save", methods=["POST"])
 def devto_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/devto/job/save",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/devto/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json())
@@ -1137,10 +1259,11 @@ def stackoverflow_page():
 @app.route("/connectors/stackoverflow/save_config", methods=["POST"])
 def stackoverflow_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/stackoverflow/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/stackoverflow/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -1149,9 +1272,11 @@ def stackoverflow_save_config_proxy():
 @app.route("/connectors/stackoverflow/connect")
 def stackoverflow_connect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/stackoverflow/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/stackoverflow/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     if r.status_code != 200:
@@ -1164,9 +1289,11 @@ def stackoverflow_connect():
 @app.route("/connectors/stackoverflow/disconnect")
 def stackoverflow_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/stackoverflow/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/stackoverflow/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1176,9 +1303,11 @@ def stackoverflow_disconnect():
 @app.route("/connectors/stackoverflow/sync")
 def stackoverflow_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/stackoverflow/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/stackoverflow/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1194,9 +1323,11 @@ def stackoverflow_dashboard():
 @app.route("/api/status/stackoverflow")
 def stackoverflow_status():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/stackoverflow",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/stackoverflow",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1270,12 +1401,22 @@ def hackernews_page():
 
 @app.route("/connectors/hackernews/connect")
 def hackernews_connect():
-    requests.get("http://localhost:4000/connectors/hackernews/connect")
+    base = request.host_url.rstrip("/")
+    requests.get(
+        f"{base}/_backend/connectors/hackernews/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
     return redirect("/connectors/hackernews")
 
 @app.route("/connectors/hackernews/sync")
 def hackernews_sync():
-    r = requests.get("http://localhost:4000/connectors/hackernews/sync")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/connectors/hackernews/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
     return jsonify(r.json())
 
 @app.route("/dashboard/hackernews")
@@ -1330,10 +1471,11 @@ def nvd_page():
 @app.route("/connectors/nvd/save_config", methods=["POST"])
 def nvd_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/nvd/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/nvd/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     try:
@@ -1349,9 +1491,11 @@ def nvd_save_config_proxy():
 @app.route("/connectors/nvd/connect")
 def nvd_connect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/nvd/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/nvd/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     if r.status_code != 200:
@@ -1363,9 +1507,11 @@ def nvd_connect():
 @app.route("/connectors/nvd/sync")
 def nvd_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/nvd/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/nvd/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1380,7 +1526,12 @@ def nvd_dashboard():
 @app.route("/api/status/nvd")
 def nvd_status():
 
-    r = requests.get("http://localhost:4000/api/status/nvd")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/api/status/nvd",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
 
     return jsonify(r.json())
 
@@ -1415,10 +1566,11 @@ def discord_page():
 @app.route("/connectors/discord/save_config", methods=["POST"])
 def discord_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/discord/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/discord/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -1426,8 +1578,11 @@ def discord_save_config_proxy():
 @app.route("/connectors/discord/connect")
 def discord_connect_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/discord/connect"
+        f"{base}/_backend/connectors/discord/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     if r.status_code != 200:
@@ -1438,9 +1593,11 @@ def discord_connect_proxy():
 @app.route("/connectors/discord/disconnect")
 def discord_disconnect_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/discord/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/discord/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1448,9 +1605,11 @@ def discord_disconnect_proxy():
 @app.route("/connectors/discord/sync")
 def discord_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/discord/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/discord/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1458,9 +1617,11 @@ def discord_sync():
 @app.route("/api/status/discord")
 def discord_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/discord",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/discord",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1475,9 +1636,11 @@ def telegram_page():
 @app.route("/connectors/telegram/connect")
 def telegram_connect_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/telegram/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/telegram/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     if r.status_code != 200:
@@ -1488,8 +1651,11 @@ def telegram_connect_proxy():
 @app.route("/connectors/telegram/disconnect")
 def telegram_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/telegram/disconnect"
+        f"{base}/_backend/connectors/telegram/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1497,8 +1663,11 @@ def telegram_disconnect():
 @app.route("/connectors/telegram/sync")
 def telegram_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/telegram/sync"
+        f"{base}/_backend/connectors/telegram/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     try:
@@ -1516,9 +1685,11 @@ def telegram_dashboard():
 @app.route("/api/status/telegram")
 def telegram_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/telegram",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/telegram",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1545,7 +1716,12 @@ def telegram_channels():
 def telegram_messages(cid):
 
     # Trigger sync before fetch
-    requests.get("http://localhost:4000/connectors/telegram/sync")
+    base = request.host_url.rstrip("/")
+    requests.get(
+        f"{base}/_backend/connectors/telegram/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
 
     conn = sqlite3.connect("../identity.db")
     conn.row_factory = sqlite3.Row
@@ -1568,10 +1744,11 @@ def telegram_messages(cid):
 @app.route("/connectors/telegram/save_config", methods=["POST"])
 def telegram_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/telegram/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/telegram/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -1586,9 +1763,11 @@ def tumblr_page():
 @app.route("/connectors/tumblr/connect")
 def tumblr_connect_proxy():
 
-    r=requests.get(
-        "http://localhost:4000/connectors/tumblr/connect",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/connectors/tumblr/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/tumblr")
@@ -1596,10 +1775,11 @@ def tumblr_connect_proxy():
 @app.route("/connectors/tumblr/save_config", methods=["POST"])
 def tumblr_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/tumblr/save_config",
-        json=request.json,
-        cookies=request.cookies
+        f"{base}/_backend/connectors/tumblr/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     try:
@@ -1613,9 +1793,11 @@ def tumblr_save_config_proxy():
 @app.route("/connectors/tumblr/sync")
 def tumblr_sync_proxy():
 
-    r=requests.get(
-        "http://localhost:4000/connectors/tumblr/sync",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/connectors/tumblr/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1627,9 +1809,11 @@ def tumblr_dashboard():
 @app.route("/connectors/tumblr/disconnect")
 def tumblr_disconnect_proxy():
 
-    r=requests.get(
-        "http://localhost:4000/connectors/tumblr/disconnect",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/connectors/tumblr/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1639,9 +1823,11 @@ def tumblr_disconnect_proxy():
 @app.route("/api/status/tumblr")
 def tumblr_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/tumblr",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/tumblr",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1694,26 +1880,32 @@ def mastodon_page():
 @app.route("/connectors/mastodon/connect")
 def mastodon_connect_proxy():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/mastodon/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/mastodon/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/mastodon")
 
 @app.route("/connectors/mastodon/disconnect")
 def mastodon_disconnect():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/mastodon/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/mastodon/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 @app.route("/connectors/mastodon/sync")
 def mastodon_sync():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/mastodon/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/mastodon/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
@@ -1727,9 +1919,11 @@ def mastodon_dashboard():
 @app.route("/api/status/mastodon")
 def mastodon_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/mastodon",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/mastodon",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     try:
@@ -1784,10 +1978,11 @@ def mastodon_tags():
 @app.route("/connectors/mastodon/save_config",methods=["POST"])
 def mastodon_save_config_proxy():
 
-    r=requests.post(
-        "http://localhost:4000/connectors/mastodon/save_config",
-        json=request.json,
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.post(
+        f"{base}/_backend/connectors/mastodon/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()),r.status_code
@@ -1802,9 +1997,11 @@ def lemmy_page():
 @app.route("/connectors/lemmy/connect")
 def lemmy_connect_proxy():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/lemmy/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/lemmy/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/lemmy")
@@ -1812,9 +2009,11 @@ def lemmy_connect_proxy():
 @app.route("/connectors/lemmy/sync")
 def lemmy_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/lemmy/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/lemmy/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1829,9 +2028,11 @@ def lemmy_dashboard():
 @app.route("/api/status/lemmy")
 def lemmy_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/lemmy",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/lemmy",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     try:
@@ -1906,10 +2107,11 @@ def lemmy_users():
 @app.route("/connectors/lemmy/save_config",methods=["POST"])
 def lemmy_save_config_proxy():
 
-    r=requests.post(
-        "http://localhost:4000/connectors/lemmy/save_config",
-        json=request.json,
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.post(
+        f"{base}/_backend/connectors/lemmy/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()),r.status_code
@@ -1924,14 +2126,16 @@ def pinterest_page():
 
 @app.route("/connectors/pinterest/connect")
 def pinterest_connect():
-    return redirect("http://localhost:4000/connectors/pinterest/connect")
+    return redirect("/_backend/connectors/pinterest/connect")
 
 @app.route("/connectors/pinterest/sync")
 def pinterest_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/pinterest/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/pinterest/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1939,9 +2143,11 @@ def pinterest_sync():
 @app.route("/connectors/pinterest/disconnect")
 def pinterest_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/pinterest/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/pinterest/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -1956,9 +2162,11 @@ def pinterest_dashboard():
 @app.route("/api/status/pinterest")
 def pinterest_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/pinterest",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/pinterest",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2005,10 +2213,11 @@ def pinterest_pins():
 @app.route("/connectors/pinterest/save_app", methods=["POST"])
 def pinterest_save_app_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/pinterest/save_app",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/pinterest/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -2028,10 +2237,11 @@ def pinterest_callback_proxy():
     if not code:
         return "Authorization failed: no code returned from Pinterest.", 400
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        f"http://localhost:4000/pinterest/callback?code={code}&state={state}",
+        f"{base}/_backend/pinterest/callback?code={code}&state={state}",
         cookies=request.cookies,
-        allow_redirects=False
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     print(f"[PINTEREST CALLBACK PROXY] api_server responded {r.status_code}", flush=True)
@@ -2051,9 +2261,11 @@ def twitch_page():
 @app.route("/connectors/twitch/connect")
 def twitch_connect():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/twitch/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/twitch/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     # CRITICAL
@@ -2061,14 +2273,22 @@ def twitch_connect():
 
 @app.route("/connectors/twitch/disconnect")
 def twitch_disconnect():
-    requests.get("http://localhost:4000/connectors/twitch/disconnect")
+    base = request.host_url.rstrip("/")
+    requests.get(
+        f"{base}/_backend/connectors/twitch/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
     return redirect("/connectors/twitch")
 
 @app.route("/connectors/twitch/sync")
 def twitch_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/twitch/sync"
+        f"{base}/_backend/connectors/twitch/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2076,9 +2296,11 @@ def twitch_sync():
 @app.route("/api/status/twitch")
 def twitch_status():
 
-    r=requests.get(
-        "http://localhost:4000/api/status/twitch",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/api/status/twitch",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2086,10 +2308,11 @@ def twitch_status():
 @app.route("/connectors/twitch/save_config",methods=["POST"])
 def twitch_save_config_proxy():
 
-    r=requests.post(
-        "http://localhost:4000/connectors/twitch/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.post(
+        f"{base}/_backend/connectors/twitch/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()),r.status_code
@@ -2104,9 +2327,11 @@ def peertube_page():
 @app.route("/connectors/peertube/connect")
 def peertube_connect():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/peertube/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/peertube/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/peertube")
@@ -2114,9 +2339,11 @@ def peertube_connect():
 @app.route("/connectors/peertube/disconnect")
 def peertube_disconnect_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/peertube/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/peertube/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json()), r.status_code
@@ -2124,9 +2351,11 @@ def peertube_disconnect_proxy():
 @app.route("/connectors/peertube/sync")
 def peertube_sync_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/peertube/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/peertube/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json()), r.status_code
@@ -2142,9 +2371,11 @@ def peertube_dashboard():
 @app.route("/api/status/peertube")
 def peertube_status():
 
-    r=requests.get(
-        "http://localhost:4000/api/status/peertube",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/api/status/peertube",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2191,10 +2422,11 @@ def peertube_channels():
 @app.route("/connectors/peertube/save_config",methods=["POST"])
 def peertube_save_proxy():
 
-    r=requests.post(
-        "http://localhost:4000/connectors/peertube/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.post(
+        f"{base}/_backend/connectors/peertube/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()),r.status_code
@@ -2209,9 +2441,11 @@ def osm_page():
 @app.route("/connectors/openstreetmap/connect")
 def ui_osm_connect():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/openstreetmap/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/openstreetmap/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/openstreetmap")
@@ -2219,9 +2453,11 @@ def ui_osm_connect():
 @app.route("/connectors/openstreetmap/disconnect")
 def ui_osm_disconnect():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/openstreetmap/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/openstreetmap/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/openstreetmap")
@@ -2229,9 +2465,11 @@ def ui_osm_disconnect():
 @app.route("/connectors/openstreetmap/sync")
 def ui_osm_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/openstreetmap/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/openstreetmap/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2246,9 +2484,11 @@ def osm_dashboard():
 @app.route("/api/status/openstreetmap")
 def osm_status_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/openstreetmap",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/openstreetmap",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2304,9 +2544,11 @@ def wikipedia_page():
 @app.route("/connectors/wikipedia/connect")
 def ui_wikipedia_connect():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/wikipedia/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/wikipedia/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/wikipedia")
@@ -2316,9 +2558,11 @@ def ui_wikipedia_connect():
 @app.route("/connectors/wikipedia/disconnect")
 def ui_wikipedia_disconnect():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/wikipedia/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/wikipedia/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/wikipedia")
@@ -2328,9 +2572,11 @@ def ui_wikipedia_disconnect():
 @app.route("/connectors/wikipedia/sync")
 def ui_wikipedia_sync():
 
-    r=requests.get(
-        "http://localhost:4000/connectors/wikipedia/sync",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/connectors/wikipedia/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2340,9 +2586,11 @@ def ui_wikipedia_sync():
 @app.route("/api/status/wikipedia")
 def wikipedia_status_proxy():
 
-    r=requests.get(
-        "http://localhost:4000/api/status/wikipedia",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/api/status/wikipedia",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2425,9 +2673,11 @@ def producthunt_page():
 @app.route("/connectors/producthunt/connect")
 def ui_producthunt_connect():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/producthunt/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/producthunt/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/producthunt")
@@ -2437,9 +2687,11 @@ def ui_producthunt_connect():
 @app.route("/connectors/producthunt/disconnect")
 def ui_producthunt_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/producthunt/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/producthunt/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json()), r.status_code
@@ -2450,9 +2702,11 @@ def ui_producthunt_disconnect():
 @app.route("/connectors/producthunt/sync")
 def ui_producthunt_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/producthunt/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/producthunt/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json()), r.status_code
@@ -2463,9 +2717,11 @@ def ui_producthunt_sync():
 @app.route("/api/status/producthunt")
 def ui_producthunt_status():
 
-    r=requests.get(
-        "http://localhost:4000/api/status/producthunt",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/api/status/producthunt",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2482,9 +2738,11 @@ def producthunt_dashboard():
 @app.route("/api/producthunt/posts")
 def ui_producthunt_posts():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/producthunt/data/posts",
-        cookies=request.cookies
+        f"{base}/_backend/producthunt/data/posts",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2493,9 +2751,11 @@ def ui_producthunt_posts():
 @app.route("/api/producthunt/topics")
 def ui_producthunt_topics():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/producthunt/data/topics",
-        cookies=request.cookies
+        f"{base}/_backend/producthunt/data/topics",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2503,10 +2763,11 @@ def ui_producthunt_topics():
 @app.route("/connectors/producthunt/save_config",methods=["POST"])
 def ui_producthunt_save():
 
-    r=requests.post(
-        "http://localhost:4000/connectors/producthunt/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.post(
+        f"{base}/_backend/connectors/producthunt/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json())
@@ -2521,9 +2782,11 @@ def discourse_page():
 @app.route("/connectors/discourse/connect")
 def ui_discourse_connect():
 
+    base = request.host_url.rstrip("/")
     requests.get(
-        "http://localhost:4000/connectors/discourse/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/discourse/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return redirect("/connectors/discourse")
@@ -2531,9 +2794,11 @@ def ui_discourse_connect():
 @app.route("/api/status/discourse")
 def discourse_status():
 
-    r=requests.get(
-        "http://localhost:4000/api/status/discourse",
-        cookies=request.cookies
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/api/status/discourse",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -2541,9 +2806,11 @@ def discourse_status():
 @app.route("/connectors/discourse/disconnect")
 def ui_discourse_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/discourse/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/discourse/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json()), r.status_code
@@ -2552,9 +2819,11 @@ def ui_discourse_disconnect():
 @app.route("/connectors/discourse/sync")
 def ui_discourse_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/discourse/sync",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/discourse/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json()), r.status_code
@@ -2605,7 +2874,7 @@ def gmail_page():
 # Redirect to Identity Server OAuth
 @app.route("/connectors/gmail/connect")
 def gmail_connect():
-    return redirect("http://localhost:4000/google/connect?source=gmail")
+    return redirect("/_backend/google/connect?source=gmail")
 
 
 # After OAuth redirect comes back here
@@ -2618,8 +2887,11 @@ def gmail_callback():
         return "Authorization failed", 400
 
     # Forward to identity server
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        f"http://localhost:4000/google/callback?code={code}&source=gmail"
+        f"{base}/_backend/google/callback?code={code}&source=gmail",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     if r.status_code != 200:
@@ -2633,9 +2905,11 @@ def gmail_callback():
 @app.route("/connectors/gmail/sync")
 def gmail_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/gmail",
-        timeout=120
+        f"{base}/_backend/google/sync/gmail",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=120
     )
 
     try:
@@ -2647,7 +2921,12 @@ def gmail_sync():
 @app.route("/connectors/gmail/disconnect")
 def gmail_disconnect():
 
-    r = requests.get("http://localhost:4000/google/disconnect/gmail")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/google/disconnect/gmail",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
 
     return jsonify(r.json())
 
@@ -2691,10 +2970,11 @@ def gmail_status():
 
 @app.route("/connectors/gmail/save_app", methods=["POST"])
 def gmail_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/gmail/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/gmail/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -2739,14 +3019,16 @@ def drive_page():
 
 @app.route("/connectors/drive/connect")
 def drive_connect():
-    return redirect("http://localhost:4000/google/connect?source=drive")
+    return redirect("/_backend/google/connect?source=drive")
 
 @app.route("/connectors/drive/sync")
 def drive_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/drive",
-        timeout=120
+        f"{base}/_backend/google/sync/drive",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=120
     )
 
     # Safe handling
@@ -2805,17 +3087,23 @@ def drive_status():
 
 @app.route("/connectors/drive/save_app", methods=["POST"])
 def drive_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/drive/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/drive/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/drive/disconnect")
 def drive_disconnect():
 
-    r = requests.get("http://localhost:4000/google/disconnect/drive")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/google/disconnect/drive",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
 
     return jsonify(r.json())
 
@@ -2840,8 +3128,10 @@ def drive_files_data():
 
 @app.route("/connectors/drive/job/get")
 def drive_job_get_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/drive/job/get",
+        f"{base}/_backend/connectors/drive/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -2856,10 +3146,11 @@ def drive_job_get_proxy():
 
 @app.route("/connectors/drive/job/save", methods=["POST"])
 def drive_job_save_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/drive/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/drive/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -2872,30 +3163,38 @@ def calendar_page():
 
 @app.route("/connectors/calendar/connect")
 def calendar_connect():
-    return redirect("http://localhost:4000/google/connect?source=calendar")
+    return redirect("/_backend/google/connect?source=calendar")
 
 @app.route("/connectors/calendar/save_app", methods=["POST"])
 def calendar_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/calendar/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/calendar/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/calendar/disconnect")
 def calendar_disconnect():
 
-    r = requests.get("http://localhost:4000/google/disconnect/calendar")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/google/disconnect/calendar",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
 
     return jsonify(r.json())
 
 @app.route("/connectors/calendar/sync")
 def calendar_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/calendar",
-        timeout=180
+        f"{base}/_backend/google/sync/calendar",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=180
     )
 
     # Safe JSON handling
@@ -2954,8 +3253,10 @@ def calendar_status():
 
 @app.route("/connectors/calendar/job/get")
 def calendar_job_get_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/calendar/job/get",
+        f"{base}/_backend/connectors/calendar/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json()), r.status_code
@@ -2963,10 +3264,11 @@ def calendar_job_get_proxy():
 
 @app.route("/connectors/calendar/job/save", methods=["POST"])
 def calendar_job_save_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/calendar/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/calendar/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -3011,22 +3313,26 @@ def sheets_page():
 
 @app.route("/connectors/sheets/connect")
 def sheets_connect():
-    return redirect("http://localhost:4000/google/connect?source=sheets")
+    return redirect("/_backend/google/connect?source=sheets")
 
 @app.route("/connectors/sheets/save_app", methods=["POST"])
 def sheets_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/sheets/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/sheets/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/sheets/disconnect")
 def sheets_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/sheets"
+        f"{base}/_backend/google/disconnect/sheets",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3034,8 +3340,10 @@ def sheets_disconnect():
 @app.route("/connectors/sheets/job/get")
 def sheets_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/sheets/job/get",
+        f"{base}/_backend/connectors/sheets/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -3045,10 +3353,11 @@ def sheets_job_get_proxy():
 @app.route("/connectors/sheets/job/save", methods=["POST"])
 def sheets_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/sheets/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/sheets/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3056,9 +3365,11 @@ def sheets_job_save_proxy():
 @app.route("/connectors/sheets/sync")
 def sheets_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/sheets",
-        timeout=120
+        f"{base}/_backend/google/sync/sheets",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=120
     )
 
     # Safe JSON handling
@@ -3145,31 +3456,37 @@ def forms_page():
 @app.route("/connectors/forms/sync")
 def forms_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/forms",
-        timeout=180
+        f"{base}/_backend/google/sync/forms",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=180
     )
 
     return jsonify(r.json())
 
 @app.route("/connectors/forms/connect")
 def forms_connect():
-    return redirect("http://localhost:4000/google/connect?source=forms")
+    return redirect("/_backend/google/connect?source=forms")
 
 @app.route("/connectors/forms/save_app", methods=["POST"])
 def forms_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/forms/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/forms/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/forms/disconnect")
 def forms_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/forms"
+        f"{base}/_backend/google/disconnect/forms",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3219,8 +3536,10 @@ def forms_status():
 @app.route("/connectors/forms/job/get")
 def forms_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/forms/job/get",
+        f"{base}/_backend/connectors/forms/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -3230,10 +3549,11 @@ def forms_job_get_proxy():
 @app.route("/connectors/forms/job/save", methods=["POST"])
 def forms_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/forms/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/forms/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3280,30 +3600,36 @@ def contacts_page():
 
 @app.route("/connectors/contacts/connect")
 def contacts_connect():
-    return redirect("http://localhost:4000/google/connect?source=contacts")
+    return redirect("/_backend/google/connect?source=contacts")
 
 @app.route("/connectors/contacts/save_app", methods=["POST"])
 def contacts_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/contacts/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/contacts/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/contacts/disconnect")
 def contacts_disconnect():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/contacts"
+        f"{base}/_backend/google/disconnect/contacts",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 @app.route("/connectors/contacts/sync")
 def contacts_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/contacts",
-        timeout=180
+        f"{base}/_backend/google/sync/contacts",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=180
     )
 
     return jsonify(r.json())
@@ -3372,8 +3698,10 @@ def contacts_data():
 @app.route("/connectors/contacts/job/get")
 def contacts_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/contacts/job/get",
+        f"{base}/_backend/connectors/contacts/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -3383,10 +3711,11 @@ def contacts_job_get_proxy():
 @app.route("/connectors/contacts/job/save", methods=["POST"])
 def contacts_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/contacts/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/contacts/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3400,22 +3729,26 @@ def tasks_page():
 
 @app.route("/connectors/tasks/connect")
 def tasks_connect():
-    return redirect("http://localhost:4000/google/connect?source=tasks")
+    return redirect("/_backend/google/connect?source=tasks")
 
 @app.route("/connectors/tasks/save_app", methods=["POST"])
 def tasks_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/tasks/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/tasks/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/tasks/disconnect")
 def tasks_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/tasks"
+        f"{base}/_backend/google/disconnect/tasks",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3423,9 +3756,11 @@ def tasks_disconnect():
 @app.route("/connectors/tasks/sync")
 def tasks_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/tasks",
-        timeout=180
+        f"{base}/_backend/google/sync/tasks",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=180
     )
 
     try:
@@ -3485,8 +3820,10 @@ def tasks_status():
 @app.route("/connectors/tasks/job/get")
 def tasks_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/tasks/job/get",
+        f"{base}/_backend/connectors/tasks/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -3496,10 +3833,11 @@ def tasks_job_get_proxy():
 @app.route("/connectors/tasks/job/save", methods=["POST"])
 def tasks_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/tasks/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/tasks/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3545,15 +3883,16 @@ def ga4_page():
 
 @app.route("/connectors/ga4/connect")
 def ga4_connect():
-    return redirect("http://localhost:4000/google/connect?source=ga4")
+    return redirect("/_backend/google/connect?source=ga4")
 
 @app.route("/connectors/ga4/save_app", methods=["POST"])
 def ga4_save_app_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/ga4/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/ga4/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3561,8 +3900,11 @@ def ga4_save_app_proxy():
 @app.route("/connectors/ga4/disconnect")
 def ga4_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/ga4"
+        f"{base}/_backend/google/disconnect/ga4",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3570,8 +3912,10 @@ def ga4_disconnect():
 @app.route("/connectors/ga4/job/get")
 def ga4_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/ga4/job/get",
+        f"{base}/_backend/connectors/ga4/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -3581,10 +3925,11 @@ def ga4_job_get_proxy():
 @app.route("/connectors/ga4/job/save", methods=["POST"])
 def ga4_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/ga4/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/ga4/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3592,9 +3937,11 @@ def ga4_job_save_proxy():
 @app.route("/connectors/ga4/sync")
 def ga4_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/ga4",
-        timeout=180
+        f"{base}/_backend/google/sync/ga4",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=180
     )
 
     try:
@@ -3685,15 +4032,16 @@ def gsc_page():
 
 @app.route("/connectors/search-console/connect")
 def search_console_connect():
-    return redirect("http://localhost:4000/google/connect?source=search-console")
+    return redirect("/_backend/google/connect?source=search-console")
 
 @app.route("/connectors/search-console/save_app", methods=["POST"])
 def search_console_save_app_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/search-console/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/search-console/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3701,8 +4049,11 @@ def search_console_save_app_proxy():
 @app.route("/connectors/search-console/disconnect")
 def search_console_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/search-console"
+        f"{base}/_backend/google/disconnect/search-console",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3713,12 +4064,11 @@ def ui_gsc_sync():
     site = request.args.get("site")
     sync_type = request.args.get("sync_type", "incremental")
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/search-console/sync",
-        params={
-            "site": site,
-            "sync_type": sync_type
-        }
+        f"{base}/_backend/connectors/search-console/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3789,15 +4139,16 @@ def youtube_page():
 
 @app.route("/connectors/youtube/connect")
 def youtube_connect():
-    return redirect("http://localhost:4000/google/connect?source=youtube")
+    return redirect("/_backend/google/connect?source=youtube")
 
 @app.route("/connectors/youtube/save_app", methods=["POST"])
 def youtube_save_app_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/youtube/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/youtube/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3805,8 +4156,11 @@ def youtube_save_app_proxy():
 @app.route("/connectors/youtube/disconnect")
 def youtube_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/youtube"
+        f"{base}/_backend/google/disconnect/youtube",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3847,8 +4201,10 @@ def youtube_status():
 @app.route("/connectors/youtube/job/get")
 def youtube_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/youtube/job/get",
+        f"{base}/_backend/connectors/youtube/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -3864,10 +4220,11 @@ def youtube_job_get_proxy():
 @app.route("/connectors/youtube/job/save", methods=["POST"])
 def youtube_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/youtube/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/youtube/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -3877,9 +4234,11 @@ def ui_youtube_sync():
 
     sync_type = request.args.get("sync_type", "incremental")
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/youtube/sync",
-        params={"sync_type": sync_type}
+        f"{base}/_backend/connectors/youtube/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3932,7 +4291,12 @@ def trends_page():
 @app.route("/connectors/trends/disconnect")
 def trends_disconnect():
 
-    r = requests.get("http://localhost:4000/google/disconnect/trends")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/google/disconnect/trends",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
 
     return jsonify(r.json())
 
@@ -3942,12 +4306,11 @@ def ui_trends_sync():
     keyword = request.args.get("keyword")
     sync_type = request.args.get("sync_type", "daily")
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/trends/sync",
-        params={
-            "keyword": keyword,
-            "sync_type": sync_type
-        }
+        f"{base}/_backend/connectors/trends/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -3955,8 +4318,11 @@ def ui_trends_sync():
 @app.route("/connectors/trends/connect", methods=["POST"])
 def ui_trends_connect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/trends/connect"
+        f"{base}/_backend/connectors/trends/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -4003,8 +4369,10 @@ def trends_data(table):
 @app.route("/connectors/trends/job/get")
 def trends_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/trends/job/get",
+        f"{base}/_backend/connectors/trends/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -4013,10 +4381,11 @@ def trends_job_get_proxy():
 @app.route("/connectors/trends/job/save", methods=["POST"])
 def trends_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/trends/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/trends/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json())
@@ -4031,8 +4400,10 @@ def news_page():
 
 @app.route("/connectors/news/connect", methods=["POST"])
 def news_connect():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/news/connect",
+        f"{base}/_backend/connectors/news/connect",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
@@ -4040,8 +4411,10 @@ def news_connect():
 
 @app.route("/connectors/news/disconnect", methods=["POST"])
 def news_disconnect():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/news/disconnect",
+        f"{base}/_backend/connectors/news/disconnect",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
@@ -4053,12 +4426,10 @@ def news_sync():
     keyword = request.args.get("keyword")
     sync_type = request.args.get("sync_type", "incremental")
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/news/sync",
-        params={
-            "keyword": keyword,
-            "sync_type": sync_type
-        },
+        f"{base}/_backend/connectors/news/sync",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
@@ -4067,8 +4438,10 @@ def news_sync():
 
 @app.route("/connectors/news/job/get")
 def news_job_get_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/news/job/get",
+        f"{base}/_backend/connectors/news/job/get",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
@@ -4076,18 +4449,21 @@ def news_job_get_proxy():
 
 @app.route("/connectors/news/job/save", methods=["POST"])
 def news_job_save_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/news/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/news/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json())
 
 
 @app.route("/api/status/news")
 def news_status_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/news",
+        f"{base}/_backend/api/status/news",
+        cookies=request.cookies,
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
@@ -4102,13 +4478,23 @@ def books_page():
 
 @app.route("/connectors/books/connect")
 def ui_books_connect():
-    r = requests.get("http://localhost:4000/connectors/books/connect")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/connectors/books/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
     return jsonify(r.json())
 
 
 @app.route("/connectors/books/disconnect")
 def ui_books_disconnect():
-    r = requests.get("http://localhost:4000/connectors/books/disconnect")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/connectors/books/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
     return jsonify(r.json())
 
 
@@ -4118,12 +4504,11 @@ def ui_books_sync():
     query = request.args.get("query")
     sync_type = request.args.get("sync_type", "incremental")
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/books/sync",
-        params={
-            "query": query,
-            "sync_type": sync_type
-        }
+        f"{base}/_backend/connectors/books/sync",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -4131,15 +4516,22 @@ def ui_books_sync():
 
 @app.route("/connectors/books/job/get")
 def ui_books_job_get():
-    r = requests.get("http://localhost:4000/connectors/books/job/get")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/connectors/books/job/get",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
     return jsonify(r.json())
 
 
 @app.route("/connectors/books/job/save", methods=["POST"])
 def ui_books_job_save():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/books/job/save",
-        json=request.json
+        f"{base}/_backend/connectors/books/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json())
 
@@ -4151,7 +4543,12 @@ def books_dashboard():
 
 @app.route("/api/status/books")
 def books_status():
-    r = requests.get("http://localhost:4000/api/status/books")
+    base = request.host_url.rstrip("/")
+    r = requests.get(
+        f"{base}/_backend/api/status/books",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
+    )
     return jsonify(r.json())
 
 
@@ -4184,56 +4581,66 @@ def webfonts_page():
 
 @app.route("/connectors/webfonts/connect")
 def webfonts_connect():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/webfonts/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/webfonts/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 
 @app.route("/connectors/webfonts/disconnect")
 def webfonts_disconnect():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/webfonts/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/webfonts/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 
 @app.route("/connectors/webfonts/sync")
 def webfonts_sync():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/webfonts/sync",
+        f"{base}/_backend/connectors/webfonts/sync",
         cookies=request.cookies,
-        timeout=180
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=180
     )
     return jsonify(r.json())
 
 
 @app.route("/connectors/webfonts/job/get")
 def webfonts_job_get_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/webfonts/job/get",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/webfonts/job/get",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 
 @app.route("/connectors/webfonts/job/save", methods=["POST"])
 def webfonts_job_save_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/webfonts/job/save",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/webfonts/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json())
 
 
 @app.route("/api/status/webfonts")
 def webfonts_status():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/api/status/webfonts",
-        cookies=request.cookies
+        f"{base}/_backend/api/status/webfonts",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
@@ -4260,10 +4667,11 @@ def webfonts_data():
 @app.route("/connectors/webfonts/save_config", methods=["POST"])
 def webfonts_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/webfonts/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/webfonts/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -4291,12 +4699,11 @@ def pagespeed_sync():
 
     try:
 
+        base = request.host_url.rstrip("/")
         r = requests.post(
-            "http://localhost:4000/google/sync/pagespeed",
-            json={
-                "urls": [url]
-            },
-            timeout=600
+            f"{base}/_backend/google/sync/pagespeed",
+            cookies=request.cookies,
+            headers={"Cookie": request.headers.get("Cookie", "")}, timeout=600, json=request.get_json(silent=True) or request.json or {}
         )
 
         return jsonify(r.json())
@@ -4372,17 +4779,21 @@ def pagespeed_data():
 
 @app.route("/connectors/pagespeed/connect")
 def pagespeed_connect_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/pagespeed/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/pagespeed/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 @app.route("/connectors/pagespeed/disconnect")
 def pagespeed_disconnect_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/pagespeed/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/pagespeed/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
@@ -4390,28 +4801,32 @@ def pagespeed_disconnect_proxy():
 @app.route("/connectors/pagespeed/save_config", methods=["POST"])
 def pagespeed_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/pagespeed/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/pagespeed/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
 
 @app.route("/connectors/pagespeed/job/get")
 def pagespeed_job_get_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/pagespeed/job/get",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/pagespeed/job/get",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 @app.route("/connectors/pagespeed/job/save", methods=["POST"])
 def pagespeed_job_save_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/pagespeed/job/save",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/pagespeed/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json())
 
@@ -4427,7 +4842,7 @@ def gcs_page():
 @app.route("/connectors/gcs/connect")
 def gcs_connect():
     return redirect(
-        "http://localhost:4000/google/connect?source=gcs"
+        "/_backend/google/connect?source=gcs"
     )
 
 # ---- SYNC ----
@@ -4436,9 +4851,11 @@ def gcs_sync():
 
     sync_type = request.args.get("sync_type","incremental")
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/gcs",
-        params={"sync_type": sync_type}
+        f"{base}/_backend/google/sync/gcs",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -4520,8 +4937,11 @@ def gcs_status():
 @app.route("/connectors/gcs/disconnect")
 def gcs_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/gcs"
+        f"{base}/_backend/google/disconnect/gcs",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -4529,9 +4949,11 @@ def gcs_disconnect():
 @app.route("/connectors/gcs/job/get")
 def gcs_job_get_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/gcs/job/get",
-        headers={"Cookie": request.headers.get("Cookie","")}
+        f"{base}/_backend/connectors/gcs/job/get",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -4539,20 +4961,22 @@ def gcs_job_get_proxy():
 @app.route("/connectors/gcs/job/save", methods=["POST"])
 def gcs_job_save_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/gcs/job/save",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie","")}
+        f"{base}/_backend/connectors/gcs/job/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json())
 
 @app.route("/connectors/gcs/save_app",methods=["POST"])
 def gcs_save_app_proxy():
-    r=requests.post(
-        "http://localhost:4000/connectors/gcs/save_app",
-        json=request.get_json(),
-        headers={"Cookie":request.headers.get("Cookie","")}
+    base = request.host_url.rstrip("/")
+    r = requests.post(
+        f"{base}/_backend/connectors/gcs/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()),r.status_code
 
@@ -4567,16 +4991,17 @@ def classroom_page():
 @app.route("/connectors/classroom/connect")
 def classroom_connect():
     return redirect(
-        "http://localhost:4000/google/connect?source=classroom"
+        "/_backend/google/connect?source=classroom"
     )
 
 @app.route("/connectors/classroom/save_app", methods=["POST"])
 def classroom_save_app_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/classroom/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie","")}
+        f"{base}/_backend/connectors/classroom/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -4584,8 +5009,11 @@ def classroom_save_app_proxy():
 @app.route("/connectors/classroom/disconnect")
 def classroom_disconnect():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/disconnect/classroom"
+        f"{base}/_backend/google/disconnect/classroom",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
     return jsonify(r.json())
@@ -4595,9 +5023,11 @@ def classroom_disconnect():
 @app.route("/connectors/classroom/sync")
 def classroom_sync():
 
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/google/sync/classroom",
-        timeout=300
+        f"{base}/_backend/google/sync/classroom",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, timeout=300
     )
 
     if r.status_code != 200:
@@ -4762,17 +5192,21 @@ def factcheck_page():
 
 @app.route("/connectors/factcheck/connect")
 def factcheck_connect():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/factcheck/connect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/factcheck/connect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
 @app.route("/connectors/factcheck/disconnect")
 def factcheck_disconnect():
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        "http://localhost:4000/connectors/factcheck/disconnect",
-        cookies=request.cookies
+        f"{base}/_backend/connectors/factcheck/disconnect",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json())
 
@@ -4866,10 +5300,11 @@ def factcheck_claims():
 @app.route("/connectors/factcheck/save_config", methods=["POST"])
 def factcheck_save_config_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/factcheck/save_config",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/connectors/factcheck/save_config",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code
@@ -4884,7 +5319,7 @@ def facebook_page():
 
 @app.route("/connectors/facebook/connect")
 def facebook_connect():
-    return redirect("http://localhost:4000/connectors/facebook/connect")
+    return redirect("/_backend/connectors/facebook/connect")
 
 
 @app.route("/connectors/facebook/disconnect")
@@ -4903,10 +5338,11 @@ def facebook_status():
 
 @app.route("/connectors/facebook/save_app", methods=["POST"])
 def facebook_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/facebook/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/facebook/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -4937,7 +5373,7 @@ def facebook_ads_page():
 
 @app.route("/connectors/facebook_ads/connect")
 def facebook_ads_connect():
-    return redirect("http://localhost:4000/connectors/facebook_ads/connect")
+    return redirect("/_backend/connectors/facebook_ads/connect")
 
 @app.route("/connectors/facebook_ads/disconnect")
 def facebook_ads_disconnect():
@@ -4972,10 +5408,11 @@ def facebook_ads_job_save_proxy():
 
 @app.route("/connectors/facebook_ads/save_app", methods=["POST"])
 def facebook_ads_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/facebook_ads/save_app",
-        json=request.get_json(),
-        headers={"Cookie": request.headers.get("Cookie", "")}
+        f"{base}/_backend/connectors/facebook_ads/save_app",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -4989,11 +5426,11 @@ def chartbeat_page():
 
 @app.route("/connectors/chartbeat/save_app", methods=["POST"])
 def chartbeat_save_app_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/connectors/chartbeat/save_app",
-        json=request.get_json(),
+        f"{base}/_backend/connectors/chartbeat/save_app",
         cookies=request.cookies,
-        headers={"Cookie": request.headers.get("Cookie", "")},
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
@@ -5101,28 +5538,32 @@ def stripe_job_save_proxy():
 
 @app.route("/destination/save", methods=["POST"])
 def destination_save_proxy():
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/destination/save",
-        json=request.get_json(),
-        cookies=request.cookies   
+        f"{base}/_backend/destination/save",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/destination/list/<source>")
 def destination_list_proxy(source):
+    base = request.host_url.rstrip("/")
     r = requests.get(
-        f"http://localhost:4000/destination/list/{source}",
-        cookies=request.cookies  
+        f"{base}/_backend/destination/list/{source}",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}
     )
     return jsonify(r.json()), r.status_code
 
 @app.route("/destination/activate", methods=["POST"])
 def activate_destination_proxy():
 
+    base = request.host_url.rstrip("/")
     r = requests.post(
-        "http://localhost:4000/destination/activate",
-        json=request.get_json(),
-        cookies=request.cookies
+        f"{base}/_backend/destination/activate",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")}, json=request.get_json(silent=True) or request.json or {}
     )
 
     return jsonify(r.json()), r.status_code

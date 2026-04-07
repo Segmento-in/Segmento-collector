@@ -641,8 +641,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function saveCredentials() {
-    const username = document.getElementById("username").value.trim();
-    const apiToken = document.getElementById("apiToken").value.trim();
+    const username = getFieldValue("username");
+    const apiToken = getFieldValue("apiToken");
     if (!username || !apiToken) { alert("Username and API Token are required"); return; }
     try {
       const res = await fetch("/connectors/bitbucket/save_app", {

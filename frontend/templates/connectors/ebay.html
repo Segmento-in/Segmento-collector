@@ -862,9 +862,9 @@
   }
 
   async function saveCredentials() {
-    const appId = document.getElementById("appId").value.trim();
-    const certId = document.getElementById("certId").value.trim();
-    const devId = document.getElementById("devId").value.trim();
+    const appId = getFieldValue("appId");
+    const certId = getFieldValue("certId");
+    const devId = getFieldValue("devId");
     if (!appId || !certId || !devId) { alert("All fields are required"); return; }
     try {
       const res = await fetch("/connectors/ebay/save_app", {

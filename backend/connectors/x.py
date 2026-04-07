@@ -92,22 +92,23 @@ def _get_connection(uid):
     return row
 
 
-def get_x_auth_url(uid):
+def get_x_auth_url(uid, redirect_uri=None):
     cfg = _get_config(uid)
     if not cfg:
         raise Exception("X app not configured")
 
     client_id = cfg.get("client_id")
-    redirect_uri = cfg.get("scopes")
-    if not client_id or not redirect_uri:
+    # Use specified redirect_uri or fallback to the one saved in config
+    final_redirect_uri = redirect_uri or cfg.get("scopes")
+    if not client_id or not final_redirect_uri:
         raise Exception("Missing client_id or redirect_uri")
 
     params = {
         "response_type": "code",
         "client_id": client_id,
-        "redirect_uri": redirect_uri,
+        "redirect_uri": final_redirect_uri,
         "scope": " ".join(SCOPES),
-        "state": f"x-{uid}",
+        "state": f"x-{uid}|x", # Append connector name for unified routing
         "code_challenge": "segmentoxchallenge",
         "code_challenge_method": "plain",
     }
@@ -119,15 +120,16 @@ def _basic_auth_header(client_id, client_secret):
     return {"Authorization": f"Basic {token}"}
 
 
-def _exchange_code_for_token(uid, code):
+def _exchange_code_for_token(uid, code, redirect_uri=None):
     cfg = _get_config(uid)
     if not cfg:
         raise Exception("X app not configured")
 
     client_id = cfg.get("client_id")
     client_secret = cfg.get("client_secret")
-    redirect_uri = cfg.get("scopes")
-    if not client_id or not client_secret or not redirect_uri:
+    # Use specified redirect_uri or fallback to the one saved in config
+    final_redirect_uri = redirect_uri or cfg.get("scopes")
+    if not client_id or not client_secret or not final_redirect_uri:
         raise Exception("Missing OAuth app settings")
 
     headers = {
@@ -138,7 +140,7 @@ def _exchange_code_for_token(uid, code):
         "grant_type": "authorization_code",
         "client_id": client_id,
         "code": code,
-        "redirect_uri": redirect_uri,
+        "redirect_uri": final_redirect_uri,
         "code_verifier": "segmentoxchallenge",
     }
 
@@ -504,8 +506,8 @@ def get_active_destination(uid):
     }
 
 
-def handle_x_oauth_callback(uid, code):
-    token_data = _exchange_code_for_token(uid, code)
+def handle_x_oauth_callback(uid, code, redirect_uri=None):
+    token_data = _exchange_code_for_token(uid, code, redirect_uri=redirect_uri)
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
     expires_in = int(token_data.get("expires_in") or 7200)

@@ -803,7 +803,7 @@
 
   async function saveCredentials() {
     try {
-      const apiToken = document.getElementById("apiToken").value.trim();
+      const apiToken = getFieldValue("apiToken");
       if (!apiToken) { alert("API Token required"); return; }
       const res = await fetch("/connectors/clickup/save_app", {
         method: "POST",

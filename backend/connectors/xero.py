@@ -25,7 +25,7 @@ def save_app_xero(client_id, client_secret):
     conn.close()
     return {"status": "success"}
 
-def connect_xero():
+def connect_xero(uid=None, redirect_uri=None):
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT client_id FROM xero_config LIMIT 1")
@@ -36,21 +36,23 @@ def connect_xero():
         return redirect("/connectors/xero?error=missing_creds")
         
     client_id = row['client_id']
-    redirect_uri = "http://localhost:4000/connectors/xero/callback"
+    # Use provided redirect_uri or fallback to legacy
+    final_redirect_uri = redirect_uri or "/_backend/connectors/xero/callback"
     scope = "offline_access accounting.contacts accounting.transactions accounting.settings"
     
     # Xero Authorization URL
-    auth_url = (
-        f"https://login.xero.com/identity/connect/authorize"
-        f"?client_id={client_id}"
-        f"&response_type=code"
-        f"&scope={scope}"
-        f"&redirect_uri={redirect_uri}"
-        f"&state=xero_state"
-    )
+    from urllib.parse import urlencode
+    params = {
+        "client_id": client_id,
+        "response_type": "code",
+        "scope": scope,
+        "redirect_uri": final_redirect_uri,
+        "state": "xero" # Pass connector name for unified routing
+    }
+    auth_url = "https://login.xero.com/identity/connect/authorize?" + urlencode(params)
     return redirect(auth_url)
 
-def callback_xero():
+def callback_xero(uid=None, redirect_uri=None):
     code = request.args.get("code")
     
     conn = get_db()
@@ -61,13 +63,16 @@ def callback_xero():
     if not config or not code:
         return redirect("/connectors/xero?error=auth_failed")
 
+    # Use provided redirect_uri or fallback to legacy
+    final_redirect_uri = redirect_uri or "/_backend/connectors/xero/callback"
+
     # Exchange code for token
     token_url = "https://identity.xero.com/connect/token"
     auth = (config['client_id'], config['client_secret'])
     payload = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": "http://localhost:4000/connectors/xero/callback"
+        "redirect_uri": final_redirect_uri
     }
     
     res = requests.post(token_url, data=payload, auth=auth)

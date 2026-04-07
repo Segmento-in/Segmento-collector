@@ -15,7 +15,7 @@ DB = "identity.db"
 UPLOAD_DIR = "uploads/company_logos"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
-UI_BASE_URL = os.getenv("UI_BASE_URL", "http://localhost:3000")
+UI_BASE_URL = os.getenv("UI_BASE_URL", "")
 
 # DB CONNECTION
 def get_db():
@@ -40,7 +40,7 @@ def build_login_redirect(error_code, next_path="", auth_required=""):
     if auth_required == "1":
         params.append("auth_required=1")
 
-    return f"{UI_BASE_URL}/login?{'&'.join(params)}"
+    return ((f"{UI_BASE_URL}/login?") if UI_BASE_URL else "/login?") + '&'.join(params)
 
 # ================= Signup =================
 @auth.route("/auth/signup", methods=["POST"])
@@ -152,7 +152,7 @@ def signup():
 
     resp = make_response(jsonify({
         "success": True,
-        "redirect": f"{UI_BASE_URL}{next_url}"
+        "redirect": (f"{UI_BASE_URL}{next_url}") if UI_BASE_URL else next_url
     }))
 
     resp.set_cookie(
@@ -246,7 +246,7 @@ def login():
     con.close()
 
     safe_next = sanitize_next_path(next_url)
-    resp = make_response(redirect(f"{UI_BASE_URL}{safe_next}"))
+    resp = make_response(redirect((f"{UI_BASE_URL}{safe_next}") if UI_BASE_URL else safe_next))
 
     resp.set_cookie(
         "segmento_session",
@@ -286,6 +286,6 @@ def logout():
 
     resp = make_response(jsonify({"status": "logged_out"}))
 
-    resp.delete_cookie("segmento_session")
+    resp.delete_cookie("segmento_session", path="/")
 
     return resp

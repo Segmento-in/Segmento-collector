@@ -42,7 +42,7 @@ def _safe_graph_get(url, params=None, timeout=30, retries=3):
     return r
 
 
-def get_instagram_auth_url(uid):
+def get_instagram_auth_url(uid, redirect_uri=None):
     con = get_db()
     cur = con.cursor()
     cur.execute(
@@ -60,16 +60,20 @@ def get_instagram_auth_url(uid):
     if not row:
         raise Exception("Instagram app not configured")
 
+    # Use specified redirect_uri or fallback to the one saved during setup
+    final_redirect_uri = redirect_uri or row["scopes"]
+
     params = {
         "client_id": row["client_id"],
-        "redirect_uri": row["scopes"],
+        "redirect_uri": final_redirect_uri,
         "scope": ",".join(SCOPES),
         "response_type": "code",
+        "state": "instagram" # Pass the connector name for unified routing
     }
     return "https://www.facebook.com/v19.0/dialog/oauth?" + urlencode(params)
 
 
-def exchange_instagram_code(uid, code):
+def exchange_instagram_code(uid, code, redirect_uri=None):
     con = get_db()
     cur = con.cursor()
     cur.execute(
@@ -87,12 +91,14 @@ def exchange_instagram_code(uid, code):
     if not row:
         raise Exception("Instagram app not configured")
 
+    final_redirect_uri = redirect_uri or row["scopes"]
+
     res = _safe_graph_get(
         f"{GRAPH_BASE}/oauth/access_token",
         params={
             "client_id": row["client_id"],
             "client_secret": row["client_secret"],
-            "redirect_uri": row["scopes"],
+            "redirect_uri": final_redirect_uri,
             "code": code,
         },
     )
@@ -392,8 +398,8 @@ def sync_instagram(uid, sync_type="historical"):
         return {"status": "error", "message": str(e)}
 
 
-def handle_oauth_callback(uid, code):
-    token_data = exchange_instagram_code(uid, code)
+def handle_oauth_callback(uid, code, redirect_uri=None):
+    token_data = exchange_instagram_code(uid, code, redirect_uri=redirect_uri)
     short_lived_token = token_data.get("access_token")
 
     if not short_lived_token:

@@ -4542,7 +4542,7 @@ def google_connect():
             }
         },
         scopes=scopes,
-        redirect_uri=request.host_url.rstrip("/") + "/oauth2callback"
+        redirect_uri=request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
     )
 
     auth_url, state = flow.authorization_url(
@@ -4644,7 +4644,7 @@ def google_callback():
             }
         },
         scopes=scopes,
-        redirect_uri=request.host_url.rstrip("/") + "/oauth2callback"
+        redirect_uri=request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
     )
 
     flow.fetch_token(
@@ -4690,8 +4690,61 @@ def google_callback():
         con.close()
 
     return redirect(
-        f"http://localhost:3000/connectors/{source}"
+        f"/connectors/{source}"
     )
+
+@app.route("/oauth/callback")
+def unified_oauth_callback():
+    """
+    Unified OAuth Callback Router.
+    Routes the callback to the appropriate connector handler based on the state.
+    """
+    state_raw = request.args.get("state", "")
+    
+    # Extract connector name from state (supports 'csrf|connector' format)
+    if "|" in state_raw:
+        _, connector = state_raw.rsplit("|", 1)
+    else:
+        connector = state_raw
+        
+    print(f"[OAUTH] Unified callback for: {connector}", flush=True)
+    
+    # Map of connectors to backend handlers
+    # Using local mapping to handle redirects/calls
+    from backend.connectors.quickbooks import callback_quickbooks
+    from backend.connectors.xero import callback_xero
+    from backend.connectors.amazon_seller import callback_amazon_seller
+    
+    handlers = {
+        "google": google_callback,
+        "gmail": google_callback,
+        "drive": google_callback,
+        "youtube": google_callback,
+        "ga4": google_callback,
+        "search_console": google_callback,
+        "search-console": google_callback,
+        "sheets": google_callback,
+        "calendar": google_callback,
+        "tasks": google_callback,
+        "classroom": google_callback,
+        "contacts": google_callback,
+        "github": github_callback,
+        "instagram": instagram_callback,
+        "tiktok": tiktok_callback, # Placeholder or map to connector func
+        "x": x_callback,
+        "linkedin": linkedin_callback,
+        "quickbooks": callback_quickbooks,
+        "xero": callback_xero,
+        "amazon_seller": callback_amazon_seller,
+        "facebook": facebook_callback,
+        "facebook_ads": facebook_callback # Facebook Ads often uses same token
+    }
+    
+    handler = handlers.get(connector)
+    if handler:
+        return handler()
+        
+    return f"Unknown OAuth connector: {connector}", 400
 
 @app.route("/ai/connector/<connector>/<action>", methods=["GET", "POST"])
 def ai_connector_router(connector, action):
@@ -4761,13 +4814,8 @@ def gmail_connect_alt():
 
 @app.route("/connectors/gmail/status")
 def gmail_status_alt():
+    # Call the original gmail status logic
     return gmail_status()
-
-    if action == "status":
-        try:
-            return call_connector_route(f"/connectors/{connector}/status", uid)
-        except:
-            return jsonify({"status": "unknown"})
 
 @app.route("/ai/sync/<source>")
 def ai_sync(source):
@@ -8956,7 +9004,7 @@ def devto_connect():
     con.commit()
     con.close()
 
-    return redirect("http://localhost:3000/connectors/devto")
+    return redirect("/connectors/devto")
 
 # ---------------- DEVTO STATUS ----------------
 
@@ -9193,7 +9241,10 @@ def github_connect():
 
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
-    return redirect(get_auth_url(uid))
+    
+    # Use unified redirect URI targeting the frontend proxy
+    redirect_uri = request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
+    return redirect(get_auth_url(uid, redirect_uri=redirect_uri))
 
 @app.route("/github/callback")
 def github_callback():
@@ -9214,7 +9265,7 @@ def github_callback():
 
     save_token(uid, token)
 
-    return redirect("http://localhost:3000/connectors/github")
+    return redirect("/connectors/github")
 
 
 @app.route("/connectors/github/disconnect")
@@ -9431,7 +9482,9 @@ def instagram_connect():
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        return redirect(get_instagram_auth_url(uid))
+        # Use unified redirect URI targeting the frontend proxy
+        redirect_uri = request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
+        return redirect(get_instagram_auth_url(uid, redirect_uri=redirect_uri))
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -9446,12 +9499,14 @@ def instagram_callback():
     if not code:
         return "Authorization failed", 400
 
-    result = handle_oauth_callback(uid, code)
+    # Use unified redirect URI targeting the frontend proxy
+    redirect_uri = request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
+    result = handle_oauth_callback(uid, code, redirect_uri=redirect_uri)
 
     if result.get("status") != "success":
         return jsonify(result), 400
 
-    return redirect("http://localhost:3000/connectors/instagram")
+    return redirect("/connectors/instagram")
 
 @app.route("/connectors/instagram/disconnect")
 def instagram_disconnect():
@@ -9631,7 +9686,9 @@ def tiktok_connect():
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        return redirect(get_tiktok_auth_url(uid))
+        # Use unified redirect URI targeting the frontend proxy
+        redirect_uri = request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
+        return redirect(get_tiktok_auth_url(uid, redirect_uri=redirect_uri))
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -9650,7 +9707,7 @@ def tiktok_callback():
     if result.get("status") != "success":
         return jsonify(result), 400
 
-    return redirect("http://localhost:3000/connectors/tiktok")
+    return redirect("/connectors/tiktok")
 
 
 @app.route("/connectors/tiktok/disconnect")
@@ -10526,7 +10583,9 @@ def x_connect():
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        return redirect(get_x_auth_url(uid))
+        # Use unified redirect URI targeting the frontend proxy
+        redirect_uri = request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
+        return redirect(get_x_auth_url(uid, redirect_uri=redirect_uri))
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -10545,7 +10604,7 @@ def x_callback():
     if result.get("status") != "success":
         return jsonify(result), 400
 
-    return redirect("http://localhost:3000/connectors/x")
+    return redirect("/connectors/x")
 
 
 @app.route("/connectors/x/disconnect")
@@ -10719,13 +10778,19 @@ def linkedin_connect():
 
     try:
         oauth_state = secrets.token_urlsafe(24)
+        # Append connector name for unified routing
+        state_with_connector = f"{oauth_state}|linkedin"
+        
         state = get_connector_state(uid, "linkedin") or {}
-        state["oauth_state"] = oauth_state
+        state["oauth_state"] = oauth_state # Store the base state for CSRF validation
         state["oauth_state_expires_at"] = (
             datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=10)
         ).isoformat()
         save_connector_state(uid, "linkedin", state)
-        return redirect(get_linkedin_auth_url(uid, oauth_state))
+        
+        # Use unified redirect URI targeting the frontend proxy
+        redirect_uri = request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
+        return redirect(get_linkedin_auth_url(uid, state_with_connector, redirect_uri=redirect_uri))
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -10766,7 +10831,7 @@ def linkedin_callback():
     stored_state.pop("oauth_state_expires_at", None)
     save_connector_state(uid, "linkedin", stored_state)
 
-    return redirect("http://localhost:3000/connectors/linkedin")
+    return redirect("/connectors/linkedin")
 
 
 @app.route("/connectors/linkedin/disconnect")
@@ -11000,7 +11065,7 @@ def gitlab_callback():
     con.commit()
     con.close()
 
-    return redirect("http://localhost:3000/connectors/gitlab")
+    return redirect("/connectors/gitlab")
 
 @app.route("/api/status/gitlab")
 def gitlab_status():
@@ -13484,7 +13549,7 @@ def pinterest_callback():
         con.close()
 
         print(f"[PINTEREST CALLBACK] Success — token saved for uid={uid}", flush=True)
-        return redirect("http://localhost:3000/connectors/pinterest?connected=1")
+        return redirect("/connectors/pinterest?connected=1")
 
     except Exception as e:
         print(f"[PINTEREST CALLBACK ERROR] {str(e)}", flush=True)
@@ -13684,7 +13749,8 @@ def facebook_save_app():
     if not app_id or not app_secret:
         return jsonify({"error": "App ID and App Secret required"}), 400
 
-    redirect_uri = request.host_url.rstrip("/") + "/connectors/facebook/callback"
+    # Use unified redirect URI targeting the frontend proxy
+    redirect_uri = request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
 
     con = get_db()
     cur = con.cursor()
@@ -13727,7 +13793,7 @@ def facebook_test_save():
         uid,
         "TEST_APP_ID",
         "TEST_SECRET",
-        request.host_url.rstrip("/") + "/connectors/facebook/callback",
+        request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback",
         datetime.datetime.now(datetime.UTC).isoformat()
     ))
 
@@ -13740,9 +13806,7 @@ def facebook_test_save():
 
 @app.route("/connectors/facebook/connect", methods=["GET"])
 def facebook_connect():
-    print("CONNECT UID:", uid, flush=True)
     uid = getattr(g, "user_id", None)
-
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
 
@@ -13750,7 +13814,7 @@ def facebook_connect():
     cur = con.cursor()
 
     cur.execute("""
-        SELECT app_id, redirect_uri
+        SELECT app_id
         FROM facebook_app_credentials
         WHERE uid=?
     """, (uid,))
@@ -13761,13 +13825,16 @@ def facebook_connect():
     if not row:
         return "App credentials not saved", 400
 
-    app_id, redirect_uri = row
+    app_id = row[0]
+    # Use unified redirect URI targeting the frontend proxy
+    redirect_uri = request.host_url.replace("/_backend", "").rstrip("/") + "/oauth/callback"
 
     params = {
         "client_id": app_id,
         "redirect_uri": redirect_uri,
         "scope": "pages_show_list,pages_read_engagement,pages_read_user_content,read_insights",
-        "response_type": "code"
+        "response_type": "code",
+        "state": "facebook" # Pass connector name for unified routing
     }
 
     auth_url = "https://www.facebook.com/v19.0/dialog/oauth?" + urlencode(params)

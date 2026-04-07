@@ -135,7 +135,7 @@ function buildBarChart(ctx, labels, values) {
 
 async function loadUsage() {
     try {
-        const res = await fetch("http://localhost:4000/api/usage", { credentials: "include" });
+        const res = await fetch("/_backend/api/usage", { credentials: "include" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 

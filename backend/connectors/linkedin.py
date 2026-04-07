@@ -158,21 +158,22 @@ def save_state(uid, state):
     con.close()
 
 
-def get_linkedin_auth_url(uid, state):
+def get_linkedin_auth_url(uid, state, redirect_uri=None):
     cfg = _get_config(uid)
     if not cfg:
         raise Exception("LinkedIn app not configured")
 
     client_id = cfg.get("client_id")
-    redirect_uri = cfg.get("scopes")
+    # Use specified redirect_uri or fallback to the one saved in config
+    final_redirect_uri = redirect_uri or cfg.get("scopes")
     scopes = DEFAULT_SCOPES
-    if not client_id or not redirect_uri:
+    if not client_id or not final_redirect_uri:
         raise Exception("Missing LinkedIn client_id or redirect_uri")
 
     params = {
         "response_type": "code",
         "client_id": client_id,
-        "redirect_uri": redirect_uri,
+        "redirect_uri": final_redirect_uri,
         "scope": " ".join(scopes),
         "state": state,
     }
@@ -387,21 +388,22 @@ def _save_connection(
     con.close()
 
 
-def _exchange_code_for_token(uid, code):
+def _exchange_code_for_token(uid, code, redirect_uri=None):
     cfg = _get_config(uid)
     if not cfg:
         raise Exception("LinkedIn app not configured")
 
     client_id = cfg.get("client_id")
     client_secret = cfg.get("client_secret")
-    redirect_uri = cfg.get("scopes")
-    if not client_id or not client_secret or not redirect_uri:
+    # Use specified redirect_uri or fallback to the one saved in config
+    final_redirect_uri = redirect_uri or cfg.get("scopes")
+    if not client_id or not client_secret or not final_redirect_uri:
         raise Exception("LinkedIn app missing client_id, client_secret or redirect_uri")
 
     data = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": redirect_uri,
+        "redirect_uri": final_redirect_uri,
         "client_id": client_id,
         "client_secret": client_secret,
     }
@@ -412,7 +414,7 @@ def _exchange_code_for_token(uid, code):
         data=data,
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
-
+    
     if res.status_code != 200:
         raise Exception(f"LinkedIn token exchange failed ({res.status_code}): {res.text[:300]}")
 
@@ -516,8 +518,8 @@ def _fetch_member_id(access_token, linkedin_version):
     return payload.get("sub") or payload.get("id")
 
 
-def handle_linkedin_oauth_callback(uid, code):
-    token_data = _exchange_code_for_token(uid, code)
+def handle_linkedin_oauth_callback(uid, code, redirect_uri=None):
+    token_data = _exchange_code_for_token(uid, code, redirect_uri=redirect_uri)
     access_token = token_data.get("access_token")
     refresh_token = token_data.get("refresh_token")
     expires_in = int(token_data.get("expires_in") or 5184000)

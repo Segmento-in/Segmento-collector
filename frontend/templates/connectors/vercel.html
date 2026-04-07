@@ -749,7 +749,7 @@
     }
 
     async function saveCredentials() {
-        const api_key = document.getElementById("apiKey").value.trim();
+        const api_key = getFieldValue("apiKey");
         if (!api_key) { alert("API Key is required"); return; }
         try {
             const res = await fetch("/connectors/vercel/save_app", {

@@ -98,34 +98,39 @@ def _get_connection(uid):
     return row
 
 
-def get_tiktok_auth_url(uid):
+def get_tiktok_auth_url(uid, redirect_uri=None):
     cfg = _get_tiktok_config(uid)
     if not cfg:
         raise Exception("TikTok app not configured")
 
-    redirect_uri = cfg.get("scopes")
+    # Use provided redirect_uri or fallback to the one saved in config
+    final_redirect_uri = redirect_uri or cfg.get("scopes")
     scopes = DEFAULT_SCOPES
 
     params = {
         "client_key": cfg["client_id"],
         "scope": scopes,
         "response_type": "code",
-        "redirect_uri": redirect_uri,
+        "redirect_uri": final_redirect_uri,
+        "state": "tiktok" # Pass the connector name for unified routing
     }
     return AUTH_URL + "?" + urlencode(params)
 
 
-def _exchange_code_for_token(uid, code):
+def _exchange_code_for_token(uid, code, redirect_uri=None):
     cfg = _get_tiktok_config(uid)
     if not cfg:
         raise Exception("TikTok app not configured")
+
+    # Use provided redirect_uri or fallback to the one saved in config
+    final_redirect_uri = redirect_uri or cfg.get("scopes")
 
     payload = {
         "client_key": cfg["client_id"],
         "client_secret": cfg["client_secret"],
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": cfg.get("scopes"),
+        "redirect_uri": final_redirect_uri,
     }
 
     res = _request_with_retry(
@@ -628,8 +633,8 @@ def sync_tiktok(uid, sync_type="historical"):
         return {"status": "error", "message": str(e)}
 
 
-def handle_tiktok_oauth_callback(uid, code):
-    token_res = _exchange_code_for_token(uid, code)
+def handle_tiktok_oauth_callback(uid, code, redirect_uri=None):
+    token_res = _exchange_code_for_token(uid, code, redirect_uri=redirect_uri)
     if token_res.status_code != 200:
         return {
             "status": "error",

@@ -767,8 +767,8 @@
 
   async function saveCredentials() {
     try {
-      const clientId = document.getElementById("clientId").value.trim();
-      const clientSecret = document.getElementById("clientSecret").value.trim();
+      const clientId = getFieldValue("clientId");
+      const clientSecret = getFieldValue("clientSecret");
       const useSandbox = document.getElementById("useSandbox").checked;
       if (!clientId || !clientSecret) { alert("Client ID and Secret required"); return; }
       const res = await fetch("/connectors/paypal/save_app", {

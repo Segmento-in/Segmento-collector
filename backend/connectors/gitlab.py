@@ -89,22 +89,29 @@ def save_project_state(uid, project_id, commit_date=None, issue_date=None):
 
 # ---------------- AUTH ----------------
 
-def get_auth_url(uid):
+def get_auth_url(uid, redirect_uri=None):
 
     app = get_gitlab_app(uid)
 
+    # Use provided redirect_uri or fallback to legacy
+    final_redirect_uri = redirect_uri or "/_backend/gitlab/callback"
+
     params = {
         "client_id": app["client_id"],
-        "redirect_uri": "http://localhost:4000/gitlab/callback",
+        "redirect_uri": final_redirect_uri,
         "response_type": "code",
-        "scope": "read_user read_api read_repository"
+        "scope": "read_user read_api read_repository",
+        "state": "gitlab" # Pass connector name for unified routing
     }
 
     return "https://gitlab.com/oauth/authorize?" + urlencode(params)
 
-def exchange_code(uid, code):
+def exchange_code(uid, code, redirect_uri=None):
 
     app = get_gitlab_app(uid)
+
+    # Use provided redirect_uri or fallback to legacy
+    final_redirect_uri = redirect_uri or "/_backend/gitlab/callback"
 
     r = requests.post(
         "https://gitlab.com/oauth/token",
@@ -113,7 +120,7 @@ def exchange_code(uid, code):
             "client_secret": app["client_secret"],
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": "http://localhost:4000/gitlab/callback"
+            "redirect_uri": final_redirect_uri
         },
         timeout=20
     )

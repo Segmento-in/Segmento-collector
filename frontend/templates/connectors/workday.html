@@ -843,9 +843,9 @@
   }
 
   async function saveCredentials() {
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
-    const url = document.getElementById("baseUrl").value.trim();
+    const user = getFieldValue("username");
+    const pass = getFieldValue("password");
+    const url = getFieldValue("baseUrl");
     if (!user || !pass || !url) { alert("All fields are required"); return; }
     try {
       const res = await fetch("/connectors/workday/save_app", {

@@ -753,7 +753,7 @@
   }
 
   async function saveCredentials() {
-    const bd = { base_url: document.getElementById('base_url').value.trim(), username: document.getElementById('username').value.trim(), password: document.getElementById('password').value.trim() };
+    const bd = { base_url: getFieldValue('base_url'), username: getFieldValue('username'), password: getFieldValue('password') };
     if (!bd.username || !bd.password || !bd.base_url) { alert("Credentials required"); return; }
     try {
       document.getElementById("saveCredsBtn").innerText = "Saving...";

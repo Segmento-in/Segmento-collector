@@ -26,7 +26,7 @@ def save_app_amazon_seller(client_id, client_secret, seller_id, region):
     conn.close()
     return {"status": "success"}
 
-def connect_amazon_seller():
+def connect_amazon_seller(uid=None, redirect_uri=None):
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT client_id FROM amazon_seller_config LIMIT 1")
@@ -38,18 +38,22 @@ def connect_amazon_seller():
         
     # Amazon Login with Amazon (LWA) setup
     client_id = row['client_id']
-    redirect_uri = "http://localhost:4000/connectors/amazon_seller/callback"
+    
+    # Use provided redirect_uri or fallback to legacy
+    final_redirect_uri = redirect_uri or "/_backend/connectors/amazon_seller/callback"
     
     # NOTE: In production, you'd use the Amazon marketplace-specific Auth URL
-    auth_url = (
-        f"https://sellercentral.amazon.com/apps/authorize/consent"
-        f"?application_id={client_id}"
-        f"&state=amazon_state"
-        f"&version=beta" # For SP-API
-    )
+    from urllib.parse import urlencode
+    params = {
+        "application_id": client_id,
+        "state": "amazon_seller", # Pass connector name for unified routing
+        "version": "beta", # For SP-API
+        "redirect_uri": final_redirect_uri
+    }
+    auth_url = "https://sellercentral.amazon.com/apps/authorize/consent?" + urlencode(params)
     return redirect(auth_url)
 
-def callback_amazon_seller():
+def callback_amazon_seller(uid=None, redirect_uri=None):
     spapi_oauth_code = request.args.get("spapi_oauth_code")
     selling_partner_id = request.args.get("selling_partner_id")
     
@@ -61,6 +65,9 @@ def callback_amazon_seller():
     if not config or not spapi_oauth_code:
         return redirect("/connectors/amazon_seller?error=auth_failed")
 
+    # Use provided redirect_uri or fallback to legacy
+    final_redirect_uri = redirect_uri or "/_backend/connectors/amazon_seller/callback"
+
     # Exchange code for LWA refresh token
     token_url = "https://api.amazon.com/auth/o2/token"
     payload = {
@@ -68,7 +75,7 @@ def callback_amazon_seller():
         "code": spapi_oauth_code,
         "client_id": config['client_id'],
         "client_secret": config['client_secret'],
-        "redirect_uri": "http://localhost:4000/connectors/amazon_seller/callback"
+        "redirect_uri": final_redirect_uri
     }
     
     res = requests.post(token_url, data=payload)

@@ -757,8 +757,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function saveCredentials() {
-    const clientId = document.getElementById("clientId").value.trim();
-    const clientSecret = document.getElementById("clientSecret").value.trim();
+    const clientId = getFieldValue("clientId");
+    const clientSecret = getFieldValue("clientSecret");
     if (!clientId || !clientSecret) { alert("Credentials required"); return; }
     try {
       const res = await fetch("/connectors/socialinsider/save_app", {

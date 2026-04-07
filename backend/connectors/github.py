@@ -155,15 +155,21 @@ def get_github_app(uid):
 
 # ---------------- AUTH ---------------- #
 
-def get_auth_url(uid):
-
+def get_auth_url(uid, redirect_uri=None):
+    """
+    Generate GitHub OAuth authorization URL.
+    """
     app = get_github_app(uid)
 
     params = {
         "client_id": app["client_id"],
         "scope": "repo read:user",
-        "allow_signup": "true"
+        "allow_signup": "true",
+        "state": "github"  # Pass the connector name for unified routing
     }
+    
+    if redirect_uri:
+        params["redirect_uri"] = redirect_uri
 
     return (
         "https://github.com/login/oauth/authorize?"

@@ -758,7 +758,7 @@
 
   async function saveCredentials() {
     try {
-      const apiSecret = document.getElementById("apiSecret").value.trim();
+      const apiSecret = getFieldValue("apiSecret");
       if (!apiSecret) { alert("API Secret required"); return; }
       const res = await fetch("/connectors/mixpanel/save_app", {
         method: "POST",

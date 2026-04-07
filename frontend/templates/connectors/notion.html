@@ -770,14 +770,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function saveCredentials() {
-    const clientId = document.getElementById("clientId").value.trim();
-    const clientSecret = document.getElementById("clientSecret").value.trim();
-    if (!clientId || !clientSecret) { alert("Credentials required"); return; }
+    const accessToken = getFieldValue("access_token");
+    if (!accessToken) { alert("Access token is required"); return; }
     try {
       const res = await fetch("/connectors/notion/save_app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
+        body: JSON.stringify({ access_token: accessToken })
       });
       if (res.ok) { checkNotionStatus(); }
     } catch (e) { alert("Save failed"); }

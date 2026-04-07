@@ -746,7 +746,7 @@
   }
 
   async function saveCredentials() {
-    const bd = { connection_string: document.getElementById('connection_string').value.trim(), container_name: document.getElementById('container_name').value.trim() };
+    const bd = { connection_string: getFieldValue('connection_string'), container_name: getFieldValue('container_name') };
     if (!bd.connection_string || !bd.container_name) { alert("Credentials required"); return; }
     try {
       document.getElementById("saveCredsBtn").innerText = "Saving...";

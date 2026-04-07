@@ -773,9 +773,9 @@
 
   async function saveCredentials() {
     try {
-      const email = document.getElementById("email").value.trim();
-      const apiToken = document.getElementById("apiToken").value.trim();
-      const domain = document.getElementById("domain").value.trim();
+      const email = getFieldValue("email");
+      const apiToken = getFieldValue("apiToken");
+      const domain = getFieldValue("domain");
       if (!email || !apiToken || !domain) { alert("All fields required"); return; }
       const res = await fetch("/connectors/jira/save_app", {
         method: "POST",

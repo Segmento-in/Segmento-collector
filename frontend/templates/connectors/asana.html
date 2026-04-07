@@ -754,7 +754,7 @@
 
   async function saveCredentials() {
     try {
-      const accessToken = document.getElementById("accessToken").value.trim();
+      const accessToken = getFieldValue("accessToken");
       if (!accessToken) { alert("Access token required"); return; }
       const res = await fetch("/connectors/asana/save_app", {
         method: "POST",

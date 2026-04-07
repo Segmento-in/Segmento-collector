@@ -11,7 +11,8 @@ DB="identity.db"
 
 AUTH_URL="https://www.pinterest.com/oauth/"
 TOKEN_URL="https://api.pinterest.com/v5/oauth/token"
-REDIRECT_URI="http://localhost:4000/pinterest/callback"
+# Local redirect (legacy, now resolved dynamically)
+_LEGACY_REDIRECT_URI="/_backend/pinterest/callback"
 API_BASE="https://api.pinterest.com/v5"
 
 
@@ -85,7 +86,7 @@ def pinterest_save_token(uid, token, refresh, exp):
 
 # ---------------- OAuth ----------------
 
-def pinterest_get_auth_url(uid):
+def pinterest_get_auth_url(uid, redirect_uri=None):
 
     cfg = get_app_credentials(uid)
 
@@ -94,11 +95,15 @@ def pinterest_get_auth_url(uid):
 
     from urllib.parse import urlencode
 
+    # Use provided redirect_uri or fallback to legacy logic
+    final_redirect_uri = redirect_uri or _LEGACY_REDIRECT_URI
+
     params = {
         "response_type": "code",
         "client_id": cfg["client_id"],
-        "redirect_uri": REDIRECT_URI,
-        "scope": "boards:read,pins:read,user_accounts:read"
+        "redirect_uri": final_redirect_uri,
+        "scope": "boards:read,pins:read,user_accounts:read",
+        "state": "pinterest" # Pass connector name for unified routing
     }
 
     return AUTH_URL + "?" + urlencode(params)
@@ -106,7 +111,7 @@ def pinterest_get_auth_url(uid):
 import base64
 
 
-def pinterest_exchange_code(uid, code):
+def pinterest_exchange_code(uid, code, redirect_uri=None):
 
     cfg = get_app_credentials(uid)
 
@@ -124,6 +129,8 @@ def pinterest_exchange_code(uid, code):
     auth_str = f"{client_id}:{client_secret}"
     auth_b64 = base64.b64encode(auth_str.encode()).decode()
 
+    final_redirect_uri = redirect_uri or _LEGACY_REDIRECT_URI
+
     headers = {
         "Authorization": f"Basic {auth_b64}",
         "Content-Type": "application/x-www-form-urlencoded"
@@ -132,7 +139,7 @@ def pinterest_exchange_code(uid, code):
     data = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": REDIRECT_URI
+        "redirect_uri": final_redirect_uri
     }
 
     response = requests.post(

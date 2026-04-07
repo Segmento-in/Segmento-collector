@@ -25,7 +25,7 @@ def save_app_quickbooks(client_id, client_secret):
     conn.close()
     return {"status": "success"}
 
-def connect_quickbooks():
+def connect_quickbooks(uid, redirect_uri=None):
     conn = get_db()
     cur = conn.cursor()
     cur.execute("SELECT client_id FROM quickbooks_config LIMIT 1")
@@ -36,21 +36,23 @@ def connect_quickbooks():
         return redirect("/connectors/quickbooks?error=missing_creds")
         
     client_id = row['client_id']
-    redirect_uri = "http://localhost:4000/connectors/quickbooks/callback"
+    # Use provided redirect_uri or fallback to legacy
+    final_redirect_uri = redirect_uri or "/_backend/connectors/quickbooks/callback"
     scope = "com.intuit.quickbooks.accounting openid profile email"
     
     # Intuit Authorization URL
-    auth_url = (
-        f"https://appcenter.intuit.com/connect/oauth2"
-        f"?client_id={client_id}"
-        f"&response_type=code"
-        f"&scope={scope}"
-        f"&redirect_uri={redirect_uri}"
-        f"&state=quickbooks_state"
-    )
+    from urllib.parse import urlencode
+    params = {
+        "client_id": client_id,
+        "response_type": "code",
+        "scope": scope,
+        "redirect_uri": final_redirect_uri,
+        "state": "quickbooks" # Pass connector name for unified routing
+    }
+    auth_url = "https://appcenter.intuit.com/connect/oauth2?" + urlencode(params)
     return redirect(auth_url)
 
-def callback_quickbooks():
+def callback_quickbooks(uid=None, redirect_uri=None):
     code = request.args.get("code")
     realm_id = request.args.get("realmId")
     
@@ -62,13 +64,16 @@ def callback_quickbooks():
     if not config or not code:
         return redirect("/connectors/quickbooks?error=auth_failed")
 
+    # Use provided redirect_uri or fallback to legacy
+    final_redirect_uri = redirect_uri or "/_backend/connectors/quickbooks/callback"
+
     # Exchange code for token
     token_url = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
     auth = (config['client_id'], config['client_secret'])
     payload = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": "http://localhost:4000/connectors/quickbooks/callback"
+        "redirect_uri": final_redirect_uri
     }
     
     res = requests.post(token_url, data=payload, auth=auth)

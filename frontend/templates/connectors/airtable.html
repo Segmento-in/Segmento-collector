@@ -775,14 +775,19 @@
   }
 
   async function saveCredentials() {
-    const clientId = document.getElementById("clientId").value.trim();
-    const clientSecret = document.getElementById("clientSecret").value.trim();
-    if (!clientId || !clientSecret) { alert("Credentials required"); return; }
+    const accessToken = getFieldValue("access_token");
+    const baseId = getFieldValue("base_id");
+    const tableName = getFieldValue("table_name");
+    if (!accessToken || !baseId || !tableName) { alert("All fields are required"); return; }
     try {
       const res = await fetch("/connectors/airtable/save_app", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
+        body: JSON.stringify({
+          access_token: accessToken,
+          base_id: baseId,
+          table_name: tableName
+        })
       });
       if (res.ok) { checkAirtableStatus(); }
     } catch (e) { alert("Save failed"); }

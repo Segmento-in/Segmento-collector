@@ -1822,7 +1822,7 @@ including courses, assignments, and submissions.
     auth_type: "api_key",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/google/sync/factcheck",
+    sync_url: "/_backend/google/sync/factcheck",
     dashboard: "/dashboard/factcheck",
 
     long_description: `
@@ -1863,8 +1863,8 @@ and validate public statements.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/connectors/facebook/connect",
-    sync_url: "http://localhost:4000/connectors/facebook/sync",
+    connect_url: "/_backend/connectors/facebook/connect",
+    sync_url: "/_backend/connectors/facebook/sync",
     dashboard: "/dashboard/facebook",
 
     long_description: `
@@ -1909,8 +1909,8 @@ All page data is securely synchronized using OAuth authorization.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/connectors/facebook_ads/connect",
-    sync_url: "http://localhost:4000/connectors/facebook_ads/sync",
+    connect_url: "/_backend/connectors/facebook_ads/connect",
+    sync_url: "/_backend/connectors/facebook_ads/sync",
     dashboard: "/dashboard/facebook_ads",
 
     long_description: `
@@ -1955,8 +1955,8 @@ All advertising data is securely synchronized using OAuth authorization.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/instagram/connect",
-    sync_url: "http://localhost:4000/connectors/instagram/sync",
+    connect_url: "/_backend/instagram/connect",
+    sync_url: "/_backend/connectors/instagram/sync",
     dashboard: "/dashboard/instagram",
 
     long_description: `
@@ -1997,8 +1997,8 @@ OAuth access is scoped and securely stored.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/connectors/tiktok/connect",
-    sync_url: "http://localhost:4000/connectors/tiktok/sync",
+    connect_url: "/_backend/connectors/tiktok/connect",
+    sync_url: "/_backend/connectors/tiktok/sync",
     dashboard: "/dashboard/tiktok",
 
     long_description: `
@@ -2039,8 +2039,8 @@ and integrated ad reports with secure OAuth token management.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/connectors/taboola/connect",
-    sync_url: "http://localhost:4000/connectors/taboola/sync",
+    connect_url: "/_backend/connectors/taboola/connect",
+    sync_url: "/_backend/connectors/taboola/sync",
     dashboard: "/dashboard/taboola",
 
     long_description: `
@@ -2081,8 +2081,8 @@ top campaign content, and publisher revenue reports with token caching.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/connectors/outbrain/connect",
-    sync_url: "http://localhost:4000/connectors/outbrain/sync",
+    connect_url: "/_backend/connectors/outbrain/connect",
+    sync_url: "/_backend/connectors/outbrain/sync",
     dashboard: "/dashboard/outbrain",
 
     long_description: `
@@ -2123,8 +2123,8 @@ campaign reports, promoted content performance, and periodic campaign metrics.
 
     auth_type: "api_key",
 
-    connect_url: "http://localhost:4000/connectors/similarweb/connect",
-    sync_url: "http://localhost:4000/connectors/similarweb/sync",
+    connect_url: "/_backend/connectors/similarweb/connect",
+    sync_url: "/_backend/connectors/similarweb/sync",
     dashboard: "/dashboard/similarweb",
 
     long_description: `
@@ -2166,8 +2166,8 @@ marketing channel shares, social traffic sources, and search keyword analytics.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/connectors/x/connect",
-    sync_url: "http://localhost:4000/connectors/x/sync",
+    connect_url: "/_backend/connectors/x/connect",
+    sync_url: "/_backend/connectors/x/sync",
     dashboard: "/dashboard/x",
 
     long_description: `
@@ -2207,8 +2207,8 @@ and recent tweet data with secure token refresh support.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/connectors/linkedin/connect",
-    sync_url: "http://localhost:4000/connectors/linkedin/sync",
+    connect_url: "/_backend/connectors/linkedin/connect",
+    sync_url: "/_backend/connectors/linkedin/sync",
     dashboard: "/dashboard/linkedin",
 
     long_description: `
@@ -2252,8 +2252,8 @@ ad accounts, campaigns, creatives, and ad analytics with refresh-token support.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/github/connect",
-    sync_url: "http://localhost:4000/github/sync/repos",
+    connect_url: "/_backend/github/connect",
+    sync_url: "/_backend/github/sync/repos",
     dashboard: "/dashboard/github",
 
     long_description: `
@@ -2295,8 +2295,8 @@ to provide engineering productivity insights.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/gitlab/connect",
-    sync_url: "http://localhost:4000/gitlab/sync/projects",
+    connect_url: "/_backend/gitlab/connect",
+    sync_url: "/_backend/gitlab/sync/projects",
     dashboard: "/dashboard/gitlab",
 
     long_description: `
@@ -2340,7 +2340,7 @@ for DevOps and workflow analytics.
     auth_type: "api_key",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/devto/sync/articles",
+    sync_url: "/_backend/devto/sync/articles",
     dashboard: "/dashboard/devto",
 
     long_description: `
@@ -2383,7 +2383,7 @@ on Dev.to to analyze content performance and trends.
     auth_type: "api_key",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/stackoverflow/sync/questions",
+    sync_url: "/_backend/stackoverflow/sync/questions",
     dashboard: "/dashboard/stackoverflow",
 
     long_description: `
@@ -2426,7 +2426,7 @@ to analyze developer knowledge trends.
     auth_type: "none",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/hackernews/sync",
+    sync_url: "/_backend/hackernews/sync",
     dashboard: "/dashboard/hackernews",
 
     long_description: `
@@ -2468,7 +2468,7 @@ to track technology and startup trends.
     auth_type: "api_key",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/nvd/sync",
+    sync_url: "/_backend/nvd/sync",
     dashboard: "/dashboard/nvd",
 
     long_description: `
@@ -2513,8 +2513,8 @@ for security monitoring.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/reddit/connect",
-    sync_url: "http://localhost:4000/reddit/sync",
+    connect_url: "/_backend/reddit/connect",
+    sync_url: "/_backend/reddit/sync",
     dashboard: "/dashboard/reddit",
 
     long_description: `
@@ -2558,7 +2558,7 @@ to measure community engagement and sentiment.
     auth_type: "bot",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/discord/sync/guilds",
+    sync_url: "/_backend/discord/sync/guilds",
     dashboard: "/dashboard/discord",
 
     long_description: `
@@ -2601,7 +2601,7 @@ using bot-based integration.
     auth_type: "bot_token",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/telegram/sync/channel",
+    sync_url: "/_backend/telegram/sync/channel",
     dashboard: "/dashboard/telegram",
 
     long_description: `
@@ -2642,8 +2642,8 @@ using bot token authentication.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/tumblr/connect",
-    sync_url: "http://localhost:4000/tumblr/sync",
+    connect_url: "/_backend/tumblr/connect",
+    sync_url: "/_backend/tumblr/sync",
     dashboard: "/dashboard/tumblr",
 
     long_description: `
@@ -2685,8 +2685,8 @@ to analyze content reach.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/medium/connect",
-    sync_url: "http://localhost:4000/medium/sync",
+    connect_url: "/_backend/medium/connect",
+    sync_url: "/_backend/medium/sync",
     dashboard: "/dashboard/medium",
 
     long_description: `
@@ -2728,8 +2728,8 @@ to measure content impact.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/mastodon/connect",
-    sync_url: "http://localhost:4000/mastodon/sync",
+    connect_url: "/_backend/mastodon/connect",
+    sync_url: "/_backend/mastodon/sync",
     dashboard: "/dashboard/mastodon",
 
     long_description: `
@@ -2772,7 +2772,7 @@ instances for decentralized social analytics.
     auth_type: "none",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/lemmy/sync",
+    sync_url: "/_backend/lemmy/sync",
     dashboard: "/dashboard/lemmy",
 
     long_description: `
@@ -2815,8 +2815,8 @@ to understand decentralized social engagement.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/pinterest/connect",
-    sync_url: "http://localhost:4000/pinterest/sync",
+    connect_url: "/_backend/pinterest/connect",
+    sync_url: "/_backend/pinterest/sync",
     dashboard: "/dashboard/pinterest",
 
     long_description: `
@@ -2858,8 +2858,8 @@ visual content performance and trends.
 
     auth_type: "oauth",
 
-    connect_url: "http://localhost:4000/twitch/connect",
-    sync_url: "http://localhost:4000/twitch/sync",
+    connect_url: "/_backend/twitch/connect",
+    sync_url: "/_backend/twitch/sync",
     dashboard: "/dashboard/twitch",
 
     long_description: `
@@ -2903,7 +2903,7 @@ for live streaming analytics.
     auth_type: "none",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/peertube/sync",
+    sync_url: "/_backend/peertube/sync",
     dashboard: "/dashboard/peertube",
 
     long_description: `
@@ -2949,7 +2949,7 @@ instances for federated media analytics.
     auth_type: "none",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/osm/sync",
+    sync_url: "/_backend/osm/sync",
     dashboard: "/dashboard/openstreetmap",
 
     long_description: `
@@ -2993,7 +2993,7 @@ OpenStreetMap for mapping and location services.
     auth_type: "none",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/wikipedia/sync",
+    sync_url: "/_backend/wikipedia/sync",
     dashboard: "/dashboard/wikipedia",
 
     long_description: `
@@ -3036,7 +3036,7 @@ to track knowledge updates and editor activity.
     auth_type: "api_key",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/producthunt/sync",
+    sync_url: "/_backend/producthunt/sync",
     dashboard: "/dashboard/producthunt",
 
     long_description: `
@@ -3079,7 +3079,7 @@ on Product Hunt for startup analytics.
     auth_type: "api_key",
 
     connect_url: null,
-    sync_url: "http://localhost:4000/discourse/sync",
+    sync_url: "/_backend/discourse/sync",
     dashboard: "/dashboard/discourse",
 
     long_description: `
@@ -3157,8 +3157,8 @@ from Discourse communities.
     auth_type: "api_key",
 
     route: "/connectors/chartbeat",
-    connect_url: "http://localhost:4000/connectors/chartbeat/connect",
-    sync_url: "http://localhost:4000/connectors/chartbeat/sync",
+    connect_url: "/_backend/connectors/chartbeat/connect",
+    sync_url: "/_backend/connectors/chartbeat/sync",
     dashboard: "/dashboard/chartbeat",
 
     long_description: `
@@ -3201,8 +3201,8 @@ video engagement metrics directly into your data warehouse.
     auth_type: "api_key",
 
     route: "/connectors/socialinsider",
-    connect_url: "http://localhost:4000/connectors/socialinsider/connect",
-    sync_url: "http://localhost:4000/connectors/socialinsider/sync",
+    connect_url: "/_backend/connectors/socialinsider/connect",
+    sync_url: "/_backend/connectors/socialinsider/sync",
 
     long_description: `
 Connect Social Insider using your API Key to ingest social media posts, 

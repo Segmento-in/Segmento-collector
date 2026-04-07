@@ -758,7 +758,7 @@
 
   async function saveCredentials() {
     try {
-      const apiKey = document.getElementById("apiKey").value.trim();
+      const apiKey = getFieldValue("apiKey");
       if (!apiKey) { alert("API Key required"); return; }
       const res = await fetch("/connectors/sendgrid/save_app", {
         method: "POST",

@@ -744,7 +744,7 @@
   }
 
   async function saveCredentials() {
-    const bd = { api_key: document.getElementById('api_key').value.trim(), application_key: document.getElementById('application_key').value.trim() };
+    const bd = { api_key: getFieldValue('api_key'), application_key: getFieldValue('application_key') };
     if (!bd.api_key || !bd.application_key) { alert("Credentials required"); return; }
     try {
       document.getElementById("saveCredsBtn").innerText = "Saving...";

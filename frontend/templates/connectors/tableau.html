@@ -877,9 +877,9 @@
   }
 
   async function saveCredentials() {
-    const tokenName = document.getElementById("tokenName").value.trim();
-    const tokenSecret = document.getElementById("tokenSecret").value.trim();
-    const baseUrl = document.getElementById("baseUrl").value.trim();
+    const tokenName = getFieldValue("tokenName");
+    const tokenSecret = getFieldValue("tokenSecret");
+    const baseUrl = getFieldValue("baseUrl");
     if (!tokenName || !tokenSecret || !baseUrl) { alert("All fields are required"); return; }
     try {
       const res = await fetch("/connectors/tableau/save_app", {
