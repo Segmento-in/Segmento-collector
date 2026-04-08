@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB="identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 INSTANCE=os.getenv("LEMMY_INSTANCE","https://lemmy.world").rstrip("/")
 

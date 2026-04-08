@@ -1,11 +1,12 @@
-import requests
+﻿import requests
 import sqlite3
+import os
 import time
 from datetime import datetime
 
 
 BASE = "https://hacker-news.firebaseio.com/v0"
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 
 # ---------------- DB Helper ----------------

@@ -1,6 +1,7 @@
-import json
+﻿import json
 import time
 import sqlite3
+import os
 import datetime
 
 from google.oauth2.credentials import Credentials
@@ -10,7 +11,7 @@ from backend.destinations.destination_router import push_to_destination
 from backend.security.token_manager import ensure_valid_google_token
 
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 SOURCE = "calendar"
 
 

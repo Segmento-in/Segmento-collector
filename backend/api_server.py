@@ -37,7 +37,7 @@ from google_auth_oauthlib.flow import Flow
 from backend.scheduler.scheduler import start_scheduler
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-REAL_DB = os.path.join(PROJECT_ROOT, "identity.db")
+REAL_DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 _original_sqlite_connect = sqlite3.connect
 
@@ -507,7 +507,7 @@ def load_logged_user():
     if not session_id:
         return
 
-    con = sqlite3.connect("identity.db")
+    con = sqlite3.connect(REAL_DB)
     cur = con.cursor()
 
     cur.execute("""
@@ -702,7 +702,7 @@ GOOGLE_CLIENT_CONFIG = {
 
 #-------------Helper Fucntion---------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "identity.db")
+DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
 def get_db():
 
     con = sqlite3.connect(
@@ -12865,7 +12865,7 @@ def discourse_topics():
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
 
-    con = sqlite3.connect("identity.db")
+    con = sqlite3.connect(REAL_DB)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -12892,7 +12892,7 @@ def discourse_categories():
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
 
-    con = sqlite3.connect("identity.db")
+    con = sqlite3.connect(REAL_DB)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 

@@ -1,7 +1,8 @@
-import datetime
+﻿import datetime
 import hashlib
 import json
 import sqlite3
+import os
 from decimal import Decimal
 
 import boto3
@@ -11,7 +12,7 @@ from backend.destinations.destination_router import push_to_destination
 from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 SOURCE = "dynamodb"
 TABLES_SOURCE = "dynamodb_tables"
 DATA_SOURCE = "dynamodb_data"

@@ -1,11 +1,12 @@
-import requests
+﻿import requests
 import sqlite3
+import os
 import json
 import time
 from datetime import datetime, timedelta
 
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 BASE = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
 # DB

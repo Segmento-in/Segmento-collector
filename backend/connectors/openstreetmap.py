@@ -1,11 +1,12 @@
-import requests
+﻿import requests
 import sqlite3
+import os
 import time
 import json
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 BASE = "https://api.openstreetmap.org/api/0.6"
 

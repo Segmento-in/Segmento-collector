@@ -1,11 +1,12 @@
-import requests
+﻿import requests
 import sqlite3
+import os
 import datetime
 import json
 import time
 
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 BASE = "https://dev.to/api"
 

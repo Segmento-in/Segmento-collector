@@ -1,4 +1,4 @@
-import requests
+﻿import requests
 import sqlite3
 import datetime
 import json
@@ -9,7 +9,7 @@ from backend.destinations.destination_router import push_to_destination
 load_dotenv()
 
 SOURCE = "factcheck"
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 BASE = "https://factchecktools.googleapis.com/v1alpha1/claims:search"
 

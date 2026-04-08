@@ -1,9 +1,10 @@
-import feedparser
+﻿import feedparser
 import sqlite3
+import os
 import datetime
 import json
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 
 def db():

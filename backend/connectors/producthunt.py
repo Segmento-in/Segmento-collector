@@ -1,11 +1,11 @@
-from flask import json
+﻿from flask import json
 import requests
 import sqlite3
 import time
 import os
 from datetime import datetime
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 API_URL = "https://api.producthunt.com/v2/api/graphql"
 

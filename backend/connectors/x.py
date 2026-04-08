@@ -1,7 +1,8 @@
-import base64
+﻿import base64
 import datetime
 import json
 import sqlite3
+import os
 import time
 from urllib.parse import urlencode
 
@@ -12,7 +13,7 @@ from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 SOURCE = "x"
 AUTH_URL = "https://twitter.com/i/oauth2/authorize"
 TOKEN_URL = "https://api.x.com/2/oauth2/token"

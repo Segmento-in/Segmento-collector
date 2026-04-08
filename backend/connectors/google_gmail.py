@@ -1,4 +1,5 @@
-import sqlite3
+﻿import sqlite3
+import os
 import json
 import datetime
 import time
@@ -7,7 +8,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from backend.security.token_manager import ensure_valid_google_token
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 def get_state(uid, source):
 

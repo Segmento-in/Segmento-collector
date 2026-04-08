@@ -1,9 +1,10 @@
-import requests
+﻿import requests
 import sqlite3
+import os
 import datetime
 import json
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 BASE = "https://api.tumblr.com/v2/blog"
 
 

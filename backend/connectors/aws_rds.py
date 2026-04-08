@@ -1,12 +1,13 @@
-import json
+﻿import json
 import sqlite3
+import os
 import datetime
 
 from backend.security.secure_fetch import fetchone_secure
 from backend.security.crypto import encrypt_value
 from backend.destinations.destination_router import push_to_destination
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 SOURCE = "aws_rds"
 
 # MySQL-family engines

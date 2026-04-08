@@ -1,6 +1,7 @@
-import datetime
+﻿import datetime
 import json
 import sqlite3
+import os
 import time
 
 import requests
@@ -10,7 +11,7 @@ from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 SOURCE = "stripe"
 API_BASE = "https://api.stripe.com/v1"
 PAGE_SIZE = 100

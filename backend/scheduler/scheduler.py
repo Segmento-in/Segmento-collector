@@ -1,4 +1,4 @@
-import time
+﻿import time
 import requests
 import sqlite3
 import datetime
@@ -7,7 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import os
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(PROJECT_ROOT, "identity.db")
+DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
 BASE_URL = os.getenv("BASE_URL", "http://localhost:7860") + "/_backend"
 
 # Prevent overlapping runs

@@ -1,5 +1,6 @@
-import requests
+﻿import requests
 import sqlite3
+import os
 import datetime
 import json
 import time
@@ -8,7 +9,7 @@ from backend.destinations.destination_router import push_to_destination
 
 
 SOURCE = "pagespeed"
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 BASE_URL = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
 

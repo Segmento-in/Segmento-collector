@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import os
 import datetime
 
@@ -26,7 +26,7 @@ app = Flask(
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "..", "identity.db")
+DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
 
 # ================= AUTH UTILITIES =================# ================= AUTH UTILITIES =================
 
@@ -1141,7 +1141,7 @@ def gitlab_dashboard():
 @app.route("/api/gitlab/<table>")
 def gitlab_data(table):
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1343,7 +1343,7 @@ def stackoverflow_status():
 @app.route("/api/stackoverflow/data/questions")
 def stack_questions():
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1362,7 +1362,7 @@ def stack_questions():
 @app.route("/api/stackoverflow/data/answers")
 def stack_answers():
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1381,7 +1381,7 @@ def stack_answers():
 @app.route("/api/stackoverflow/data/users")
 def stack_users():
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1433,7 +1433,7 @@ def hackernews_dashboard():
 @app.route("/api/status/hackernews")
 def hackernews_status():
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     cur = conn.cursor()
 
     cur.execute("SELECT COUNT(*) FROM hackernews_stories")
@@ -1450,7 +1450,7 @@ def hackernews_status():
 @app.route("/api/hackernews/data/stories")
 def hackernews_stories():
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1545,7 +1545,7 @@ def nvd_status():
 @app.route("/api/nvd/data/cves")
 def nvd_cves():
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1704,7 +1704,7 @@ def telegram_status_proxy():
 @app.route("/api/telegram/channels")
 def telegram_channels():
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1728,7 +1728,7 @@ def telegram_messages(cid):
         headers={"Cookie": request.headers.get("Cookie", "")}
     )
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1842,7 +1842,7 @@ def tumblr_status_proxy():
 @app.route("/api/tumblr/blogs")
 def tumblr_blogs():
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1858,7 +1858,7 @@ def tumblr_blogs():
 @app.route("/api/tumblr/posts/<blog>")
 def tumblr_posts(blog):
 
-    conn = sqlite3.connect("../identity.db")
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1944,7 +1944,7 @@ def mastodon_status_proxy():
 @app.route("/api/mastodon/statuses")
 def mastodon_statuses():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -1964,7 +1964,7 @@ def mastodon_statuses():
 @app.route("/api/mastodon/tags")
 def mastodon_tags():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2053,7 +2053,7 @@ def lemmy_status_proxy():
 @app.route("/api/lemmy/posts")
 def lemmy_posts():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2073,7 +2073,7 @@ def lemmy_posts():
 @app.route("/api/lemmy/communities")
 def lemmy_communities():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2093,7 +2093,7 @@ def lemmy_communities():
 @app.route("/api/lemmy/users")
 def lemmy_users():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2181,7 +2181,7 @@ def pinterest_status_proxy():
 @app.route("/api/pinterest/boards")
 def pinterest_boards():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2200,7 +2200,7 @@ def pinterest_boards():
 @app.route("/api/pinterest/pins")
 def pinterest_pins():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2390,7 +2390,7 @@ def peertube_status():
 @app.route("/api/peertube/videos")
 def peertube_videos():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2409,7 +2409,7 @@ def peertube_videos():
 @app.route("/api/peertube/channels")
 def peertube_channels():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2503,7 +2503,7 @@ def osm_status_proxy():
 @app.route("/api/osm/changesets")
 def osm_changesets():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2522,7 +2522,7 @@ def osm_changesets():
 @app.route("/api/osm/notes")
 def osm_notes():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2612,7 +2612,7 @@ def wikipedia_dashboard():
 @app.route("/api/wiki/recent")
 def wiki_recent():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2631,7 +2631,7 @@ def wiki_recent():
 @app.route("/api/wiki/newpages")
 def wiki_new():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -2650,7 +2650,7 @@ def wiki_new():
 @app.route("/api/wiki/viewed")
 def wiki_viewed():
 
-    con = sqlite3.connect("../identity.db")
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 

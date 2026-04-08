@@ -1,9 +1,10 @@
-import requests
+﻿import requests
 import sqlite3
+import os
 import datetime
 import json
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 TOKEN_URL = "https://id.twitch.tv/oauth2/token"
 BASE = "https://api.twitch.tv/helix"

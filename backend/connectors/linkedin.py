@@ -1,6 +1,7 @@
-import datetime
+﻿import datetime
 import json
 import sqlite3
+import os
 import time
 from urllib.parse import quote, urlencode
 
@@ -11,7 +12,7 @@ from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 SOURCE = "linkedin"
 AUTH_URL = "https://www.linkedin.com/oauth/v2/authorization"
 TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"

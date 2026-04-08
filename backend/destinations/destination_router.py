@@ -1,4 +1,4 @@
-from backend.destinations.mysql_writer import push_to_mysql
+﻿from backend.destinations.mysql_writer import push_to_mysql
 from backend.destinations.postgres_writer import push_postgres
 from backend.destinations.bigquery_writer import push_bigquery
 from backend.destinations.snowflake_writer import push_snowflake
@@ -15,9 +15,10 @@ from backend.security.secure_db import decrypt_payload
 from flask import g, has_request_context
 
 import sqlite3
+import os
 import datetime
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 def resolve_destination_format(dest_cfg, source):
 

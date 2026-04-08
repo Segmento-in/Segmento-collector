@@ -1,6 +1,7 @@
-import datetime
+﻿import datetime
 import json
 import sqlite3
+import os
 import time
 from base64 import b64encode
 
@@ -10,7 +11,7 @@ from backend.destinations.destination_router import push_to_destination
 from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 SOURCE = "mixpanel"
 EVENTS_SOURCE = "mixpanel_events"
 USERS_SOURCE = "mixpanel_users"

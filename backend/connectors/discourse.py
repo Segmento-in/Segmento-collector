@@ -1,10 +1,11 @@
-import requests
+﻿import requests
 import sqlite3
+import os
 import json
 import time
 from datetime import datetime
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 BASE_HEADERS = {
     "User-Agent": "SegmentoCollector/1.0"

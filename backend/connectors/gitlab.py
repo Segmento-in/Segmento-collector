@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 API = "https://gitlab.com/api/v4"
 
@@ -22,7 +22,7 @@ from backend.security.secure_fetch import fetchone_secure
 
 def get_gitlab_app(uid):
 
-    con = sqlite3.connect("identity.db")
+    con = db()
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 

@@ -1,9 +1,10 @@
-import sqlite3
+﻿import sqlite3
+import os
 import json
 import uuid
 import datetime
 
-DB = "identity.db"
+DB = os.getenv("DB_PATH", "/tmp/identity.db")
 
 def init_sync_db():
     try:

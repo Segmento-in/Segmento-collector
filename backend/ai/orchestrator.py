@@ -22,7 +22,7 @@ from .registry import ALIAS_INDEX, get_connector_url, CONNECTORS
 from .route_executor import call_connector_route
 from .executor import execute_intent, normalize_source
 
-DB_PATH = "identity.db"
+DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
 
 
 def get_db():
