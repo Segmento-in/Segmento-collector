@@ -12,7 +12,7 @@ from werkzeug.security import check_password_hash
 auth = Blueprint("auth", __name__)
 
 DB = "identity.db"
-UPLOAD_DIR = "uploads/company_logos"
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "/tmp/uploads")
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 def get_base_url():

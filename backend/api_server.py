@@ -639,7 +639,7 @@ def me():
 
 app.register_blueprint(auth)
 
-UPLOAD_FOLDER = "uploads"
+UPLOAD_FOLDER = os.getenv("UPLOAD_DIR", "/tmp/uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # ✓ CHANGED: Use absolute path to root database, not relative "identity.db"
