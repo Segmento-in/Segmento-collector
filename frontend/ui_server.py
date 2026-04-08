@@ -168,13 +168,20 @@ def ui_login():
     location = r.headers.get("Location", "")
     if r.status_code == 302 and "error=1" in location:
         return redirect("/login?error=1")
-        
-    # Default success redirect
-    resp = redirect("/")
 
-    # Explicitly copy authentication cookies from the backend response
-    # to ensure they are available in the browser context.
-    copy_auth_cookies(r, resp)
+    if r.status_code in [301, 302, 303, 307, 308]:
+        resp = redirect(r.headers.get("Location", "/"))
+    else:
+        resp = Response(r.content, status=r.status_code)
+
+    raw_headers = getattr(getattr(r, "raw", None), "headers", None)
+
+    if raw_headers and hasattr(raw_headers, "getlist"):
+        for cookie in raw_headers.getlist("Set-Cookie"):
+            resp.headers.add("Set-Cookie", cookie)
+    else:
+        if "Set-Cookie" in r.headers:
+            resp.headers.add("Set-Cookie", r.headers["Set-Cookie"])
 
     return resp
 
