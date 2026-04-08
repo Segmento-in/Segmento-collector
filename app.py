@@ -6,6 +6,6 @@ application = DispatcherMiddleware(frontend_app, {
     '/_backend': backend_app
 })
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from werkzeug.serving import run_simple
-    run_simple('0.0.0.0', 7860, application, threaded=True)
+    run_simple("0.0.0.0", 7860, application, threaded=True)
