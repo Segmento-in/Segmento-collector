@@ -36,48 +36,16 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
 
-SESSION_COOKIE_NAME = "segmento_session"
-SESSION_COOKIE_OPTIONS = {
-    "httponly": True,
-    "secure": True,
-    "samesite": "None",
-    "path": "/",
-}
-
-
 def copy_auth_cookies(source_response, target_response):
-    for cookie in source_response.cookies:
-        if cookie.name == SESSION_COOKIE_NAME:
-            target_response.set_cookie(
-                SESSION_COOKIE_NAME,
-                cookie.value,
-                expires=cookie.expires,
-                **SESSION_COOKIE_OPTIONS,
-            )
-            continue
-
-        target_response.set_cookie(
-            cookie.name,
-            cookie.value,
-            expires=cookie.expires,
-            path="/",
-            domain=cookie.domain,
-            secure=True,
-            httponly=bool(cookie._rest.get("HttpOnly")),
-            samesite="None",
-        )
-
-
-def forward_set_cookie_headers(source_response, target_response):
     raw_headers = getattr(getattr(source_response, "raw", None), "headers", None)
     if raw_headers and hasattr(raw_headers, "getlist"):
-        for cookie_header in raw_headers.getlist("Set-Cookie"):
-            target_response.headers.add("Set-Cookie", cookie_header)
-        return
+        cookies = raw_headers.getlist("Set-Cookie")
+    else:
+        set_cookie = source_response.headers.get("Set-Cookie")
+        cookies = [set_cookie] if set_cookie else []
 
-    set_cookie = source_response.headers.get("Set-Cookie")
-    if set_cookie:
-        target_response.headers.add("Set-Cookie", set_cookie)
+    for cookie in cookies:
+        target_response.headers.add("Set-Cookie", cookie)
 
 
 def build_proxy_response(source_response):
@@ -99,7 +67,7 @@ def build_proxy_response(source_response):
             continue
         response.headers[key] = value
 
-    forward_set_cookie_headers(source_response, response)
+    copy_auth_cookies(source_response, response)
     return response
 
 
