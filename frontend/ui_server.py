@@ -15,7 +15,8 @@ from flask import (
     render_template,
     redirect,
     jsonify,
-    request
+    request,
+    Response,
 )
 
 # ================= CORE SETUP =================
@@ -65,6 +66,52 @@ def copy_auth_cookies(source_response, target_response):
             httponly=bool(cookie._rest.get("HttpOnly")),
             samesite="None",
         )
+
+
+def forward_set_cookie_headers(source_response, target_response):
+    raw_headers = getattr(getattr(source_response, "raw", None), "headers", None)
+    if raw_headers and hasattr(raw_headers, "getlist"):
+        for cookie_header in raw_headers.getlist("Set-Cookie"):
+            target_response.headers.add("Set-Cookie", cookie_header)
+        return
+
+    set_cookie = source_response.headers.get("Set-Cookie")
+    if set_cookie:
+        target_response.headers.add("Set-Cookie", set_cookie)
+
+
+def build_proxy_response(source_response):
+    response = Response(
+        source_response.content,
+        status=source_response.status_code,
+    )
+
+    excluded_headers = {
+        "content-length",
+        "transfer-encoding",
+        "content-encoding",
+        "connection",
+        "set-cookie",
+    }
+
+    for key, value in source_response.headers.items():
+        if key.lower() in excluded_headers:
+            continue
+        response.headers[key] = value
+
+    forward_set_cookie_headers(source_response, response)
+    return response
+
+
+def proxy_request(method, path, **kwargs):
+    base = request.host_url.rstrip("/")
+    return requests.request(
+        method,
+        f"{base}/_backend{path}",
+        cookies=request.cookies,
+        headers={"Cookie": request.headers.get("Cookie", "")},
+        **kwargs
+    )
 
 # ================= AUTH UTILITIES =================# ================= AUTH UTILITIES =================
 
@@ -251,23 +298,35 @@ def connectors():
 # ================= PROXY UTILITIES =================
 
 def proxy_get(path, **kwargs):
-    base = request.host_url.rstrip("/")
-    return requests.get(
-        f"{base}/_backend{path}",
-        cookies=request.cookies,
-        headers={"Cookie": request.headers.get("Cookie", "")},
-        **kwargs
-    )
+    return proxy_request("GET", path, **kwargs)
 
 
 def proxy_post(path, **kwargs):
-    base = request.host_url.rstrip("/")
-    return requests.post(
-        f"{base}/_backend{path}",
-        cookies=request.cookies,
-        headers={"Cookie": request.headers.get("Cookie", "")},
-        **kwargs
-    )
+    return proxy_request("POST", path, **kwargs)
+
+
+def proxy_put(path, **kwargs):
+    return proxy_request("PUT", path, **kwargs)
+
+
+def proxy_delete(path, **kwargs):
+    return proxy_request("DELETE", path, **kwargs)
+
+
+def proxy_get_response(path, **kwargs):
+    return build_proxy_response(proxy_get(path, **kwargs))
+
+
+def proxy_post_response(path, **kwargs):
+    return build_proxy_response(proxy_post(path, **kwargs))
+
+
+def proxy_put_response(path, **kwargs):
+    return build_proxy_response(proxy_put(path, **kwargs))
+
+
+def proxy_delete_response(path, **kwargs):
+    return build_proxy_response(proxy_delete(path, **kwargs))
 
 
 def connector_sync(source):
