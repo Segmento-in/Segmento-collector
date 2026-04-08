@@ -1,7 +1,12 @@
 import requests
 import json
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
+import os
+
+OLLAMA_URL = os.getenv(
+    "OLLAMA_URL",
+    "http://localhost:11434/api/generate"
+)
 
 SYSTEM_PROMPT = """
 You are an AI assistant that converts user requests into structured JSON actions.
