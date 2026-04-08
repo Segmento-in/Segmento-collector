@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -115,7 +115,7 @@ def save_config(uid: str, bot_token: str):
             uid,
             SOURCE,
             encrypt_value(json.dumps(config)),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -320,7 +320,7 @@ def sync_slack(uid: str, sync_type: str = "incremental") -> dict:
         return {"status": "error", "message": str(exc)}
 
     dest_cfg = _get_active_destination(uid)
-    now = datetime.datetime.now(datetime.UTC).isoformat() + "Z"
+    now = datetime.datetime.utcnow().isoformat() + "Z"
 
     if dest_cfg:
         _log(f"Active destination found for uid={uid}: type={dest_cfg.get('type')}")
@@ -418,3 +418,4 @@ def sync_slack(uid: str, sync_type: str = "incremental") -> dict:
     if not dest_cfg:
         result["message"] = "No active destination configured"
     return result
+

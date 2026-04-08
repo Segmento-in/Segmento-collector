@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -43,14 +43,14 @@ def _parse_dt(value):
     try:
         dt = datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 
 def _get_config(uid: str) -> dict | None:
@@ -226,7 +226,7 @@ def _fetch_events(api_secret: str, last_sync_at: datetime.datetime | None = None
     url = f"{API_BASE}/2.0/export"
     
     # Default to last 7 days if no last sync
-    end_date = datetime.datetime.now(datetime.UTC)
+    end_date = datetime.datetime.utcnow()
     start_date = last_sync_at if last_sync_at else (end_date - datetime.timedelta(days=7))
     
     params = {
@@ -461,3 +461,4 @@ def _get_active_destination(uid: str) -> dict | None:
         "password": row["password"],
         "database_name": row["database_name"],
     }
+

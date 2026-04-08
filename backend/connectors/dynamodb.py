@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import hashlib
 import json
 import sqlite3
@@ -120,7 +120,7 @@ def save_config(uid: str, access_key: str, secret_key: str, region: str):
             uid,
             SOURCE,
             encrypt_value(json.dumps(config)),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -252,7 +252,7 @@ def sync_dynamodb(uid: str, sync_type: str = "incremental") -> dict:
         return {"status": "error", "message": str(exc)}
 
     dest_cfg = _get_active_destination(uid)
-    now = datetime.datetime.now(datetime.UTC).isoformat() + "Z"
+    now = datetime.datetime.utcnow().isoformat() + "Z"
 
     _log(f"uid={uid} discovered {len(tables)} tables in region={cfg['region']}: {tables}")
     if dest_cfg:
@@ -397,3 +397,4 @@ def _get_active_destination(uid: str) -> dict | None:
         "password": row[4],
         "database_name": row[5],
     }
+

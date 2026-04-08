@@ -1,4 +1,4 @@
-﻿import json
+import json
 import sqlite3
 import os
 import time
@@ -22,7 +22,7 @@ def _log(message: str):
     print(f"[LOOKER] {message}", flush=True)
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 def _get_config(uid: str) -> dict | None:
     con = get_db()
@@ -287,3 +287,4 @@ def disconnect_looker(uid: str) -> dict:
     _update_status(uid, "disconnected")
     _log(f"Disconnected uid={uid}")
     return {"status": "disconnected"}
+

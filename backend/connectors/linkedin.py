@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -38,8 +38,8 @@ def _parse_dt(value):
     try:
         dt = datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
@@ -48,7 +48,7 @@ def _token_expired(expires_at):
     dt = _parse_dt(expires_at)
     if not dt:
         return True
-    return dt <= (datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=2))
+    return dt <= (datetime.datetime.utcnow() + datetime.timedelta(minutes=2))
 
 
 def _urn_account(account_id):
@@ -152,7 +152,7 @@ def save_state(uid, state):
             uid,
             SOURCE,
             json.dumps(state),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -363,7 +363,7 @@ def _save_connection(
             enc_refresh,
             expires_at,
             linkedin_version,
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
 
@@ -457,7 +457,7 @@ def _refresh_access_token(uid, refresh_token):
     next_refresh = token_data.get("refresh_token") or refresh_token
     expires_in = int(token_data.get("expires_in") or 5184000)
     expires_at = (
-        datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)
     ).isoformat()
 
     if not access_token:
@@ -525,7 +525,7 @@ def handle_linkedin_oauth_callback(uid, code, redirect_uri=None):
     refresh_token = token_data.get("refresh_token")
     expires_in = int(token_data.get("expires_in") or 5184000)
     expires_at = (
-        datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)
     ).isoformat()
 
     cfg = _get_config(uid) or {}
@@ -735,7 +735,7 @@ def sync_linkedin(uid, sync_type="historical"):
 
         con = get_db()
         cur = con.cursor()
-        fetched_at = datetime.datetime.now(datetime.UTC).isoformat()
+        fetched_at = datetime.datetime.utcnow().isoformat()
         rows = []
 
         accounts_raw = _fetch_paginated(
@@ -933,3 +933,4 @@ def disconnect_linkedin(uid):
 
     con.commit()
     con.close()
+

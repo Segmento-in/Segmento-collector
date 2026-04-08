@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -32,7 +32,7 @@ def _mask_token(token: str | None) -> str | None:
     return f"{token[:4]}{'*' * max(len(token) - 8, 4)}{token[-4:]}"
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 def _get_config(uid: str) -> dict | None:
     con = get_db()
@@ -317,3 +317,4 @@ def _get_active_destination(uid: str) -> dict | None:
         "password": row["password"],
         "database_name": row["database_name"],
     }
+

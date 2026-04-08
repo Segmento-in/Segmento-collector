@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -26,7 +26,7 @@ def _log(message: str):
     print(f"[MAILCHIMP] {message}", flush=True)
 
 def _iso_now() -> str:
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 def _mask_token(token: str | None) -> str | None:
     if not token: return None
@@ -185,3 +185,4 @@ def _get_active_destination(uid: str) -> dict | None:
     con.close()
     if not row: return None
     return {"type": row["dest_type"], "host": row["host"], "port": row["port"], "username": row["username"], "password": row["password"], "database_name": row["database_name"]}
+

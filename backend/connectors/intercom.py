@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -26,20 +26,20 @@ def _log(message: str):
     print(f"[INTERCOM] {message}", flush=True)
 
 def _iso_now() -> str:
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 def _parse_dt(value):
     if not value:
         return None
     try:
         if isinstance(value, (int, float)):
-            dt = datetime.datetime.fromtimestamp(value, datetime.UTC)
+            dt = datetime.datetime.fromtimestamp(value, datetime.timezone.utc)
         else:
             text = str(value).strip()
             if text.endswith("Z"): text = text.replace("Z", "+00:00")
             dt = datetime.datetime.fromisoformat(text)
-        if dt.tzinfo is None: dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+        if dt.tzinfo is None: dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
@@ -221,3 +221,4 @@ def _get_active_destination(uid: str) -> dict | None:
     con.close()
     if not row: return None
     return {"type": row["dest_type"], "host": row["host"], "port": row["port"], "username": row["username"], "password": row["password"], "database_name": row["database_name"]}
+

@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -59,8 +59,8 @@ def _token_expired(expires_at):
     try:
         dt = datetime.datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt <= (datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=2))
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt <= (datetime.datetime.utcnow() + datetime.timedelta(minutes=2))
     except Exception:
         return True
 
@@ -175,7 +175,7 @@ def _refresh_access_token(uid, refresh_token):
     access_token = body.get("access_token")
     next_refresh_token = body.get("refresh_token") or refresh_token
     expires_in = int(body.get("expires_in") or 86400)
-    expires_at = (datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)).isoformat()
+    expires_at = (datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)).isoformat()
 
     if not access_token:
         raise Exception("TikTok token refresh did not return access_token")
@@ -249,7 +249,7 @@ def _save_connection(uid, advertiser_id, access_token, refresh_token, expires_at
             enc_access,
             enc_refresh,
             expires_at,
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
 
@@ -336,7 +336,7 @@ def save_state(uid, state):
             uid,
             SOURCE,
             json.dumps(state),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -396,7 +396,7 @@ def sync_tiktok(uid, sync_type="historical"):
 
         con = get_db()
         cur = con.cursor()
-        now = datetime.datetime.now(datetime.UTC).isoformat()
+        now = datetime.datetime.utcnow().isoformat()
         rows = []
 
         # Campaigns
@@ -653,7 +653,7 @@ def handle_tiktok_oauth_callback(uid, code, redirect_uri=None):
     access_token = body.get("access_token")
     refresh_token = body.get("refresh_token")
     expires_in = int(body.get("expires_in") or 86400)
-    expires_at = (datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)).isoformat()
+    expires_at = (datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)).isoformat()
 
     cfg = _get_tiktok_config(uid)
     advertiser_id = cfg.get("api_key") if cfg else None
@@ -694,3 +694,4 @@ def disconnect_tiktok(uid):
 
     con.commit()
     con.close()
+

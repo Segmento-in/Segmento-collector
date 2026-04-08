@@ -1,4 +1,4 @@
-﻿import base64
+import base64
 import datetime
 import json
 import sqlite3
@@ -38,8 +38,8 @@ def _parse_dt(value):
     try:
         dt = datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
@@ -48,15 +48,15 @@ def _to_iso_z(dt):
     if not dt:
         return None
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=datetime.UTC)
-    return dt.astimezone(datetime.UTC).isoformat().replace("+00:00", "Z")
+        dt = dt.replace(tzinfo=datetime.timezone.utc)
+    return dt.astimezone(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _token_expired(expires_at):
     dt = _parse_dt(expires_at)
     if not dt:
         return True
-    return dt <= (datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=2))
+    return dt <= (datetime.datetime.utcnow() + datetime.timedelta(minutes=2))
 
 
 def _get_config(uid):
@@ -175,7 +175,7 @@ def _save_connection(uid, x_user_id, username, access_token, refresh_token, expi
             enc_access,
             enc_refresh,
             expires_at,
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
 
@@ -246,7 +246,7 @@ def _refresh_access_token(uid, refresh_token):
     next_refresh = token_data.get("refresh_token") or refresh_token
     expires_in = int(token_data.get("expires_in") or 7200)
     expires_at = (
-        datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)
     ).isoformat()
 
     if not access_token:
@@ -473,7 +473,7 @@ def save_state(uid, state):
             uid,
             SOURCE,
             json.dumps(state),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -513,7 +513,7 @@ def handle_x_oauth_callback(uid, code, redirect_uri=None):
     refresh_token = token_data.get("refresh_token")
     expires_in = int(token_data.get("expires_in") or 7200)
     expires_at = (
-        datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)
     ).isoformat()
 
     me = _api_get(
@@ -542,11 +542,11 @@ def sync_x(uid, sync_type="historical"):
         if not access_token:
             return {"status": "error", "message": "X not connected"}
 
-        fetched_at = datetime.datetime.now(datetime.UTC).isoformat()
+        fetched_at = datetime.datetime.utcnow().isoformat()
         state = get_state(uid)
         last_ts_raw = state.get("last_tweet_timestamp")
         last_ts = _parse_dt(last_ts_raw)
-        now_utc = datetime.datetime.now(datetime.UTC)
+        now_utc = datetime.datetime.utcnow()
         min_recent = now_utc - datetime.timedelta(days=7)
 
         me_data = _api_get(
@@ -721,3 +721,4 @@ def disconnect_x(uid):
 
     con.commit()
     con.close()
+

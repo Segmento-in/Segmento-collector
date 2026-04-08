@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -256,7 +256,7 @@ def _save_connection(uid, domain):
         (uid, domain, connected_at)
         VALUES (?, ?, ?)
         """,
-        (uid, domain, datetime.datetime.now(datetime.UTC).isoformat()),
+        (uid, domain, datetime.datetime.utcnow().isoformat()),
     )
 
     cur.execute(
@@ -380,7 +380,7 @@ def save_state(uid, state):
             uid,
             SOURCE,
             json.dumps(state),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -456,7 +456,7 @@ def sync_similarweb(uid, sync_type="historical"):
 
         state = get_state(uid)
         start_date, end_date = _sync_window(sync_type, state)
-        fetched_at = datetime.datetime.now(datetime.UTC).isoformat()
+        fetched_at = datetime.datetime.utcnow().isoformat()
 
         params_base = _build_params(api_key, start_date, end_date)
 
@@ -675,3 +675,4 @@ def disconnect_similarweb(uid):
 
     con.commit()
     con.close()
+

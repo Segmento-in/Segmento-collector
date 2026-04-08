@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -42,14 +42,14 @@ def _parse_dt(value):
     try:
         dt = datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 
 def _get_config(uid: str) -> dict | None:
@@ -244,7 +244,7 @@ def _fetch_transactions(access_token: str, use_sandbox: bool, last_sync_at: date
     url = f"{base_url}/v1/reporting/transactions"
     
     # Build date range for query
-    end_date = datetime.datetime.now(datetime.UTC)
+    end_date = datetime.datetime.utcnow()
     start_date = last_sync_at if last_sync_at else (end_date - datetime.timedelta(days=30))
     
     params = {
@@ -299,7 +299,7 @@ def _fetch_payments(access_token: str, use_sandbox: bool, last_sync_at: datetime
         if last_sync_at:
             payments = [
                 p for p in payments
-                if (_parse_dt(p.get("update_time")) or datetime.datetime.min.replace(tzinfo=datetime.UTC)) > last_sync_at
+                if (_parse_dt(p.get("update_time")) or datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)) > last_sync_at
             ]
         
         all_payments.extend(payments)
@@ -487,3 +487,4 @@ def _get_active_destination(uid: str) -> dict | None:
         "password": row["password"],
         "database_name": row["database_name"],
     }
+

@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -45,14 +45,14 @@ def _parse_dt(value):
     try:
         dt = datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 
 def _get_config(uid: str) -> dict | None:
@@ -278,8 +278,8 @@ def connect_amplitude(uid: str) -> dict:
 
     try:
         # Test API connection by fetching a small date range
-        yesterday = (datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=1)).strftime("%Y%m%d")
-        today = datetime.datetime.now(datetime.UTC).strftime("%Y%m%d")
+        yesterday = (datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime("%Y%m%d")
+        today = datetime.datetime.utcnow().strftime("%Y%m%d")
         _fetch_export_events(cfg["api_key"], cfg["secret_key"], yesterday, today)
     except Exception as exc:
         _log(f"Connection failed for uid={uid}: {exc}")
@@ -310,9 +310,9 @@ def sync_amplitude(uid: str, sync_type: str = "incremental") -> dict:
         start_date = last_sync.strftime("%Y%m%dT%H")
     else:
         # Default to last 7 days for historical sync
-        start_date = (datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=7)).strftime("%Y%m%d")
+        start_date = (datetime.datetime.utcnow() - datetime.timedelta(days=7)).strftime("%Y%m%d")
     
-    end_date = datetime.datetime.now(datetime.UTC).strftime("%Y%m%dT%H")
+    end_date = datetime.datetime.utcnow().strftime("%Y%m%dT%H")
 
     try:
         events = _fetch_export_events(cfg["api_key"], cfg["secret_key"], start_date, end_date)
@@ -449,3 +449,4 @@ def _get_active_destination(uid: str) -> dict | None:
         "password": row["password"],
         "database_name": row["database_name"],
     }
+

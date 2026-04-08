@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -37,7 +37,7 @@ def _mask_token(token: str | None) -> str | None:
 
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 
 def _get_config(uid: str) -> dict | None:
@@ -208,9 +208,9 @@ def _push_rows(dest_cfg: dict | None, route_source: str, label: str, rows: list[
     if not rows:
         _log(f"No rows generated for {label}. Skipping push")
         return 0
-    _log(f"Pushing {len(rows)} rows → {label}")
+    _log(f"Pushing {len(rows)} rows ? {label}")
     pushed = push_to_destination(dest_cfg, route_source, rows)
-    _log(f"Push complete → {label}: {pushed} rows")
+    _log(f"Push complete ? {label}: {pushed} rows")
     return pushed
 
 
@@ -335,3 +335,4 @@ def disconnect_okta(uid: str) -> dict:
     _update_status(uid, "disconnected")
     _log(f"Disconnected uid={uid}")
     return {"status": "disconnected"}
+

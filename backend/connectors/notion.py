@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -44,14 +44,14 @@ def _parse_dt(value):
     try:
         dt = datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 
 def _get_config(uid: str) -> dict | None:
@@ -372,8 +372,8 @@ def sync_notion(uid: str, sync_type: str = "incremental") -> dict:
         return {"status": "error", "message": str(exc)}
 
     if last_sync_at:
-        pages = [p for p in pages if (_parse_dt(p.get("last_edited_time")) or datetime.datetime.min.replace(tzinfo=datetime.UTC)) > last_sync_at]
-        databases = [d for d in databases if (_parse_dt(d.get("last_edited_time")) or datetime.datetime.min.replace(tzinfo=datetime.UTC)) > last_sync_at]
+        pages = [p for p in pages if (_parse_dt(p.get("last_edited_time")) or datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)) > last_sync_at]
+        databases = [d for d in databases if (_parse_dt(d.get("last_edited_time")) or datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)) > last_sync_at]
 
     dest_cfg = _get_active_destination(uid)
     fetched_at = _iso_now() + "Z"
@@ -536,3 +536,4 @@ def _get_active_destination(uid: str) -> dict | None:
         "password": row["password"],
         "database_name": row["database_name"],
     }
+

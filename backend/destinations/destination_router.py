@@ -1,4 +1,4 @@
-﻿from backend.destinations.mysql_writer import push_to_mysql
+from backend.destinations.mysql_writer import push_to_mysql
 from backend.destinations.postgres_writer import push_postgres
 from backend.destinations.bigquery_writer import push_bigquery
 from backend.destinations.snowflake_writer import push_snowflake
@@ -191,12 +191,11 @@ def log_destination_push(uid, source, dest_type,
         source,
         dest_type,
         rows,
-        datetime.datetime.now(
-            datetime.UTC
-        ).isoformat(),
+        datetime.datetime.utcnow().isoformat(),
         status,
         error
     ))
 
     con.commit()
     con.close()
+

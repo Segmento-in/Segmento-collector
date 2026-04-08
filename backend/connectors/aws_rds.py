@@ -1,4 +1,4 @@
-﻿import json
+import json
 import sqlite3
 import os
 import datetime
@@ -18,9 +18,9 @@ POSTGRES_ENGINES = {"postgres", "postgresql", "aurora_postgres", "aurora-postgre
 BATCH_SIZE = 500
 
 
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 # DB helpers
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 
 def get_db():
     con = sqlite3.connect(DB, timeout=60, check_same_thread=False)
@@ -33,9 +33,9 @@ def _log(msg: str):
     print(f"[AWS-RDS] {msg}", flush=True)
 
 
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 # Config helpers
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 
 def _get_config(uid: str) -> dict | None:
     """
@@ -137,7 +137,7 @@ def save_config(uid: str, engine: str, host: str, port: int,
             uid,
             SOURCE,
             encrypt_value(config_json),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -145,9 +145,9 @@ def save_config(uid: str, engine: str, host: str, port: int,
     _log(f"Config saved for uid={uid}, engine={engine}, host={host}")
 
 
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 # Driver helpers
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 
 def _engine_family(engine: str) -> str:
     """Return 'mysql' or 'postgres' for any supported engine string."""
@@ -202,9 +202,9 @@ def _open_connection(cfg: dict):
     return conn, family
 
 
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 # Table discovery
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 
 def _list_tables(conn, family: str, database: str) -> list[str]:
     """Return a list of user-visible table names."""
@@ -229,9 +229,9 @@ def _list_tables(conn, family: str, database: str) -> list[str]:
     return [r[0] for r in rows]
 
 
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 # Row normalisation
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 
 def _normalize_row(columns: list[str], values: tuple) -> dict:
     """
@@ -253,9 +253,9 @@ def _normalize_row(columns: list[str], values: tuple) -> dict:
     return record
 
 
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 # Public API
-# ──────────────────────────────────────────────
+# ----------------------------------------------
 
 def connect_rds(uid: str) -> dict:
     """
@@ -340,7 +340,7 @@ def sync_rds(uid: str, sync_type: str = "incremental") -> dict:
     tables_processed = 0
     total_rows_found = 0
     total_rows_pushed = 0
-    now = datetime.datetime.now(datetime.UTC).isoformat() + "Z"
+    now = datetime.datetime.utcnow().isoformat() + "Z"
 
     for table in tables:
         try:

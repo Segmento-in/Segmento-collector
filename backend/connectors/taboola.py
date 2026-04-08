@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -38,8 +38,8 @@ def _parse_dt(value):
     try:
         dt = datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
@@ -48,7 +48,7 @@ def _token_expired(expires_at):
     dt = _parse_dt(expires_at)
     if not dt:
         return True
-    return dt <= (datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=2))
+    return dt <= (datetime.datetime.utcnow() + datetime.timedelta(minutes=2))
 
 
 def _as_text(value):
@@ -171,7 +171,7 @@ def _save_connection(uid, account_id, access_token, expires_at):
             account_id,
             enc_access,
             expires_at,
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
 
@@ -234,7 +234,7 @@ def _request_access_token(uid):
     access_token = body.get("access_token")
     expires_in = int(body.get("expires_in") or TOKEN_TTL_SECONDS)
     expires_at = (
-        datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)
     ).isoformat()
 
     if not access_token:
@@ -485,7 +485,7 @@ def save_state(uid, state):
             uid,
             SOURCE,
             json.dumps(state),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -748,7 +748,7 @@ def sync_taboola(uid, sync_type="historical"):
 
         state = get_state(uid)
         start_date, end_date = _sync_window(sync_type, state)
-        fetched_at = datetime.datetime.now(datetime.UTC).isoformat()
+        fetched_at = datetime.datetime.utcnow().isoformat()
 
         con = get_db()
         cur = con.cursor()
@@ -854,3 +854,4 @@ def disconnect_taboola(uid):
 
     con.commit()
     con.close()
+

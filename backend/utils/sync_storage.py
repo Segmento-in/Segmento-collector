@@ -1,4 +1,4 @@
-﻿import sqlite3
+import sqlite3
 import os
 import json
 import uuid
@@ -85,7 +85,7 @@ def get_recent_sync_data(uid, source):
         return []
 
     try:
-        now = datetime.datetime.now(datetime.UTC).isoformat()
+        now = datetime.datetime.utcnow().isoformat()
         
         con = sqlite3.connect(DB)
         cur = con.cursor()
@@ -120,7 +120,7 @@ def cleanup_expired_data():
     """
     try:
         print("[CLEANUP] Running cleanup job", flush=True)
-        now = datetime.datetime.now(datetime.UTC).isoformat()
+        now = datetime.datetime.utcnow().isoformat()
         
         con = sqlite3.connect(DB)
         cur = con.cursor()
@@ -147,3 +147,4 @@ def test_cleanup():
     cleanup_expired_data()
 
 test_cleanup()
+

@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -118,7 +118,7 @@ def save_credentials(uid, secret_key):
             uid,
             SOURCE,
             encrypt_value(secret_key),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -167,7 +167,7 @@ def save_state(uid, state):
             uid,
             SOURCE,
             json.dumps(state),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -241,7 +241,7 @@ def connect_stripe(uid):
             uid,
             account_id,
             display_name,
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     cur.execute(
@@ -275,7 +275,7 @@ def _normalize_record(uid, resource, item, fetched_at):
     record_id = item.get("id")
     created_ts = _to_epoch(item.get("created"))
     created_at = (
-        datetime.datetime.fromtimestamp(created_ts, tz=datetime.UTC).isoformat()
+        datetime.datetime.fromtimestamp(created_ts, tz=datetime.timezone.utc).isoformat()
         if created_ts
         else None
     )
@@ -328,7 +328,7 @@ def sync_stripe(uid, sync_type="historical"):
         if sync_type == "incremental" and state.get("last_sync_ts"):
             created_gte = int(state["last_sync_ts"]) + 1
 
-        fetched_at = datetime.datetime.now(datetime.UTC).isoformat()
+        fetched_at = datetime.datetime.utcnow().isoformat()
         resources = ("customers", "charges", "subscriptions", "products")
         rows = []
         counts = {}
@@ -344,7 +344,7 @@ def sync_stripe(uid, sync_type="historical"):
                 if created_ts is not None:
                     max_created = created_ts if max_created is None else max(max_created, created_ts)
 
-        next_sync_ts = max_created or int(datetime.datetime.now(datetime.UTC).timestamp())
+        next_sync_ts = max_created or int(datetime.datetime.utcnow().timestamp())
         save_state(uid, {"last_sync_ts": next_sync_ts})
 
         dest_cfg = get_active_destination(uid)
@@ -405,3 +405,4 @@ def disconnect_stripe(uid):
     con.close()
 
     return {"status": "disconnected"}
+

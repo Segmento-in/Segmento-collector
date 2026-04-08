@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -43,14 +43,14 @@ def _parse_dt(value):
     try:
         dt = datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 
 def _get_config(uid: str) -> dict | None:
@@ -321,7 +321,7 @@ def sync_dbt(uid: str, sync_type: str = "incremental") -> dict:
     if last_sync_at:
         raw_runs = [
             r for r in raw_runs
-            if (_parse_dt(r.get("created_at")) or datetime.datetime.min.replace(tzinfo=datetime.UTC)) > last_sync_at
+            if (_parse_dt(r.get("created_at")) or datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)) > last_sync_at
         ]
 
     job_rows = []
@@ -459,3 +459,4 @@ def _get_active_destination(uid: str) -> dict | None:
         "password": row["password"],
         "database_name": row["database_name"],
     }
+

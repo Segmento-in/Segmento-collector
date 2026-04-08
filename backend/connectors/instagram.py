@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -191,7 +191,7 @@ def _save_ig_connection(uid, ig_account_id, access_token):
             uid,
             ig_account_id,
             enc_token,
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
 
@@ -274,7 +274,7 @@ def save_state(uid, state):
             uid,
             SOURCE,
             json.dumps(state),
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
         ),
     )
     con.commit()
@@ -450,3 +450,4 @@ def disconnect_instagram(uid):
 
     con.commit()
     con.close()
+

@@ -594,9 +594,7 @@ def log_api_usage():
             uid,
             path,
             request.method,
-            datetime.datetime.now(
-                datetime.UTC
-            ).isoformat()
+            datetime.datetime.utcnow().isoformat()
         ))
 
         con.commit()
@@ -1294,7 +1292,7 @@ def log_sync_start(uid, source, sync_type):
         uid,
         source,
         sync_type,
-        datetime.datetime.now(datetime.UTC).isoformat(),
+        datetime.datetime.utcnow().isoformat(),
         "running"
     ))
 
@@ -1318,7 +1316,7 @@ def log_sync_finish(run_id, rows_synced, status, error=None):
         WHERE id=?
     """, (
         rows_synced,
-        datetime.datetime.now(datetime.UTC).isoformat(),
+        datetime.datetime.utcnow().isoformat(),
         status,
         error,
         run_id
@@ -4813,7 +4811,7 @@ def unified_oauth_callback():
             creds.token,
             creds.refresh_token,
             ",".join(creds.scopes),
-            datetime.datetime.now(datetime.UTC).isoformat()
+            datetime.datetime.utcnow().isoformat()
         ))
 
         # Enable connector
@@ -4959,7 +4957,7 @@ def drive_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -5002,7 +5000,7 @@ def sheets_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -5153,7 +5151,7 @@ def ga4_save_app():
         client_id,
         client_secret,
         json.dumps(config),
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -5265,7 +5263,7 @@ def search_console_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -5635,7 +5633,7 @@ def forms_save_app():
         client_id,
         client_secret,
         "{}",
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -5840,7 +5838,7 @@ def gmail_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -5877,7 +5875,7 @@ def calendar_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -6050,7 +6048,7 @@ def classroom_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -6190,7 +6188,7 @@ def tasks_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -6292,7 +6290,7 @@ def contacts_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -6521,7 +6519,7 @@ def gcs_save_app():
         "gcs",
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -6790,7 +6788,7 @@ def youtube_save_app():
         uid,
         client_id,
         client_secret,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -7340,7 +7338,7 @@ def telegram_connect():
     """,(
         uid,
         bot_token,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     # enable connector
@@ -8139,7 +8137,7 @@ def discord_connect():
     """, (
         uid,
         bot_token,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     cur.execute("""
@@ -10872,7 +10870,7 @@ def linkedin_connect():
         state = get_connector_state(uid, "linkedin") or {}
         state["oauth_state"] = oauth_state # Store the base state for CSRF validation
         state["oauth_state_expires_at"] = (
-            datetime.datetime.now(datetime.UTC) + datetime.timedelta(minutes=10)
+            datetime.datetime.utcnow() + datetime.timedelta(minutes=10)
         ).isoformat()
         save_connector_state(uid, "linkedin", state)
         
@@ -10902,13 +10900,13 @@ def linkedin_callback():
         try:
             expires_dt = datetime.datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
             if expires_dt.tzinfo is None:
-                expires_dt = expires_dt.replace(tzinfo=datetime.UTC)
+                expires_dt = expires_dt.replace(tzinfo=datetime.timezone.utc)
         except Exception:
             expires_dt = None
 
     if not expected_state or not returned_state or returned_state != expected_state:
         return jsonify({"error": "Invalid OAuth state"}), 400
-    if not expires_dt or expires_dt < datetime.datetime.now(datetime.UTC):
+    if not expires_dt or expires_dt < datetime.datetime.utcnow():
         return jsonify({"error": "OAuth state expired"}), 400
 
     result = handle_linkedin_oauth_callback(uid, code)
@@ -12564,7 +12562,7 @@ def mastodon_connect():
         uid,
         "mastodon",
         json.dumps({"instance":instance}),
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     cur.execute("""
@@ -12959,7 +12957,7 @@ def lemmy_connect():
         uid,
         "lemmy",
         json.dumps(state),
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     cur.execute("""
@@ -13762,7 +13760,7 @@ def save_pinterest_app():
         encrypted["client_id"],
         encrypted["client_secret"],
         json.dumps(encrypted),
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -13852,7 +13850,7 @@ def facebook_save_app():
         app_id,
         app_secret,
         redirect_uri,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -13882,7 +13880,7 @@ def facebook_test_save():
         "TEST_APP_ID",
         "TEST_SECRET",
         get_base_url() + "/oauth/callback",
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -14010,7 +14008,7 @@ def facebook_callback():
         page.get("id"),
         page.get("name"),
         page.get("access_token"),
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     # Enable connector
@@ -14326,7 +14324,7 @@ def facebook_ads_callback():
         account.get("id"),
         account.get("name"),
         user_token,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     # Enable connector
@@ -14566,7 +14564,7 @@ def facebook_ads_save_app():
         app_id,
         app_secret,
         redirect_uri,
-        datetime.datetime.now(datetime.UTC).isoformat()
+        datetime.datetime.utcnow().isoformat()
     ))
 
     con.commit()
@@ -14967,7 +14965,7 @@ def save_destination():
             password,
             database,
             1,   # active
-            datetime.datetime.now(datetime.UTC).isoformat(),
+            datetime.datetime.utcnow().isoformat(),
             format_value
         ))
 
@@ -19101,7 +19099,7 @@ def tableau_job_save():
     cur = con.cursor()
     cur.execute(
         "INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'tableau', ?, ?, ?)",
-        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.now(datetime.UTC).isoformat()),
+        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.utcnow().isoformat()),
     )
     con.commit()
     con.close()
@@ -19184,7 +19182,7 @@ def power_bi_job_save():
     cur = con.cursor()
     cur.execute(
         "INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'power_bi', ?, ?, ?)",
-        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.now(datetime.UTC).isoformat()),
+        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.utcnow().isoformat()),
     )
     con.commit()
     con.close()
@@ -19267,7 +19265,7 @@ def workday_job_save():
     cur = con.cursor()
     cur.execute(
         "INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'workday', ?, ?, ?)",
-        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.now(datetime.UTC).isoformat()),
+        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.utcnow().isoformat()),
     )
     con.commit()
     con.close()
@@ -19350,7 +19348,7 @@ def ebay_job_save():
     cur = con.cursor()
     cur.execute(
         "INSERT OR REPLACE INTO connector_jobs (uid, source, schedule_time, sync_type, updated_at) VALUES (?, 'ebay', ?, ?, ?)",
-        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.now(datetime.UTC).isoformat()),
+        (uid, data.get("schedule_time"), data.get("sync_type", "incremental"), datetime.datetime.utcnow().isoformat()),
     )
     con.commit()
     con.close()
@@ -21299,7 +21297,7 @@ def _linear_job_save():
 def create_chat(user_id):
     chat_id = "chat_" + secrets.token_hex(8)
     title = "New Conversation"
-    created_at = datetime.datetime.now(datetime.UTC).isoformat()
+    created_at = datetime.datetime.utcnow().isoformat()
     con = get_db()
     cur = con.cursor()
     cur.execute("INSERT INTO ai_chats (id, user_id, title, created_at) VALUES (?, ?, ?, ?)",
@@ -21310,7 +21308,7 @@ def create_chat(user_id):
 
 def save_message(chat_id, role, content):
     msg_id = "msg_" + secrets.token_hex(8)
-    created_at = datetime.datetime.now(datetime.UTC).isoformat()
+    created_at = datetime.datetime.utcnow().isoformat()
     con = get_db()
     cur = con.cursor()
     cur.execute("INSERT INTO ai_messages (id, chat_id, role, content, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -21392,7 +21390,7 @@ def save_ai_state(chat_id, uid, state):
             chat_id,
             uid,
             json.dumps(state),
-            datetime.datetime.now(datetime.UTC).isoformat()
+            datetime.datetime.utcnow().isoformat()
         ))
     con.commit()
     con.close()
@@ -21513,3 +21511,4 @@ seed_test_user()
 
 if __name__=="__main__":
     app.run(port=4000,debug=True,host="0.0.0.0",use_reloader=False)
+

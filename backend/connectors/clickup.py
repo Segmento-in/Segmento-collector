@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import json
 import sqlite3
 import os
@@ -44,17 +44,17 @@ def _parse_dt(value):
         # ClickUp uses millisecond timestamps
         if isinstance(value, (int, str)) and str(value).isdigit():
             timestamp = int(value) / 1000 if int(value) > 10**10 else int(value)
-            return datetime.datetime.fromtimestamp(timestamp, tz=datetime.UTC)
+            return datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
         dt = datetime.datetime.fromisoformat(str(value).replace("Z", "+00:00"))
         if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.UTC)
-        return dt.astimezone(datetime.UTC)
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        return dt.astimezone(datetime.timezone.utc)
     except Exception:
         return None
 
 
 def _iso_now():
-    return datetime.datetime.now(datetime.UTC).isoformat()
+    return datetime.datetime.utcnow().isoformat()
 
 
 def _get_config(uid: str) -> dict | None:
@@ -478,3 +478,4 @@ def _get_active_destination(uid: str) -> dict | None:
         "password": row["password"],
         "database_name": row["database_name"],
     }
+
