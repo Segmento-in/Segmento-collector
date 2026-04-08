@@ -183,8 +183,12 @@ def unified_oauth_callback_proxy():
     return resp
 
 @app.context_processor
-def inject_auth_status():
-    return dict(is_logged_in=logged_in())
+def inject_global_vars():
+    return dict(
+        is_logged_in=logged_in(),
+        base_url=os.getenv("BASE_URL", request.host_url.rstrip("/"))
+    )
+
 
 @app.route("/logout")
 def ui_logout():

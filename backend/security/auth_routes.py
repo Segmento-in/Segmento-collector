@@ -15,7 +15,8 @@ DB = "identity.db"
 UPLOAD_DIR = "uploads/company_logos"
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
-UI_BASE_URL = os.getenv("UI_BASE_URL", "")
+def get_base_url():
+    return os.getenv("BASE_URL", request.host_url.rstrip("/"))
 
 # DB CONNECTION
 def get_db():
@@ -40,7 +41,9 @@ def build_login_redirect(error_code, next_path="", auth_required=""):
     if auth_required == "1":
         params.append("auth_required=1")
 
-    return ((f"{UI_BASE_URL}/login?") if UI_BASE_URL else "/login?") + '&'.join(params)
+    base_url = get_base_url()
+    return f"{base_url}/login?" + '&'.join(params)
+
 
 # ================= Signup =================
 @auth.route("/auth/signup", methods=["POST"])
@@ -152,8 +155,9 @@ def signup():
 
     resp = make_response(jsonify({
         "success": True,
-        "redirect": (f"{UI_BASE_URL}{next_url}") if UI_BASE_URL else next_url
+        "redirect": f"{get_base_url()}{next_url}"
     }))
+
 
     resp.set_cookie(
         "segmento_session",
@@ -246,7 +250,8 @@ def login():
     con.close()
 
     safe_next = sanitize_next_path(next_url)
-    resp = make_response(redirect((f"{UI_BASE_URL}{safe_next}") if UI_BASE_URL else safe_next))
+    resp = make_response(redirect(f"{get_base_url()}{safe_next}"))
+
 
     resp.set_cookie(
         "segmento_session",
