@@ -27,3 +27,6 @@ tmp/
 .gitignore
 Dockerfile
 .dockerignore
+identity.db
+uploads/
+frontend/static/images/

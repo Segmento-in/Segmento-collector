@@ -4,7 +4,7 @@ const CONNECTORS = [
     id: "salesforce",
     name: "Salesforce",
     categories: ["crm", "sales"],
-    logo: "/static/images/logos/salesforce.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/salesforce.png",
 
     auth_type: "oauth",
     api_key_label: "Client ID & Secret",
@@ -198,7 +198,7 @@ const CONNECTORS = [
     id: "tableau",
     name: "Tableau",
     categories: ["analytics", "bi"],
-    logo: "/static/images/logos/tableau.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/tableau.png",
 
     auth_type: "credentials",
     api_key_label: "PAT Credentials",
@@ -236,7 +236,7 @@ const CONNECTORS = [
     id: "power_bi",
     name: "Power BI",
     categories: ["analytics", "bi"],
-    logo: "/static/images/logos/powerbi.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/powerbi.png",
 
     auth_type: "oauth",
     api_key_label: "Azure AD Client Credentials",
@@ -274,7 +274,7 @@ const CONNECTORS = [
     id: "workday",
     name: "Workday",
     categories: ["hr", "operations"],
-    logo: "/static/images/logos/workday.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/workday.png",
 
     auth_type: "credentials",
     api_key_label: "Integration Credentials",
@@ -350,7 +350,7 @@ const CONNECTORS = [
     id: "sendgrid",
     name: "SendGrid",
     categories: ["email", "marketing"],
-    logo: "/static/images/logos/sendgrid.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/sendgrid.png",
 
     auth_type: "api_key",
     api_key_label: "SendGrid API Key",
@@ -426,7 +426,7 @@ const CONNECTORS = [
     id: "monday",
     name: "Monday.com",
     categories: ["project_management", "productivity"],
-    logo: "/static/images/logos/monday.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/monday.png",
 
     auth_type: "api_token",
     api_key_label: "API Token",
@@ -546,7 +546,7 @@ const CONNECTORS = [
     id: "notion",
     name: "Notion",
     categories: ["productivity", "documentation"],
-    logo: "/static/images/logos/notion.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/notion.png",
 
     auth_type: "api_key",
     api_key_label: "Notion Integration Token",
@@ -586,7 +586,7 @@ const CONNECTORS = [
     id: "airtable",
     name: "Airtable",
     categories: ["productivity", "database"],
-    logo: "/static/images/logos/airtable.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/airtable.png",
 
     auth_type: "api_key",
     api_key_label: "Airtable Personal Access Token",
@@ -824,7 +824,7 @@ const CONNECTORS = [
     id: "twilio",
     name: "Twilio",
     categories: ["communication", "sms", "voice"],
-    logo: "/static/images/logos/twilio.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/twilio.png",
 
     auth_type: "api_key",
     api_key_label: "Twilio Auth Token",
@@ -864,7 +864,7 @@ const CONNECTORS = [
     id: "pipedrive",
     name: "Pipedrive",
     categories: ["crm", "sales"],
-    logo: "/static/images/logos/pipedrive.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/pipedrive.png",
 
     auth_type: "api_key",
     api_key_label: "Pipedrive API Token",
@@ -904,7 +904,7 @@ const CONNECTORS = [
     id: "freshdesk",
     name: "Freshdesk",
     categories: ["support", "helpdesk"],
-    logo: "/static/images/logos/freshdesk.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/freshdesk.png",
 
     auth_type: "api_key",
     api_key_label: "Freshdesk API Key",
@@ -944,7 +944,7 @@ const CONNECTORS = [
     id: "klaviyo",
     name: "Klaviyo",
     categories: ["marketing", "email"],
-    logo: "/static/images/logos/klaviyo.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/klaviyo.png",
 
     auth_type: "api_key",
     api_key_label: "Klaviyo Private API Key",
@@ -984,7 +984,7 @@ const CONNECTORS = [
     id: "amplitude",
     name: "Amplitude",
     categories: ["analytics", "product"],
-    logo: "/static/images/logos/amplitude.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/amplitude.png",
 
     auth_type: "api_key",
     api_key_label: "Amplitude API Key",
@@ -1024,7 +1024,7 @@ const CONNECTORS = [
     id: "slack",
     name: "Slack",
     categories: ["communication"],
-    logo: "/static/images/logos/slack.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/slack.png",
 
     auth_type: "api_key",
     api_key_label: "Slack Bot Token",
@@ -1066,7 +1066,7 @@ const CONNECTORS = [
     id: "gmail",
     name: "Gmail",
     categories: ["google"],
-    logo: "/static/images/logos/gmail.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/gmail.png",
 
     auth_type: "oauth",
 
@@ -1110,7 +1110,7 @@ All metadata and message headers are securely synchronized.
     id: "drive",
     name: "Google Drive",
     categories: ["google", "cloud"],
-    logo: "/static/images/logos/drive.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/drive.png",
 
     auth_type: "oauth",
 
@@ -1151,7 +1151,7 @@ visibility into document usage, storage patterns, and ownership.
     id: "calendar",
     name: "Google Calendar",
     categories: ["google"],
-    logo: "/static/images/logos/calendar.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/calendar.png",
 
     auth_type: "oauth",
 
@@ -1192,7 +1192,7 @@ availability, and scheduling patterns.
     id: "sheets",
     name: "Google Sheets",
     categories: ["google"],
-    logo: "/static/images/logos/sheets.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/sheets.png",
 
     auth_type: "oauth",
 
@@ -1233,7 +1233,7 @@ to support reporting, finance tracking, and KPI analysis.
     id: "forms",
     name: "Google Forms",
     categories: ["google"],
-    logo: "/static/images/logos/forms.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/forms.png",
 
     auth_type: "oauth",
 
@@ -1274,7 +1274,7 @@ for surveys, feedback systems, and analytics pipelines.
     id: "contacts",
     name: "Google Contacts",
     categories: ["google"],
-    logo: "/static/images/logos/contacts.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/contacts.png",
 
     auth_type: "oauth",
 
@@ -1314,7 +1314,7 @@ to enrich CRM and customer databases.
     id: "tasks",
     name: "Google Tasks",
     categories: ["google"],
-    logo: "/static/images/logos/tasks.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/tasks.png",
 
     auth_type: "oauth",
 
@@ -1355,7 +1355,7 @@ to analyze productivity and completion trends.
     id: "ga4",
     name: "Google Analytics (GA4)",
     categories: ["google", "analytics"],
-    logo: "/static/images/logos/googleanalytics.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/googleanalytics.png",
 
     auth_type: "oauth",
 
@@ -1399,7 +1399,7 @@ user behavior, traffic sources, and conversions.
     id: "search-console",
     name: "Search Console",
     categories: ["google", "analytics"],
-    logo: "/static/images/logos/searchconsole.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/searchconsole.png",
 
     auth_type: "oauth",
 
@@ -1439,7 +1439,7 @@ using Google Search Console reports.
     id: "youtube",
     name: "YouTube",
     categories: ["google", "video", "social"],
-    logo: "/static/images/logos/youtube.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/youtube.png",
 
     auth_type: "oauth",
 
@@ -1482,7 +1482,7 @@ to evaluate audience engagement and growth.
     id: "trends",
     name: "Google Trends",
     categories: ["google"],
-    logo: "/static/images/logos/googletrends.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/googletrends.png",
 
     auth_type: "none",
 
@@ -1525,7 +1525,7 @@ Uses Pytrends for data collection.
     id: "news",
     name: "Google News",
     categories: ["google", "content"],
-    logo: "/static/images/logos/googlenews.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/googlenews.png",
 
     auth_type: "none",
 
@@ -1566,7 +1566,7 @@ to monitor brand mentions and trending topics.
     id: "books",
     name: "Google Books",
     categories: ["google", "content"],
-    logo: "/static/images/logos/googlebooks.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/googlebooks.png",
 
     auth_type: "api_key",
 
@@ -1607,7 +1607,7 @@ to build searchable digital libraries.
     id: "webfonts",
     name: "Google Webfonts",
     categories: ["google"],
-    logo: "/static/images/logos/webfonts.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/webfonts.png",
 
     auth_type: "api_key",
 
@@ -1647,7 +1647,7 @@ and typography optimization.
     id: "pagespeed",
     name: "PageSpeed",
     categories: ["google", "analytics"],
-    logo: "/static/images/logos/pagespeed.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/pagespeed.png",
 
     auth_type: "api_key",
 
@@ -1687,7 +1687,7 @@ to optimize SEO and loading speed.
     id: "gcs",
     name: "Google Cloud Storage",
     categories: ["google", "cloud"],
-    logo: "/static/images/logos/gcs.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/gcs.png",
 
     auth_type: "oauth",
 
@@ -1772,7 +1772,7 @@ your configured dataset.
     id: "classroom",
     name: "Google Classroom",
     categories: ["google"],
-    logo: "/static/images/logos/classroom.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/classroom.png",
 
     auth_type: "oauth",
 
@@ -1817,7 +1817,7 @@ including courses, assignments, and submissions.
     id: "factcheck",
     name: "Fact Check",
     categories: ["google", "content"],
-    logo: "/static/images/logos/factcheck.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/factcheck.png",
 
     auth_type: "api_key",
 
@@ -1859,7 +1859,7 @@ and validate public statements.
     id: "facebook",
     name: "Facebook Pages",
     categories: ["meta", "social"],
-    logo: "/static/images/logos/facebook.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/facebook.png",
 
     auth_type: "oauth",
 
@@ -1905,7 +1905,7 @@ All page data is securely synchronized using OAuth authorization.
     id: "facebook_ads",
     name: "Facebook Ads",
     categories: ["meta", "ads"],
-    logo: "/static/images/logos/facebook.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/facebook.png",
 
     auth_type: "oauth",
 
@@ -1951,7 +1951,7 @@ All advertising data is securely synchronized using OAuth authorization.
     id: "instagram",
     name: "Instagram",
     categories: ["meta", "social"],
-    logo: "/static/images/logos/instagram.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/instagram.png",
 
     auth_type: "oauth",
 
@@ -1993,7 +1993,7 @@ OAuth access is scoped and securely stored.
     id: "tiktok",
     name: "TikTok Business",
     categories: ["video", "ads"],
-    logo: "/static/images/logos/tiktok.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/tiktok.png",
 
     auth_type: "oauth",
 
@@ -2018,7 +2018,7 @@ and integrated ad reports with secure OAuth token management.
       "tiktok_reports"
     ],
 
-    erd: "/static/images/logos/tiktok.png",
+    erd: window.IMAGE_BASE_URL + "/segmento/logos/tiktok.png",
 
     description: "Collects TikTok Business campaigns, ads and performance reports.",
 
@@ -2035,7 +2035,7 @@ and integrated ad reports with secure OAuth token management.
     id: "taboola",
     name: "Taboola Backstage",
     categories: ["ads"],
-    logo: "/static/images/logos/taboola.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/taboola.png",
 
     auth_type: "oauth",
 
@@ -2060,7 +2060,7 @@ top campaign content, and publisher revenue reports with token caching.
       "taboola_publisher_revenue"
     ],
 
-    erd: "/static/images/logos/taboola.png",
+    erd: window.IMAGE_BASE_URL + "/segmento/logos/taboola.png",
 
     description: "Collects Taboola campaign, content, and publisher revenue metrics.",
 
@@ -2077,7 +2077,7 @@ top campaign content, and publisher revenue reports with token caching.
     id: "outbrain",
     name: "Outbrain Amplify",
     categories: ["ads"],
-    logo: "/static/images/logos/outbrain.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/outbrain.png",
 
     auth_type: "oauth",
 
@@ -2102,7 +2102,7 @@ campaign reports, promoted content performance, and periodic campaign metrics.
       "outbrain_ads"
     ],
 
-    erd: "/static/images/logos/outbrain.png",
+    erd: window.IMAGE_BASE_URL + "/segmento/logos/outbrain.png",
 
     description: "Collects Outbrain marketers, campaigns and promoted content performance.",
 
@@ -2119,7 +2119,7 @@ campaign reports, promoted content performance, and periodic campaign metrics.
     id: "similarweb",
     name: "SimilarWeb",
     categories: ["analytics"],
-    logo: "/static/images/logos/similarweb.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/similarweb.png",
 
     auth_type: "api_key",
 
@@ -2145,7 +2145,7 @@ marketing channel shares, social traffic sources, and search keyword analytics.
       "similarweb_search_keywords"
     ],
 
-    erd: "/static/images/logos/similarweb.png",
+    erd: window.IMAGE_BASE_URL + "/segmento/logos/similarweb.png",
 
     description: "Collects SimilarWeb domain analytics and traffic source metrics.",
 
@@ -2162,7 +2162,7 @@ marketing channel shares, social traffic sources, and search keyword analytics.
     id: "x",
     name: "X (Twitter)",
     categories: ["social"],
-    logo: "/static/images/logos/x.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/x.png",
 
     auth_type: "oauth",
 
@@ -2186,7 +2186,7 @@ and recent tweet data with secure token refresh support.
       "x_tweets"
     ],
 
-    erd: "/static/images/logos/x.png",
+    erd: window.IMAGE_BASE_URL + "/segmento/logos/x.png",
 
     description: "Collects X user profiles, followers and recent tweets.",
 
@@ -2203,7 +2203,7 @@ and recent tweet data with secure token refresh support.
     id: "linkedin",
     name: "LinkedIn Marketing",
     categories: ["social", "ads"],
-    logo: "/static/images/logos/linkedin.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/linkedin.png",
 
     auth_type: "oauth",
 
@@ -2229,7 +2229,7 @@ ad accounts, campaigns, creatives, and ad analytics with refresh-token support.
       "linkedin_ad_analytics"
     ],
 
-    erd: "/static/images/logos/linkedin.png",
+    erd: window.IMAGE_BASE_URL + "/segmento/logos/linkedin.png",
 
     description: "Collects LinkedIn ad accounts, campaigns, creatives and performance analytics.",
 
@@ -2248,7 +2248,7 @@ ad accounts, campaigns, creatives, and ad analytics with refresh-token support.
     id: "github",
     name: "GitHub",
     categories: ["developer", "git"],
-    logo: "/static/images/logos/github.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/github.png",
 
     auth_type: "oauth",
 
@@ -2291,7 +2291,7 @@ to provide engineering productivity insights.
     id: "gitlab",
     name: "GitLab",
     categories: ["developer", "git"],
-    logo: "/static/images/logos/gitlab.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/gitlab.png",
 
     auth_type: "oauth",
 
@@ -2335,7 +2335,7 @@ for DevOps and workflow analytics.
     id: "devto",
     name: "Dev.to",
     categories: ["developer", "content"],
-    logo: "/static/images/logos/devto.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/devto.png",
 
     auth_type: "api_key",
 
@@ -2378,7 +2378,7 @@ on Dev.to to analyze content performance and trends.
     id: "stackoverflow",
     name: "StackOverflow",
     categories: ["developer"],
-    logo: "/static/images/logos/stackoverflow.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/stackoverflow.png",
 
     auth_type: "api_key",
 
@@ -2421,7 +2421,7 @@ to analyze developer knowledge trends.
     id: "hackernews",
     name: "HackerNews",
     categories: ["developer", "content"],
-    logo: "/static/images/logos/hackernews.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/hackernews.png",
 
     auth_type: "none",
 
@@ -2463,7 +2463,7 @@ to track technology and startup trends.
     id: "nvd",
     name: "NVD",
     categories: ["developer", "security"],
-    logo: "/static/images/logos/nvd.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/nvd.png",
 
     auth_type: "api_key",
 
@@ -2509,7 +2509,7 @@ for security monitoring.
     id: "reddit",
     name: "Reddit",
     categories: ["social"],
-    logo: "/static/images/logos/reddit.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/reddit.png",
 
     auth_type: "oauth",
 
@@ -2553,7 +2553,7 @@ to measure community engagement and sentiment.
     id: "discord",
     name: "Discord",
     categories: ["social", "messaging"],
-    logo: "/static/images/logos/discord.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/discord.png",
 
     auth_type: "bot",
 
@@ -2596,7 +2596,7 @@ using bot-based integration.
     id: "telegram",
     name: "Telegram",
     categories: ["social", "messaging"],
-    logo: "/static/images/logos/telegram.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/telegram.png",
 
     auth_type: "bot_token",
 
@@ -2638,7 +2638,7 @@ using bot token authentication.
     id: "tumblr",
     name: "Tumblr",
     categories: ["social"],
-    logo: "/static/images/logos/tumblr.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/tumblr.png",
 
     auth_type: "oauth",
 
@@ -2681,7 +2681,7 @@ to analyze content reach.
     id: "medium",
     name: "Medium",
     categories: ["social", "content"],
-    logo: "/static/images/logos/medium.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/medium.png",
 
     auth_type: "oauth",
 
@@ -2724,7 +2724,7 @@ to measure content impact.
     id: "mastodon",
     name: "Mastodon",
     categories: ["social"],
-    logo: "/static/images/logos/mastodon.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/mastodon.png",
 
     auth_type: "oauth",
 
@@ -2767,7 +2767,7 @@ instances for decentralized social analytics.
     id: "lemmy",
     name: "Lemmy",
     categories: ["social", "community"],
-    logo: "/static/images/logos/lemmy.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/lemmy.png",
 
     auth_type: "none",
 
@@ -2811,7 +2811,7 @@ to understand decentralized social engagement.
     id: "pinterest",
     name: "Pinterest",
     categories: ["social"],
-    logo: "/static/images/logos/pinterest.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/pinterest.png",
 
     auth_type: "oauth",
 
@@ -2854,7 +2854,7 @@ visual content performance and trends.
     id: "twitch",
     name: "Twitch",
     categories: ["video"],
-    logo: "/static/images/logos/twitch.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/twitch.png",
 
     auth_type: "oauth",
 
@@ -2898,7 +2898,7 @@ for live streaming analytics.
     id: "peertube",
     name: "PeerTube",
     categories: ["video"],
-    logo: "/static/images/logos/peertube.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/peertube.png",
 
     auth_type: "none",
 
@@ -2944,7 +2944,7 @@ instances for federated media analytics.
     id: "openstreetmap",
     name: "OpenStreetMap",
     categories: ["maps"],
-    logo: "/static/images/logos/openstreetmap.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/openstreetmap.png",
 
     auth_type: "none",
 
@@ -2988,7 +2988,7 @@ OpenStreetMap for mapping and location services.
     id: "wikipedia",
     name: "Wikipedia",
     categories: ["content"],
-    logo: "/static/images/logos/wikipedia.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/wikipedia.png",
 
     auth_type: "none",
 
@@ -3031,7 +3031,7 @@ to track knowledge updates and editor activity.
     id: "producthunt",
     name: "ProductHunt",
     categories: ["content", "community"],
-    logo: "/static/images/logos/producthunt.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/producthunt.png",
 
     auth_type: "api_key",
 
@@ -3074,7 +3074,7 @@ on Product Hunt for startup analytics.
     id: "discourse",
     name: "Discourse",
     categories: ["community"],
-    logo: "/static/images/logos/discourse.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/discourse.png",
 
     auth_type: "api_key",
 
@@ -3118,7 +3118,7 @@ from Discourse communities.
     name: "WhatsApp",
     categories: ["meta", "messaging"],
     route: "/connectors/whatsapp",
-    logo: "/static/images/logos/whatsapp.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/whatsapp.png",
     tables: [
       "whatsapp_business_accounts",
       "whatsapp_phone_numbers",
@@ -3152,7 +3152,7 @@ from Discourse communities.
     id: "chartbeat",
     name: "Chartbeat",
     categories: ["analytics", "content"],
-    logo: "/static/images/logos/chartbeat.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/chartbeat.png",
 
     auth_type: "api_key",
 
@@ -3179,7 +3179,7 @@ video engagement metrics directly into your data warehouse.
       "chartbeat_video_engagement"
     ],
 
-    erd: "/static/images/logos/chartbeat.png",
+    erd: window.IMAGE_BASE_URL + "/segmento/logos/chartbeat.png",
 
     description: "Collects real-time audience analytics and historical engagement data from Chartbeat.",
 
@@ -3236,7 +3236,7 @@ directly into your data warehouse.
     id: "aws_rds",
     name: "AWS RDS",
     categories: ["cloud", "database"],
-    logo: "/static/images/logos/aws_rds.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/aws_rds.png",
 
     auth_type: "credentials",
 
@@ -3278,7 +3278,7 @@ and Aurora PostgreSQL engines.
     id: "stripe",
     name: "Stripe",
     categories: ["finance", "payments"],
-    logo: "/static/images/logos/stripe.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/stripe.png",
 
     auth_type: "credentials",
 
@@ -3321,7 +3321,7 @@ JSON rows into your configured warehouse destination.
     id: "dynamodb",
     name: "AWS DynamoDB",
     categories: ["cloud", "database"],
-    logo: "/static/images/logos/dynamodb.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/dynamodb.png",
 
     auth_type: "credentials",
 
@@ -3423,7 +3423,7 @@ data into your configured warehouse destination.
     id: "azure_blob",
     name: "Azure Blob Storage",
     categories: ["storage", "data"],
-    logo: "/static/images/logos/azureblob.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/azureblob.png",
 
     auth_type: "api_key",
     api_key_label: "Azure Connection String",
@@ -3690,7 +3690,7 @@ data into your configured warehouse destination.
     id: "amazon_seller",
     name: "Amazon Seller",
     categories: ["ecommerce", "sales"],
-    logo: "/static/images/logos/amazonseller.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/amazonseller.png",
 
     auth_type: "oauth",
     api_key_label: "LWA Client ID & Secret",
@@ -3760,7 +3760,7 @@ data into your configured warehouse destination.
     id: "openai",
     name: "OpenAI",
     categories: ["ai", "ml"],
-    logo: "/static/images/logos/openai.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/openai.png",
     auth_type: "api_key",
     api_key_label: "API Key",
     connect_url: "/connectors/openai/connect",
@@ -3859,7 +3859,7 @@ data into your configured warehouse destination.
     id: "kafka",
     name: "Apache Kafka",
     categories: ["streaming", "data_infrastructure"],
-    logo: "static/images/logos/apachekafka.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/apachekafka.png",
     auth_type: "bootstrap_servers",
     api_key_label: "Bootstrap Servers",
     connect_url: "/connectors/kafka/connect",
@@ -3896,7 +3896,7 @@ data into your configured warehouse destination.
     id: "dbt",
     name: "dbt Cloud",
     categories: ["data_infrastructure", "analytics_engineering"],
-    logo: "/static/images/logos/dbt.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/dbt.png",
 
     auth_type: "api_key",
     api_key_label: "dbt Cloud API Token",
@@ -3936,7 +3936,7 @@ data into your configured warehouse destination.
     id: "typeform",
     name: "Typeform",
     categories: ["forms", "surveys", "productivity"],
-    logo: "/static/images/logos/typeform.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/typeform.png",
 
     auth_type: "api_key",
     api_key_label: "Typeform Personal Access Token",
@@ -4016,7 +4016,7 @@ data into your configured warehouse destination.
     id: "pinecone",
     name: "Pinecone",
     categories: ["vector_database", "data_infrastructure", "ai"],
-    logo: "/static/images/logos/pinecone.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/pinecone.png",
 
     auth_type: "api_key",
     api_key_label: "Pinecone API Key",
@@ -4096,7 +4096,7 @@ data into your configured warehouse destination.
     id: "vercel",
     name: "Vercel",
     categories: ["developer", "deployment"],
-    logo: "/static/images/logos/vercel.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/vercel.png",
 
     auth_type: "api_key",
     api_key_label: "API Token",
@@ -4176,7 +4176,7 @@ data into your configured warehouse destination.
     id: "linear",
     name: "Linear",
     categories: ["project_management"],
-    logo: "/static/images/logos/linear.png",
+    logo: window.IMAGE_BASE_URL + "/segmento/logos/linear.png",
 
     auth_type: "api_key",
     api_key_label: "API Key",

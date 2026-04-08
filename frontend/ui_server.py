@@ -186,7 +186,8 @@ def unified_oauth_callback_proxy():
 def inject_global_vars():
     return dict(
         is_logged_in=logged_in(),
-        base_url=os.getenv("BASE_URL", request.host_url.rstrip("/"))
+        base_url=os.getenv("BASE_URL", request.host_url.rstrip("/")),
+        image_base_url=os.getenv("IMAGE_BASE_URL", "")
     )
 
 

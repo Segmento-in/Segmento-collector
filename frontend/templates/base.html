@@ -18,6 +18,10 @@
         }
     </script>
 
+    <script>
+        window.IMAGE_BASE_URL = "{{ image_base_url }}";
+    </script>
+
     <style>
         :root {
             --ai-width: 30%;
@@ -217,7 +221,7 @@
                 <div class="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex justify-between items-center">
 
                     <a href="/" class="flex items-center gap-4 group">
-                        <img src="/static/logo.png" alt="Segmento Logo"
+                        <img src="{{ image_base_url }}/segmento/logo.png" alt="Segmento Logo"
                             class="w-14 h-14 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.5)] brightness-110 group-hover:scale-110 transition-all duration-500">
                         <div class="flex flex-col">
                             <span class="text-xl font-black tracking-tight leading-none text-slate-900 dark:text-white">Segmento</span>
@@ -323,7 +327,7 @@
 
             <footer class="border-t border-slate-200 dark:border-white/5 py-12 mt-20 text-center relative z-20 bg-[#020617]">
                 <div class="flex justify-center mb-10">
-                    <img src="/static/logo.png" alt="Segmento Logo"
+                    <img src="{{ image_base_url }}/segmento/logo.png" alt="Segmento Logo"
                         class="h-16 object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.3)] filter brightness-90 hover:brightness-110 transition-all duration-500">
                 </div>
                 <p class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.3em]">

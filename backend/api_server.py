@@ -718,6 +718,54 @@ def get_db():
 
     return con
 
+def init_db():
+    con = get_db()
+    cur = con.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS user_sessions (
+            session_id TEXT PRIMARY KEY,
+            user_id TEXT,
+            created_at TEXT
+        )
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS google_connections (
+            uid TEXT,
+            source TEXT,
+            enabled INTEGER,
+            PRIMARY KEY (uid, source)
+        )
+    ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS connector_configs (
+            uid TEXT,
+            connector TEXT,
+            config_json TEXT,
+            PRIMARY KEY (uid, connector)
+        )
+    ''')
+    
+    # Safe migration for connector_configs missing config_json
+    cur.execute("PRAGMA table_info(connector_configs)")
+    columns = [col[1] for col in cur.fetchall()]
+    if "config_json" not in columns:
+        cur.execute("ALTER TABLE connector_configs ADD COLUMN config_json TEXT")
+
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS api_usage_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uid TEXT,
+            endpoint TEXT,
+            method TEXT,
+            created_at TEXT
+        )
+    ''')
+    con.commit()
+    con.close()
+
+# Safe initialization
+init_db()
+
 from flask import request, g
 
 
@@ -3354,6 +3402,12 @@ def init_db():
         created_at TEXT
     )
     """)
+    
+    # Safe migration for connector_configs missing config_json
+    cur.execute("PRAGMA table_info(connector_configs)")
+    columns = [col[1] for col in cur.fetchall()]
+    if "config_json" not in columns:
+        cur.execute("ALTER TABLE connector_configs ADD COLUMN config_json TEXT")
 
     # ---------------- Meta ----------------
 
@@ -4761,58 +4815,6 @@ def unified_oauth_callback():
         f"/connectors/{source}"
     )
 
-@app.route("/oauth/callback")
-def unified_oauth_callback():
-    """
-    Unified OAuth Callback Router.
-    Routes the callback to the appropriate connector handler based on the state.
-    """
-    state_raw = request.args.get("state", "")
-    
-    # Extract connector name from state (supports 'csrf|connector' format)
-    if "|" in state_raw:
-        _, connector = state_raw.rsplit("|", 1)
-    else:
-        connector = state_raw
-        
-    print(f"[OAUTH] Unified callback for: {connector}", flush=True)
-    
-    # Map of connectors to backend handlers
-    # Using local mapping to handle redirects/calls
-    from backend.connectors.quickbooks import callback_quickbooks
-    from backend.connectors.xero import callback_xero
-    from backend.connectors.amazon_seller import callback_amazon_seller
-    
-    handlers = {
-        "google": google_callback,
-        "gmail": google_callback,
-        "drive": google_callback,
-        "youtube": google_callback,
-        "ga4": google_callback,
-        "search_console": google_callback,
-        "search-console": google_callback,
-        "sheets": google_callback,
-        "calendar": google_callback,
-        "tasks": google_callback,
-        "classroom": google_callback,
-        "contacts": google_callback,
-        "github": github_callback,
-        "instagram": instagram_callback,
-        "tiktok": tiktok_callback, # Placeholder or map to connector func
-        "x": x_callback,
-        "linkedin": linkedin_callback,
-        "quickbooks": callback_quickbooks,
-        "xero": callback_xero,
-        "amazon_seller": callback_amazon_seller,
-        "facebook": facebook_callback,
-        "facebook_ads": facebook_callback # Facebook Ads often uses same token
-    }
-    
-    handler = handlers.get(connector)
-    if handler:
-        return handler()
-        
-    return f"Unknown OAuth connector: {connector}", 400
 
 @app.route("/ai/connector/<connector>/<action>", methods=["GET", "POST"])
 def ai_connector_router(connector, action):
