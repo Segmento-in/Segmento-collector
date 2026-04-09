@@ -41,6 +41,7 @@ from backend.scheduler.scheduler import start_scheduler
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.getenv("DB_PATH", "identity.db")
+BASE_URL = os.getenv("BASE_URL", "http://localhost").rstrip("/")
 
 # AI
 from backend.ai.intent_engine import detect_intent
@@ -65,7 +66,10 @@ def get_base_url():
     Returns the base URL for the application.
     Prioritizes BASE_URL environment variable, falls back to request.host_url.
     """
-    return os.getenv("BASE_URL", request.host_url.rstrip("/"))
+    env_base_url = os.getenv("BASE_URL", "").strip()
+    if env_base_url:
+        return env_base_url.rstrip("/")
+    return request.host_url.rstrip("/")
 
 
 # Temporary PKCE verifier storage for Google OAuth callback exchange.
@@ -4547,6 +4551,10 @@ def google_connect():
 
     client_id = row["client_id"]
     client_secret = row["client_secret"]
+    if not client_id or not client_secret:
+        return jsonify({
+            "error": "Google OAuth client_id/client_secret missing. Save Google app credentials and retry."
+        }), 400
 
     # Define scopes dynamically (for now only gmail)
     if source == "gmail":
@@ -4604,7 +4612,7 @@ def google_connect():
             }
         },
         scopes=scopes,
-        redirect_uri=get_base_url() + "/oauth/callback"
+        redirect_uri=f"{BASE_URL}/oauth/callback"
     )
 
     session_id = request.cookies.get("segmento_session")
@@ -4636,7 +4644,7 @@ def unified_oauth_callback():
         return jsonify({"error": "Unauthorized"}), 401
 
     source = state or "gmail"
-    redirect_uri = get_base_url() + "/oauth/callback"
+    redirect_uri = f"{BASE_URL}/oauth/callback"
 
     # Handle Pinterest
     if source == "pinterest":
@@ -4714,6 +4722,11 @@ def unified_oauth_callback():
 
     client_id = row["client_id"]
     client_secret = row["client_secret"]
+    if not client_id or not client_secret:
+        con.close()
+        return jsonify({
+            "error": "Google OAuth client_id/client_secret missing. Save Google app credentials and retry."
+        }), 400
 
     # Define scopes
     if source == "gmail":
@@ -4772,7 +4785,7 @@ def unified_oauth_callback():
             }
         },
         scopes=scopes,
-        redirect_uri=get_base_url() + "/oauth/callback"
+        redirect_uri=f"{BASE_URL}/oauth/callback"
     )
 
     session_id = request.cookies.get("segmento_session")
@@ -4781,11 +4794,19 @@ def unified_oauth_callback():
         con.close()
         return "Missing PKCE code_verifier. Please reconnect Google and try again.", 400
 
-    flow.fetch_token(
-        code=code,
-        include_client_id=True,
-        code_verifier=code_verifier
-    )
+    try:
+        flow.fetch_token(
+            code=code,
+            include_client_id=True,
+            client_secret=client_secret,
+            code_verifier=code_verifier
+        )
+    except Exception as exc:
+        con.close()
+        return jsonify({
+            "error": "Google token exchange failed. Verify client_secret and redirect URI configuration.",
+            "details": str(exc)
+        }), 400
 
     creds = flow.credentials
 
