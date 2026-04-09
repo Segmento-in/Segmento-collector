@@ -21,6 +21,17 @@
     <script>
         window.IMAGE_BASE_URL = "{{ IMAGE_BASE_URL }}";
     </script>
+    <script>
+        const fixImageBaseUrlLiterals = () => {
+            document.querySelectorAll("img").forEach(img => {
+                if (img.src.includes("IMAGE_BASE_URL")) {
+                    img.src = img.src.replace("IMAGE_BASE_URL", window.IMAGE_BASE_URL);
+                }
+            });
+        };
+        fixImageBaseUrlLiterals();
+        document.addEventListener("DOMContentLoaded", fixImageBaseUrlLiterals);
+    </script>
 
     <style>
         :root {
