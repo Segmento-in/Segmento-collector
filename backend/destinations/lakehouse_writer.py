@@ -123,17 +123,18 @@ def _register_table(
         ).fetchone()
 
         if row:
+            row_data = dict(row)
             print(
                 f"[{tag}] Table already registered — "
                 f"source={source}, storage={storage_type}, "
-                f"location={row['table_location']}"
+                f"location={row_data.get('table_location')}"
             )
             return {
-                "source":          row["source"],
-                "storage_type":    row["storage_type"],
-                "table_format":    row["table_format"],
-                "table_location":  row["table_location"],
-                "registered_at":   row["registered_at"],
+                "source":          row_data.get("source"),
+                "storage_type":    row_data.get("storage_type"),
+                "table_format":    row_data.get("table_format"),
+                "table_location":  row_data.get("table_location"),
+                "registered_at":   row_data.get("registered_at"),
                 "already_existed": True,
             }
 

@@ -20,6 +20,26 @@ import datetime
 
 DB = os.getenv("DB_PATH", "identity.db")
 
+def validate_destination(dest):
+
+    if not dest:
+        raise Exception("Destination config missing")
+
+    dest_type = dest.get("type")
+    if not dest_type:
+        raise Exception("Destination type missing")
+
+    if dest_type == "bigquery":
+        if not dest.get("password"):
+            raise Exception("BigQuery requires service account JSON")
+
+    if dest_type == "postgres":
+        if not dest.get("host"):
+            raise Exception("Postgres host missing")
+
+    return dest
+
+
 def resolve_destination_format(dest_cfg, source):
 
     dest_type = dest_cfg.get("type")
@@ -59,13 +79,16 @@ def push_to_destination(dest_cfg, source, rows, skip_storage=False):
     if not rows:
         return 0
 
+    dest_cfg = validate_destination(dest_cfg)
+
     # FORCE DECRYPT DESTINATION CONFIG
     dest_cfg = decrypt_payload(dict(dest_cfg))
+    dest_cfg = validate_destination(dest_cfg)
 
     # CENTRAL FORMAT RESOLUTION
     dest_cfg = resolve_destination_format(dest_cfg, source)
 
-    dest_type = dest_cfg["type"]
+    dest_type = dest_cfg.get("type")
 
     # Extract uid for logging
     uid = None

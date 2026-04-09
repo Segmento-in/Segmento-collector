@@ -40,7 +40,7 @@ def push_elasticsearch(dest, source, rows):
     for r in rows:
         row = dict(r)
         if "fetched_at" not in row:
-            row["fetched_at"] = now
+            row.update({"fetched_at": now})
         
         actions.append({
             "_index": index_name,

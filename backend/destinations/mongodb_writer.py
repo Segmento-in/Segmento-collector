@@ -30,7 +30,7 @@ def push_mongodb(dest, source, rows):
     for r in rows:
         row = dict(r)
         if "fetched_at" not in row:
-            row["fetched_at"] = now
+            row.update({"fetched_at": now})
         formatted_rows.append(row)
 
     result = collection.insert_many(formatted_rows)

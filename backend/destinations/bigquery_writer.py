@@ -41,7 +41,13 @@ def push_bigquery(dest, source, rows):
     print(f"[BIGQUERY] Upload format: {fmt}", flush=True)
 
     # ---------------- Credentials ----------------
-    creds_dict = json.loads(dest["password"])
+    if not dest.get("password"):
+        raise Exception("Missing credentials for destination")
+
+    try:
+        creds_dict = json.loads(dest.get("password"))
+    except Exception:
+        raise Exception("Invalid JSON credentials")
 
     credentials = service_account.Credentials.from_service_account_info(
         creds_dict
@@ -49,11 +55,11 @@ def push_bigquery(dest, source, rows):
 
     client = bigquery.Client(
         credentials=credentials,
-        project=dest["host"]
+        project=dest.get("host")
     )
 
-    project_id = dest["host"]
-    dataset_id = dest["database_name"]
+    project_id = dest.get("host")
+    dataset_id = dest.get("database_name")
     table_id = f"{project_id}.{dataset_id}.{source}_data"
 
     # ---------------- Dataset ----------------

@@ -14845,9 +14845,9 @@ def get_connector_job(source):
         return jsonify({"exists": False})
     return jsonify({
         "exists": True,
-        "sync_type": row["sync_type"],  # Use key
-        "schedule_time": row["schedule_time"],
-        "enabled": row["enabled"]
+        "sync_type": row.get("sync_type"),
+        "schedule_time": row.get("schedule_time"),
+        "enabled": row.get("enabled")
     })
 
 def get_connector_sync_type(uid, source):
@@ -14863,7 +14863,7 @@ def get_connector_sync_type(uid, source):
     con.close()
     if not row:
         return "historical"
-    return row["sync_type"]  # Use key
+    return row.get("sync_type", "historical")
 
 @app.route("/destination/save", methods=["POST"])
 def save_destination():
@@ -14873,7 +14873,7 @@ def save_destination():
     uid = getattr(g, "user_id", None)
 
     if not uid:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
     
     source = data.get("source")
 
@@ -14897,7 +14897,7 @@ def save_destination():
     if not source or not dest_type:
         return jsonify({
             "status": "error",
-            "msg": "Missing source or destination type"
+            "message": "Missing source or destination type"
         }), 400
 
 
@@ -14908,7 +14908,7 @@ def save_destination():
         if not host or not username or not database:
             return jsonify({
                 "status": "error",
-                "msg": "Missing database credentials"
+                "message": "Missing database credentials"
             }), 400
 
     # ---------- Redshift Validation ----------
@@ -14918,7 +14918,7 @@ def save_destination():
         if not host or not username or not password or not database:
             return jsonify({
                 "status": "error",
-                "msg": "Missing Redshift credentials"
+                "message": "Missing Redshift credentials"
             }), 400
 
 
@@ -14929,7 +14929,7 @@ def save_destination():
         if not host or not password or not database:
             return jsonify({
                 "status": "error",
-                "msg": "Missing BigQuery credentials"
+                "message": "Missing BigQuery credentials"
             }), 400
 
     # ---------- Azure Data Lake Validation ----------
@@ -14939,7 +14939,7 @@ def save_destination():
         if not host or not port or not password:
             return jsonify({
                 "status": "error",
-                "msg": "Missing Azure Data Lake credentials"
+                "message": "Missing Azure Data Lake credentials"
             }), 400
 
     # ---------- Databricks Validation ----------
@@ -14949,7 +14949,7 @@ def save_destination():
         if not host or not port or not password:
             return jsonify({
                 "status": "error",
-                "msg": "Missing Databricks credentials"
+                "message": "Missing Databricks credentials"
             }), 400
 
 
@@ -15006,7 +15006,7 @@ def save_destination():
 
         return jsonify({
             "status": "error",
-            "msg": str(e)
+            "message": str(e)
         }), 500
 
 
@@ -15025,7 +15025,7 @@ def list_destinations(source):
     uid = getattr(g, "user_id", None)
 
     if not uid:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
 
     con = get_db()
     cur = con.cursor()
@@ -15053,14 +15053,14 @@ def list_destinations(source):
 
     for r in rows:
         result.append({
-            "id": r["id"],
-            "type": r["dest_type"],
-            "host": r["host"],
-            "port": r["port"],
-            "username": r["username"],
-            "database": r["database_name"],
-            "active": bool(r["is_active"]),
-            "created_at": r["created_at"]
+            "id": r.get("id"),
+            "type": r.get("dest_type"),
+            "host": r.get("host"),
+            "port": r.get("port"),
+            "username": r.get("username"),
+            "database": r.get("database_name"),
+            "active": bool(r.get("is_active")),
+            "created_at": r.get("created_at")
         })
 
     return jsonify({
@@ -15076,7 +15076,7 @@ def activate_destination():
     uid = getattr(g, "user_id", None)
 
     if not uid:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
     
     source = data.get("source")
     dest_id = data.get("dest_id")
@@ -15084,7 +15084,7 @@ def activate_destination():
     if not source or not dest_id:
         return jsonify({
             "status": "error",
-            "msg": "Missing fields"
+            "message": "Missing fields"
         }), 400
 
 
@@ -15118,7 +15118,7 @@ def activate_destination():
 
         return jsonify({
             "status": "error",
-            "msg": str(e)
+            "message": str(e)
         }), 500
 
 
@@ -15139,10 +15139,10 @@ def delete_destination():
     uid = getattr(g, "user_id", None)
 
     if not uid:
-        return jsonify({"error": "Unauthorized"}), 401
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
 
     if not dest_id:
-        return jsonify({"error": "Missing id"}), 400
+        return jsonify({"status": "error", "message": "Missing id"}), 400
 
 
     con = get_db()
@@ -15171,7 +15171,7 @@ def get_connector_state(uid, source):
     con.close()
     if not row:
         return None
-    return json.loads(row["state_json"])  # Use key
+    return json.loads(row.get("state_json") or "{}")
 
 def save_connector_state(uid, source, state_dict):
 

@@ -26,13 +26,13 @@ def push_gcs(dest, source, rows):
     fmt = (dest.get("format") or "parquet").lower()
     print(f"[GCS] Upload format: {fmt}", flush=True)
 
-    bucket_name = dest["host"]
+    bucket_name = dest.get("host")
     # GCS authentication using Service Account JSON key provided in dest["password"]
     if not dest.get("password"):
         raise Exception("GCS destination requires a valid Service Account JSON key.")
 
     try:
-        key_json = json.loads(dest["password"])
+        key_json = json.loads(dest.get("password"))
         creds = service_account.Credentials.from_service_account_info(key_json)
         client = storage.Client(credentials=creds)
     except json.JSONDecodeError:
