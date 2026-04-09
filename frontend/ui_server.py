@@ -12,7 +12,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from flask import (
     Flask,
-    render_template,
+    render_template as flask_render_template,
     redirect,
     jsonify,
     request,
@@ -35,6 +35,10 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.getenv("DB_PATH", "identity.db")
+IMAGE_BASE_URL = os.getenv(
+    "IMAGE_BASE_URL",
+    "https://res.cloudinary.com/dqxzfuory/image/upload"
+)
 
 def copy_auth_cookies(source_response, target_response):
     raw_headers = getattr(getattr(source_response, "raw", None), "headers", None)
@@ -80,6 +84,12 @@ def proxy_request(method, path, **kwargs):
         headers={"Cookie": request.headers.get("Cookie", "")},
         **kwargs
     )
+
+
+def render_ui_template(template_name_or_list, **context):
+    context.setdefault("IMAGE_BASE_URL", IMAGE_BASE_URL)
+    return flask_render_template(template_name_or_list, **context)
+
 
 # ================= AUTH UTILITIES =================# ================= AUTH UTILITIES =================
 
@@ -129,13 +139,13 @@ def require_login(f):
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    return render_ui_template("index.html")
 
 @app.route("/signup")
 def signup_page():
     if logged_in():
         return redirect("/")
-    return render_template(
+    return render_ui_template(
         "signup.html",
         next_url=request.args.get("next", ""),
         auth_required=request.args.get("auth_required", "")
@@ -145,7 +155,7 @@ def signup_page():
 def login_page():
     if logged_in():
         return redirect("/")
-    return render_template("login.html", next_url=request.args.get("next", ""), auth_required=request.args.get("auth_required", ""))
+    return render_ui_template("login.html", next_url=request.args.get("next", ""), auth_required=request.args.get("auth_required", ""))
 
 @app.route("/auth/login", methods=["POST"])
 def ui_login():
@@ -227,7 +237,7 @@ def inject_global_vars():
     return dict(
         is_logged_in=logged_in(),
         base_url=os.getenv("BASE_URL", request.host_url.rstrip("/")),
-        image_base_url=os.getenv("IMAGE_BASE_URL", "")
+        IMAGE_BASE_URL=IMAGE_BASE_URL
     )
 
 
@@ -254,21 +264,21 @@ def ui_logout():
 
 @app.route("/usage")
 def usage_page():
-    return render_template("usage.html")
+    return render_ui_template("usage.html")
 
 @app.route("/account")
 @require_login
 def account_page():
-    return render_template("account.html")
+    return render_ui_template("account.html")
 
 @app.route("/tracking")
 def tracking():
-    return render_template("tracking.html")
+    return render_ui_template("tracking.html")
 
 
 @app.route("/connectors")
 def connectors():
-    return render_template("connectors.html")
+    return render_ui_template("connectors.html")
 
 # ================= PROXY UTILITIES =================
 
@@ -335,7 +345,7 @@ def ui_recover_connector_data(source):
 @app.route("/connectors/socialinsider")
 @require_login
 def socialinsider_page():
-    return render_template("connectors/socialinsider.html")
+    return render_ui_template("connectors/socialinsider.html")
 
 
 @app.route("/connectors/socialinsider/connect")
@@ -447,7 +457,7 @@ def ui_disconnect(source):
 @app.route("/connectors/github")
 @require_login
 def github_page():
-    return render_template("connectors/github.html")
+    return render_ui_template("connectors/github.html")
 
 
 @app.route("/connectors/github/connect")
@@ -462,7 +472,7 @@ def github_sync():
 # ================= DASHBOARD ROUTES =================
 @app.route("/dashboard/github")
 def github_dashboard():
-    return render_template("dashboards/github.html")
+    return render_ui_template("dashboards/github.html")
 
 # ================= DATA APIs =================
 
@@ -520,7 +530,7 @@ def github_save_app_proxy():
 @app.route("/connectors/instagram")
 @require_login
 def instagram_page():
-    return render_template("connectors/instagram.html")
+    return render_ui_template("connectors/instagram.html")
 
 @app.route("/connectors/instagram/connect")
 def instagram_connect():
@@ -564,7 +574,7 @@ def instagram_disconnect():
 @app.route("/connectors/tiktok")
 @require_login
 def tiktok_page():
-    return render_template("connectors/tiktok.html")
+    return render_ui_template("connectors/tiktok.html")
 
 @app.route("/connectors/tiktok/connect")
 def tiktok_connect():
@@ -606,7 +616,7 @@ def tiktok_disconnect():
 @app.route("/connectors/taboola")
 @require_login
 def taboola_page():
-    return render_template("connectors/taboola.html")
+    return render_ui_template("connectors/taboola.html")
 
 @app.route("/connectors/taboola/connect")
 def taboola_connect():
@@ -649,7 +659,7 @@ def taboola_disconnect():
 @app.route("/connectors/outbrain")
 @require_login
 def outbrain_page():
-    return render_template("connectors/outbrain.html")
+    return render_ui_template("connectors/outbrain.html")
 
 @app.route("/connectors/outbrain/connect")
 def outbrain_connect():
@@ -692,7 +702,7 @@ def outbrain_disconnect():
 @app.route("/connectors/similarweb")
 @require_login
 def similarweb_page():
-    return render_template("connectors/similarweb.html")
+    return render_ui_template("connectors/similarweb.html")
 
 @app.route("/connectors/similarweb/connect")
 def similarweb_connect():
@@ -735,7 +745,7 @@ def similarweb_disconnect():
 @app.route("/connectors/x")
 @require_login
 def x_page():
-    return render_template("connectors/x.html")
+    return render_ui_template("connectors/x.html")
 
 @app.route("/connectors/x/connect")
 def x_connect():
@@ -777,7 +787,7 @@ def x_disconnect():
 @app.route("/connectors/linkedin")
 @require_login
 def linkedin_page():
-    return render_template("connectors/linkedin.html")
+    return render_ui_template("connectors/linkedin.html")
 
 @app.route("/connectors/linkedin/connect")
 def linkedin_connect():
@@ -819,7 +829,7 @@ def linkedin_disconnect():
 @app.route("/connectors/slack")
 @require_login
 def slack_page():
-    return render_template("connectors/slack.html")
+    return render_ui_template("connectors/slack.html")
 
 @app.route("/connectors/slack/connect")
 def slack_connect():
@@ -872,7 +882,7 @@ def slack_disconnect():
 @app.route("/connectors/whatsapp")
 @require_login
 def whatsapp_page():
-    return render_template("connectors/whatsapp.html")
+    return render_ui_template("connectors/whatsapp.html")
 
 @app.route("/connectors/whatsapp/connect")
 def whatsapp_connect():
@@ -913,7 +923,7 @@ def whatsapp_sync():
 @app.route("/connectors/reddit")
 @require_login
 def reddit_page():
-    return render_template("connectors/reddit.html")
+    return render_ui_template("connectors/reddit.html")
 
 @app.route("/connectors/reddit/connect")
 def reddit_connect():
@@ -967,7 +977,7 @@ def reddit_sync():
 
 @app.route("/dashboard/reddit")
 def reddit_dashboard():
-    return render_template("dashboards/reddit.html")
+    return render_ui_template("dashboards/reddit.html")
 
 @app.route("/api/status/reddit")
 def reddit_status():
@@ -1037,7 +1047,7 @@ def reddit_data(table):
 @app.route("/connectors/medium")
 @require_login
 def medium_page():
-    return render_template("connectors/medium.html")
+    return render_ui_template("connectors/medium.html")
 
 @app.route("/connectors/medium/connect")
 def medium_connect_proxy():
@@ -1083,7 +1093,7 @@ def medium_sync():
 
 @app.route("/dashboard/medium")
 def medium_dashboard():
-    return render_template("dashboards/medium.html")
+    return render_ui_template("dashboards/medium.html")
 
 
 
@@ -1119,7 +1129,7 @@ def medium_data():
 @app.route("/connectors/gitlab")
 @require_login
 def gitlab_page():
-    return render_template("connectors/gitlab.html")
+    return render_ui_template("connectors/gitlab.html")
 
 @app.route("/connectors/gitlab/save_app", methods=["POST"])
 def gitlab_save_app_proxy():
@@ -1193,7 +1203,7 @@ def gitlab_sync():
 
 @app.route("/dashboard/gitlab")
 def gitlab_dashboard():
-    return render_template("dashboards/gitlab.html")
+    return render_ui_template("dashboards/gitlab.html")
 
 @app.route("/api/gitlab/<table>")
 def gitlab_data(table):
@@ -1229,7 +1239,7 @@ def gitlab_data(table):
 @app.route("/connectors/devto")
 @require_login
 def devto_page():
-    return render_template("connectors/devto.html")
+    return render_ui_template("connectors/devto.html")
 
 @app.route("/api/status/devto")
 def devto_status_proxy():
@@ -1284,7 +1294,7 @@ def devto_sync():
 
 @app.route("/dashboard/devto")
 def devto_dashboard():
-    return render_template("dashboards/devto.html")
+    return render_ui_template("dashboards/devto.html")
 
 @app.route("/connectors/devto/job/get")
 def devto_job_get_proxy():
@@ -1316,7 +1326,7 @@ def devto_job_save_proxy():
 @app.route("/connectors/stackoverflow")
 @require_login
 def stackoverflow_page():
-    return render_template("connectors/stackoverflow.html")
+    return render_ui_template("connectors/stackoverflow.html")
 
 @app.route("/connectors/stackoverflow/save_config", methods=["POST"])
 def stackoverflow_save_config_proxy():
@@ -1377,7 +1387,7 @@ def stackoverflow_sync():
 
 @app.route("/dashboard/stackoverflow")
 def stackoverflow_dashboard():
-    return render_template("dashboards/stackoverflow.html")
+    return render_ui_template("dashboards/stackoverflow.html")
 
 
 # ---------- STATUS ----------
@@ -1458,7 +1468,7 @@ def stack_users():
 @app.route("/connectors/hackernews")
 @require_login
 def hackernews_page():
-    return render_template("connectors/hackernews.html")
+    return render_ui_template("connectors/hackernews.html")
 
 
 @app.route("/connectors/hackernews/connect")
@@ -1483,7 +1493,7 @@ def hackernews_sync():
 
 @app.route("/dashboard/hackernews")
 def hackernews_dashboard():
-    return render_template("dashboards/hackernews.html")
+    return render_ui_template("dashboards/hackernews.html")
 
 # ---------- STATUS ----------
 
@@ -1528,7 +1538,7 @@ def hackernews_stories():
 @app.route("/connectors/nvd")
 @require_login
 def nvd_page():
-    return render_template("connectors/nvd.html")
+    return render_ui_template("connectors/nvd.html")
 
 @app.route("/connectors/nvd/save_config", methods=["POST"])
 def nvd_save_config_proxy():
@@ -1580,7 +1590,7 @@ def nvd_sync():
 
 @app.route("/dashboard/nvd")
 def nvd_dashboard():
-    return render_template("dashboards/nvd.html")
+    return render_ui_template("dashboards/nvd.html")
 
 
 # ---------- STATUS ----------
@@ -1623,7 +1633,7 @@ def nvd_cves():
 @app.route("/connectors/discord")
 @require_login
 def discord_page():
-    return render_template("connectors/discord.html")
+    return render_ui_template("connectors/discord.html")
 
 @app.route("/connectors/discord/save_config", methods=["POST"])
 def discord_save_config_proxy():
@@ -1693,7 +1703,7 @@ def discord_status_proxy():
 @app.route("/connectors/telegram")
 @require_login
 def telegram_page():
-    return render_template("connectors/telegram.html")
+    return render_ui_template("connectors/telegram.html")
 
 @app.route("/connectors/telegram/connect")
 def telegram_connect_proxy():
@@ -1739,7 +1749,7 @@ def telegram_sync():
 
 @app.route("/dashboard/telegram")
 def telegram_dashboard():
-    return render_template("dashboards/telegram.html")
+    return render_ui_template("dashboards/telegram.html")
 
 
 # -------- STATUS --------
@@ -1820,7 +1830,7 @@ def telegram_save_config_proxy():
 @app.route("/connectors/tumblr")
 @require_login
 def tumblr_page():
-    return render_template("connectors/tumblr.html")
+    return render_ui_template("connectors/tumblr.html")
 
 @app.route("/connectors/tumblr/connect")
 def tumblr_connect_proxy():
@@ -1866,7 +1876,7 @@ def tumblr_sync_proxy():
 
 @app.route("/dashboard/tumblr")
 def tumblr_dashboard():
-    return render_template("dashboards/tumblr.html")
+    return render_ui_template("dashboards/tumblr.html")
 
 @app.route("/connectors/tumblr/disconnect")
 def tumblr_disconnect_proxy():
@@ -1937,7 +1947,7 @@ def tumblr_posts(blog):
 @app.route("/connectors/mastodon")
 @require_login
 def mastodon_page():
-    return render_template("connectors/mastodon.html")
+    return render_ui_template("connectors/mastodon.html")
 
 @app.route("/connectors/mastodon/connect")
 def mastodon_connect_proxy():
@@ -1973,7 +1983,7 @@ def mastodon_sync():
 
 @app.route("/dashboard/mastodon")
 def mastodon_dashboard():
-    return render_template("dashboards/mastodon.html")
+    return render_ui_template("dashboards/mastodon.html")
 
 
 # -------- STATUS --------
@@ -2054,7 +2064,7 @@ def mastodon_save_config_proxy():
 @app.route("/connectors/lemmy")
 @require_login
 def lemmy_page():
-    return render_template("connectors/lemmy.html")
+    return render_ui_template("connectors/lemmy.html")
 
 @app.route("/connectors/lemmy/connect")
 def lemmy_connect_proxy():
@@ -2082,7 +2092,7 @@ def lemmy_sync():
 
 @app.route("/dashboard/lemmy")
 def lemmy_dashboard():
-    return render_template("dashboards/lemmy.html")
+    return render_ui_template("dashboards/lemmy.html")
 
 
 # -------- STATUS --------
@@ -2183,7 +2193,7 @@ def lemmy_save_config_proxy():
 @app.route("/connectors/pinterest")
 @require_login
 def pinterest_page():
-    return render_template("connectors/pinterest.html")
+    return render_ui_template("connectors/pinterest.html")
 
 
 @app.route("/connectors/pinterest/connect")
@@ -2216,7 +2226,7 @@ def pinterest_disconnect():
 
 @app.route("/dashboard/pinterest")
 def pinterest_dashboard():
-    return render_template("dashboards/pinterest.html")
+    return render_ui_template("dashboards/pinterest.html")
 
 
 # -------- STATUS --------
@@ -2318,7 +2328,7 @@ def pinterest_callback_proxy():
 @app.route("/connectors/twitch")
 @require_login
 def twitch_page():
-    return render_template("connectors/twitch.html")
+    return render_ui_template("connectors/twitch.html")
 
 @app.route("/connectors/twitch/connect")
 def twitch_connect():
@@ -2384,7 +2394,7 @@ def twitch_save_config_proxy():
 @app.route("/connectors/peertube")
 @require_login
 def peertube_page():
-    return render_template("connectors/peertube.html")
+    return render_ui_template("connectors/peertube.html")
 
 @app.route("/connectors/peertube/connect")
 def peertube_connect():
@@ -2425,7 +2435,7 @@ def peertube_sync_proxy():
 
 @app.route("/dashboard/peertube")
 def peertube_dashboard():
-    return render_template("dashboards/peertube.html")
+    return render_ui_template("dashboards/peertube.html")
 
 
 # -------- STATUS --------
@@ -2498,7 +2508,7 @@ def peertube_save_proxy():
 @app.route("/connectors/openstreetmap")
 @require_login
 def osm_page():
-    return render_template("connectors/openstreetmap.html")
+    return render_ui_template("connectors/openstreetmap.html")
 
 @app.route("/connectors/openstreetmap/connect")
 def ui_osm_connect():
@@ -2538,7 +2548,7 @@ def ui_osm_sync():
 
 @app.route("/dashboard/openstreetmap")
 def osm_dashboard():
-    return render_template("dashboards/openstreetmap.html")
+    return render_ui_template("dashboards/openstreetmap.html")
 
 
 # -------- STATUS --------
@@ -2599,7 +2609,7 @@ def osm_notes():
 @app.route("/connectors/wikipedia")
 @require_login
 def wikipedia_page():
-    return render_template("connectors/wikipedia.html")
+    return render_ui_template("connectors/wikipedia.html")
 
 # -------- CONNECT --------
 
@@ -2661,7 +2671,7 @@ def wikipedia_status_proxy():
 
 @app.route("/dashboard/wikipedia")
 def wikipedia_dashboard():
-    return render_template("dashboards/wikipedia.html")
+    return render_ui_template("dashboards/wikipedia.html")
 
 
 # -------- DATA --------
@@ -2727,7 +2737,7 @@ def wiki_viewed():
 @app.route("/connectors/producthunt")
 @require_login
 def producthunt_page():
-    return render_template("connectors/producthunt.html")
+    return render_ui_template("connectors/producthunt.html")
 
 
 # -------- CONNECT --------
@@ -2792,7 +2802,7 @@ def ui_producthunt_status():
 
 @app.route("/dashboard/producthunt")
 def producthunt_dashboard():
-    return render_template("dashboards/producthunt.html")
+    return render_ui_template("dashboards/producthunt.html")
 
 
 # -------- DATA APIs --------
@@ -2839,7 +2849,7 @@ def ui_producthunt_save():
 @app.route("/connectors/discourse")
 @require_login
 def discourse_page():
-    return render_template("connectors/discourse.html")
+    return render_ui_template("connectors/discourse.html")
 
 @app.route("/connectors/discourse/connect")
 def ui_discourse_connect():
@@ -2892,7 +2902,7 @@ def ui_discourse_sync():
 
 @app.route("/dashboard/discourse")
 def discourse_dashboard():
-    return render_template("dashboards/discourse.html")
+    return render_ui_template("dashboards/discourse.html")
 
 @app.route("/api/discourse/topics")
 def ui_discourse_topics():
@@ -2930,7 +2940,7 @@ def ui_discourse_categories():
 @app.route("/connectors/gmail")
 @require_login
 def gmail_page():
-    return render_template("connectors/gmail.html")
+    return render_ui_template("connectors/gmail.html")
 
 
 # Redirect to Identity Server OAuth
@@ -3069,7 +3079,7 @@ def gmail_data(table):
 
 @app.route("/dashboard/gmail")
 def gmail_dashboard():
-    return render_template("dashboards/gmail.html")
+    return render_ui_template("dashboards/gmail.html")
 
 
 # ================= GOOGLE DRIVE ========================
@@ -3077,7 +3087,7 @@ def gmail_dashboard():
 @app.route("/connectors/drive")
 @require_login
 def drive_page():
-    return render_template("connectors/drive.html")
+    return render_ui_template("connectors/drive.html")
 
 @app.route("/connectors/drive/connect")
 def drive_connect():
@@ -3106,7 +3116,7 @@ def drive_sync():
 
 @app.route("/dashboard/drive")
 def drive_dashboard():
-    return render_template("dashboards/drive.html")
+    return render_ui_template("dashboards/drive.html")
 
 
 @app.route("/api/status/drive")
@@ -3221,7 +3231,7 @@ def drive_job_save_proxy():
 @app.route("/connectors/calendar")
 @require_login
 def calendar_page():
-    return render_template("connectors/calendar.html")
+    return render_ui_template("connectors/calendar.html")
 
 @app.route("/connectors/calendar/connect")
 def calendar_connect():
@@ -3273,7 +3283,7 @@ def calendar_sync():
 
 @app.route("/dashboard/calendar")
 def calendar_dashboard():
-    return render_template("dashboards/calendar.html")
+    return render_ui_template("dashboards/calendar.html")
 
 @app.route("/api/status/calendar")
 def calendar_status():
@@ -3371,7 +3381,7 @@ def calendar_data(table):
 @app.route("/connectors/sheets")
 @require_login
 def sheets_page():
-    return render_template("connectors/sheets.html")
+    return render_ui_template("connectors/sheets.html")
 
 @app.route("/connectors/sheets/connect")
 def sheets_connect():
@@ -3448,7 +3458,7 @@ def sheets_sync():
 
 @app.route("/dashboard/sheets")
 def sheets_dashboard():
-    return render_template("dashboards/sheets.html")
+    return render_ui_template("dashboards/sheets.html")
 
 
 @app.route("/api/status/sheets")
@@ -3513,7 +3523,7 @@ def sheets_data():
 @app.route("/connectors/forms")
 @require_login
 def forms_page():
-    return render_template("connectors/forms.html")
+    return render_ui_template("connectors/forms.html")
 
 @app.route("/connectors/forms/sync")
 def forms_sync():
@@ -3555,7 +3565,7 @@ def forms_disconnect():
 
 @app.route("/dashboard/forms")
 def forms_dashboard():
-    return render_template("dashboards/forms.html")
+    return render_ui_template("dashboards/forms.html")
 
 @app.route("/api/status/forms")
 def forms_status():
@@ -3658,7 +3668,7 @@ def forms_data(table):
 @app.route("/connectors/contacts")
 @require_login
 def contacts_page():
-    return render_template("connectors/contacts.html")
+    return render_ui_template("connectors/contacts.html")
 
 @app.route("/connectors/contacts/connect")
 def contacts_connect():
@@ -3698,7 +3708,7 @@ def contacts_sync():
 
 @app.route("/dashboard/contacts")
 def contacts_dashboard():
-    return render_template("dashboards/contacts.html")
+    return render_ui_template("dashboards/contacts.html")
 
 @app.route("/api/status/contacts")
 def contacts_status():
@@ -3787,7 +3797,7 @@ def contacts_job_save_proxy():
 @app.route("/connectors/tasks")
 @require_login
 def tasks_page():
-    return render_template("connectors/tasks.html")
+    return render_ui_template("connectors/tasks.html")
 
 @app.route("/connectors/tasks/connect")
 def tasks_connect():
@@ -3838,7 +3848,7 @@ def tasks_sync():
 
 @app.route("/dashboard/tasks")
 def tasks_dashboard():
-    return render_template("dashboards/tasks.html")
+    return render_ui_template("dashboards/tasks.html")
 
 
 @app.route("/api/status/tasks")
@@ -3941,7 +3951,7 @@ def tasks_data(table):
 @app.route("/connectors/ga4")
 @require_login
 def ga4_page():
-    return render_template("connectors/ga4.html")
+    return render_ui_template("connectors/ga4.html")
 
 @app.route("/connectors/ga4/connect")
 def ga4_connect():
@@ -4017,7 +4027,7 @@ def ga4_sync():
 
 @app.route("/dashboard/ga4")
 def ga4_dashboard():
-    return render_template("dashboards/ga4.html")
+    return render_ui_template("dashboards/ga4.html")
 
 
 @app.route("/api/status/ga4")
@@ -4090,7 +4100,7 @@ def ga4_data(table):
 @app.route("/connectors/search-console")
 @require_login
 def gsc_page():
-    return render_template("connectors/search_console.html")
+    return render_ui_template("connectors/search_console.html")
 
 @app.route("/connectors/search-console/connect")
 def search_console_connect():
@@ -4137,7 +4147,7 @@ def ui_gsc_sync():
 
 @app.route("/dashboard/search-console")
 def gsc_dashboard():
-    return render_template("dashboards/search_console.html")
+    return render_ui_template("dashboards/search_console.html")
 
 
 @app.route("/api/status/search-console")
@@ -4197,7 +4207,7 @@ def gsc_data():
 @app.route("/connectors/youtube")
 @require_login
 def youtube_page():
-    return render_template("connectors/youtube.html")
+    return render_ui_template("connectors/youtube.html")
 
 @app.route("/connectors/youtube/connect")
 def youtube_connect():
@@ -4307,7 +4317,7 @@ def ui_youtube_sync():
 
 @app.route("/dashboard/youtube")
 def youtube_dashboard():
-    return render_template("dashboards/youtube.html")
+    return render_ui_template("dashboards/youtube.html")
 
 @app.route("/api/youtube/data/<table>")
 def youtube_data(table):
@@ -4348,7 +4358,7 @@ def youtube_data(table):
 @app.route("/connectors/trends")
 @require_login
 def trends_page():
-    return render_template("connectors/trends.html")
+    return render_ui_template("connectors/trends.html")
 
 @app.route("/connectors/trends/disconnect")
 def trends_disconnect():
@@ -4391,7 +4401,7 @@ def ui_trends_connect():
 
 @app.route("/dashboard/trends")
 def trends_dashboard():
-    return render_template("dashboards/trends.html")
+    return render_ui_template("dashboards/trends.html")
 
 @app.route("/api/trends/data/<table>")
 def trends_data(table):
@@ -4457,7 +4467,7 @@ def trends_job_save_proxy():
 @app.route("/connectors/news")
 @require_login
 def news_page():
-    return render_template("connectors/news.html")
+    return render_ui_template("connectors/news.html")
 
 
 @app.route("/connectors/news/connect", methods=["POST"])
@@ -4535,7 +4545,7 @@ def news_status_proxy():
 @app.route("/connectors/books")
 @require_login
 def books_page():
-    return render_template("connectors/books.html")
+    return render_ui_template("connectors/books.html")
 
 
 @app.route("/connectors/books/connect")
@@ -4600,7 +4610,7 @@ def ui_books_job_save():
 
 @app.route("/dashboard/books")
 def books_dashboard():
-    return render_template("dashboards/books.html")
+    return render_ui_template("dashboards/books.html")
 
 
 @app.route("/api/status/books")
@@ -4638,7 +4648,7 @@ def books_data():
 @app.route("/connectors/webfonts")
 @require_login
 def webfonts_page():
-    return render_template("connectors/webfonts.html")
+    return render_ui_template("connectors/webfonts.html")
 
 
 @app.route("/connectors/webfonts/connect")
@@ -4743,7 +4753,7 @@ def webfonts_save_config_proxy():
 @app.route("/connectors/pagespeed")
 @require_login
 def pagespeed_page():
-    return render_template("connectors/pagespeed.html")
+    return render_ui_template("connectors/pagespeed.html")
 
 
 @app.route("/connectors/pagespeed/sync", methods=["POST"])
@@ -4780,7 +4790,7 @@ def pagespeed_sync():
 
 @app.route("/dashboard/pagespeed")
 def pagespeed_dashboard():
-    return render_template("dashboards/pagespeed.html")
+    return render_ui_template("dashboards/pagespeed.html")
 
 
 @app.route("/api/status/pagespeed")
@@ -4897,7 +4907,7 @@ def pagespeed_job_save_proxy():
 @app.route("/connectors/gcs")
 @require_login
 def gcs_page():
-    return render_template("connectors/gcs.html")
+    return render_ui_template("connectors/gcs.html")
 
 
 # ---- CONNECT (Google OAuth) ----
@@ -4925,7 +4935,7 @@ def gcs_sync():
 # ---- DASHBOARD ----
 @app.route("/dashboard/gcs")
 def gcs_dashboard():
-    return render_template("dashboards/gcs.html")
+    return render_ui_template("dashboards/gcs.html")
 
 # ---- DATA APIs ----
 @app.route("/api/gcs/data/buckets")
@@ -5047,7 +5057,7 @@ def gcs_save_app_proxy():
 @app.route("/connectors/classroom")
 @require_login
 def classroom_page():
-    return render_template("connectors/classroom.html")
+    return render_ui_template("connectors/classroom.html")
 
 
 @app.route("/connectors/classroom/connect")
@@ -5101,7 +5111,7 @@ def classroom_sync():
 # ---- DASHBOARD ----
 @app.route("/dashboard/classroom")
 def classroom_dashboard():
-    return render_template("dashboards/classroom.html")
+    return render_ui_template("dashboards/classroom.html")
 
 @app.route("/api/status/classroom")
 def classroom_status():
@@ -5250,7 +5260,7 @@ def classroom_submissions():
 @app.route("/connectors/factcheck")
 @require_login
 def factcheck_page():
-    return render_template("connectors/factcheck.html")
+    return render_ui_template("connectors/factcheck.html")
 
 @app.route("/connectors/factcheck/connect")
 def factcheck_connect():
@@ -5322,7 +5332,7 @@ def factcheck_sync():
 # ---------- DASHBOARD ----------
 @app.route("/dashboard/factcheck")
 def factcheck_dashboard():
-    return render_template("dashboards/factcheck.html")
+    return render_ui_template("dashboards/factcheck.html")
 
 
 # ---------- STATUS ----------
@@ -5376,7 +5386,7 @@ def factcheck_save_config_proxy():
 @app.route("/connectors/facebook")
 @require_login
 def facebook_page():
-    return render_template("connectors/facebookpages.html")
+    return render_ui_template("connectors/facebookpages.html")
 
 
 @app.route("/connectors/facebook/connect")
@@ -5431,7 +5441,7 @@ def facebook_job_save_proxy():
 @app.route("/connectors/facebook_ads")
 @require_login
 def facebook_ads_page():
-    return render_template("connectors/facebook_ads.html")
+    return render_ui_template("connectors/facebook_ads.html")
 
 @app.route("/connectors/facebook_ads/connect")
 def facebook_ads_connect():
@@ -5483,7 +5493,7 @@ def facebook_ads_save_app_proxy():
 @app.route("/connectors/chartbeat")
 @require_login
 def chartbeat_page():
-    return render_template("connectors/chartbeat.html")
+    return render_ui_template("connectors/chartbeat.html")
 
 
 @app.route("/connectors/chartbeat/save_app", methods=["POST"])
@@ -5542,7 +5552,7 @@ def chartbeat_job_save_proxy():
 @app.route("/connectors/stripe")
 @require_login
 def stripe_page():
-    return render_template("connectors/stripe.html")
+    return render_ui_template("connectors/stripe.html")
 
 
 @app.route("/connectors/stripe/save_app", methods=["POST"])
@@ -5635,7 +5645,7 @@ def activate_destination_proxy():
 @app.route("/connectors/bigquery")
 @require_login
 def bigquery_page():
-    return render_template("connectors/bigquery.html")
+    return render_ui_template("connectors/bigquery.html")
 
 
 @app.route("/connectors/bigquery/connect")
@@ -5691,7 +5701,7 @@ def bigquery_save_app_proxy():
 @app.route("/connectors/aws_rds")
 @require_login
 def aws_rds_page():
-    return render_template("connectors/aws_rds.html")
+    return render_ui_template("connectors/aws_rds.html")
 
 
 @app.route("/connectors/aws_rds/save_app", methods=["POST"])
@@ -5750,7 +5760,7 @@ def aws_rds_job_save_proxy():
 @app.route("/connectors/dynamodb")
 @require_login
 def dynamodb_page():
-    return render_template("connectors/dynamodb.html")
+    return render_ui_template("connectors/dynamodb.html")
 
 
 @app.route("/connectors/dynamodb/save_app", methods=["POST"])
@@ -5809,7 +5819,7 @@ def dynamodb_job_save_proxy():
 @app.route("/connectors/notion")
 @require_login
 def notion_page():
-    return render_template("connectors/notion.html")
+    return render_ui_template("connectors/notion.html")
 
 
 @app.route("/connectors/notion/connect")
@@ -5869,7 +5879,7 @@ def notion_disconnect():
 @app.route("/connectors/hubspot")
 @require_login
 def hubspot_page():
-    return render_template("connectors/hubspot.html")
+    return render_ui_template("connectors/hubspot.html")
 
 
 @app.route("/connectors/hubspot/connect")
@@ -5929,7 +5939,7 @@ def hubspot_disconnect_proxy():
 @app.route("/connectors/airtable")
 @require_login
 def airtable_page():
-    return render_template("connectors/airtable.html")
+    return render_ui_template("connectors/airtable.html")
 
 
 @app.route("/connectors/airtable/connect")
@@ -5989,7 +5999,7 @@ def airtable_disconnect_proxy():
 @app.route("/connectors/zendesk")
 @require_login
 def zendesk_page():
-    return render_template("connectors/zendesk.html")
+    return render_ui_template("connectors/zendesk.html")
 
 
 @app.route("/connectors/zendesk/connect")
@@ -6049,7 +6059,7 @@ def zendesk_disconnect():
 @app.route("/connectors/intercom")
 @require_login
 def intercom_page():
-    return render_template("connectors/intercom.html")
+    return render_ui_template("connectors/intercom.html")
 
 
 @app.route("/connectors/intercom/connect")
@@ -6109,7 +6119,7 @@ def intercom_disconnect():
 @app.route("/connectors/mailchimp")
 @require_login
 def mailchimp_page():
-    return render_template("connectors/mailchimp.html")
+    return render_ui_template("connectors/mailchimp.html")
 
 
 @app.route("/connectors/mailchimp/connect")
@@ -6169,7 +6179,7 @@ def mailchimp_disconnect():
 @app.route("/connectors/twilio")
 @require_login
 def twilio_page():
-    return render_template("connectors/twilio.html")
+    return render_ui_template("connectors/twilio.html")
 
 
 @app.route("/connectors/twilio/connect")
@@ -6229,7 +6239,7 @@ def twilio_disconnect():
 @app.route("/connectors/shopify")
 @require_login
 def shopify_page():
-    return render_template("connectors/shopify.html")
+    return render_ui_template("connectors/shopify.html")
 
 
 @app.route("/connectors/shopify/connect")
@@ -6288,7 +6298,7 @@ def shopify_disconnect():
 @app.route("/connectors/pipedrive")
 @require_login
 def pipedrive_page():
-    return render_template("connectors/pipedrive.html")
+    return render_ui_template("connectors/pipedrive.html")
 
 
 @app.route("/connectors/pipedrive/connect")
@@ -6348,7 +6358,7 @@ def pipedrive_disconnect_proxy():
 @app.route("/connectors/freshdesk")
 @require_login
 def freshdesk_page():
-    return render_template("connectors/freshdesk.html")
+    return render_ui_template("connectors/freshdesk.html")
 
 
 @app.route("/connectors/freshdesk/connect")
@@ -6408,7 +6418,7 @@ def freshdesk_disconnect_proxy():
 @app.route("/connectors/klaviyo")
 @require_login
 def klaviyo_page():
-    return render_template("connectors/klaviyo.html")
+    return render_ui_template("connectors/klaviyo.html")
 
 
 @app.route("/connectors/klaviyo/connect")
@@ -6468,7 +6478,7 @@ def klaviyo_disconnect_proxy():
 @app.route("/connectors/amplitude")
 @require_login
 def amplitude_page():
-    return render_template("connectors/amplitude.html")
+    return render_ui_template("connectors/amplitude.html")
 
 
 @app.route("/connectors/amplitude/connect")
@@ -6526,7 +6536,7 @@ def amplitude_disconnect_proxy():
 @app.route("/connectors/salesforce")
 @require_login
 def salesforce_page():
-    return render_template("connectors/salesforce.html")
+    return render_ui_template("connectors/salesforce.html")
 
 
 @app.route("/connectors/salesforce/connect")
@@ -6585,7 +6595,7 @@ def salesforce_disconnect_proxy():
 @app.route("/connectors/jira")
 @require_login
 def jira_page():
-    return render_template("connectors/jira.html")
+    return render_ui_template("connectors/jira.html")
 
 
 @app.route("/connectors/jira/connect")
@@ -6643,7 +6653,7 @@ def jira_disconnect_proxy():
 @app.route("/connectors/zoho_crm")
 @require_login
 def zoho_crm_page():
-    return render_template("connectors/zoho_crm.html")
+    return render_ui_template("connectors/zoho_crm.html")
 
 
 @app.route("/connectors/zoho_crm/connect")
@@ -6702,7 +6712,7 @@ def zoho_crm_disconnect_proxy():
 @app.route("/connectors/paypal")
 @require_login
 def paypal_page():
-    return render_template("connectors/paypal.html")
+    return render_ui_template("connectors/paypal.html")
 
 
 @app.route("/connectors/paypal/connect")
@@ -6759,7 +6769,7 @@ def paypal_disconnect_proxy():
 @app.route("/connectors/asana")
 @require_login
 def asana_page():
-    return render_template("connectors/asana.html")
+    return render_ui_template("connectors/asana.html")
 
 
 @app.route("/connectors/asana/connect")
@@ -6817,7 +6827,7 @@ def asana_disconnect_proxy():
 @app.route("/connectors/tableau")
 @require_login
 def tableau_page():
-    return render_template("connectors/tableau.html")
+    return render_ui_template("connectors/tableau.html")
 
 
 @app.route("/connectors/tableau/connect")
@@ -6875,7 +6885,7 @@ def tableau_disconnect_proxy():
 @app.route("/connectors/power_bi")
 @require_login
 def power_bi_page():
-    return render_template("connectors/power_bi.html")
+    return render_ui_template("connectors/power_bi.html")
 
 
 @app.route("/connectors/power_bi/connect")
@@ -6933,7 +6943,7 @@ def power_bi_disconnect_proxy():
 @app.route("/connectors/workday")
 @require_login
 def workday_page():
-    return render_template("connectors/workday.html")
+    return render_ui_template("connectors/workday.html")
 
 
 @app.route("/connectors/workday/connect")
@@ -6991,7 +7001,7 @@ def workday_disconnect_proxy():
 @app.route("/connectors/ebay")
 @require_login
 def ebay_page():
-    return render_template("connectors/ebay.html")
+    return render_ui_template("connectors/ebay.html")
 
 
 @app.route("/connectors/ebay/connect")
@@ -7048,7 +7058,7 @@ def ebay_disconnect_proxy():
 @app.route("/connectors/sendgrid")
 @require_login
 def sendgrid_page():
-    return render_template("connectors/sendgrid.html")
+    return render_ui_template("connectors/sendgrid.html")
 
 
 @app.route("/connectors/sendgrid/connect")
@@ -7104,7 +7114,7 @@ def sendgrid_disconnect_proxy():
 @app.route("/connectors/mixpanel")
 @require_login
 def mixpanel_page():
-    return render_template("connectors/mixpanel.html")
+    return render_ui_template("connectors/mixpanel.html")
 
 @app.route("/connectors/mixpanel/connect")
 @require_login
@@ -7160,7 +7170,7 @@ def mixpanel_disconnect_proxy():
 @app.route("/connectors/monday")
 @require_login
 def monday_page():
-    return render_template("connectors/monday.html")
+    return render_ui_template("connectors/monday.html")
 
 @app.route("/connectors/monday/connect")
 @require_login
@@ -7210,7 +7220,7 @@ def monday_disconnect_proxy():
 @app.route("/connectors/clickup")
 @require_login
 def clickup_page():
-    return render_template("connectors/clickup.html")
+    return render_ui_template("connectors/clickup.html")
 
 @app.route("/connectors/clickup/connect")
 @require_login
@@ -7260,7 +7270,7 @@ def clickup_disconnect_proxy():
 @app.route("/connectors/helpscout")
 @require_login
 def helpscout_page():
-    return render_template("connectors/helpscout.html")
+    return render_ui_template("connectors/helpscout.html")
 
 @app.route("/connectors/helpscout/connect")
 @require_login
@@ -7312,7 +7322,7 @@ def helpscout_disconnect_proxy():
 @app.route("/connectors/looker")
 @require_login
 def looker_page():
-    return render_template("connectors/looker.html")
+    return render_ui_template("connectors/looker.html")
 
 @app.route("/connectors/looker/connect")
 @require_login
@@ -7362,7 +7372,7 @@ def looker_disconnect():
 @app.route("/connectors/superset")
 @require_login
 def superset_page():
-    return render_template("connectors/superset.html")
+    return render_ui_template("connectors/superset.html")
 
 @app.route("/connectors/superset/connect")
 @require_login
@@ -7412,7 +7422,7 @@ def superset_disconnect():
 @app.route("/connectors/azure_blob")
 @require_login
 def azure_blob_page():
-    return render_template("connectors/azure_blob.html")
+    return render_ui_template("connectors/azure_blob.html")
 
 @app.route("/connectors/azure_blob/connect")
 @require_login
@@ -7462,7 +7472,7 @@ def azure_blob_disconnect():
 @app.route("/connectors/datadog")
 @require_login
 def datadog_page():
-    return render_template("connectors/datadog.html")
+    return render_ui_template("connectors/datadog.html")
 
 @app.route("/connectors/datadog/connect")
 @require_login
@@ -7513,7 +7523,7 @@ def datadog_disconnect():
 @app.route("/connectors/okta")
 @require_login
 def okta_page():
-    return render_template("connectors/okta.html")
+    return render_ui_template("connectors/okta.html")
 
 @app.route("/connectors/okta/connect")
 @require_login
@@ -7563,7 +7573,7 @@ def okta_disconnect():
 @app.route("/connectors/auth0")
 @require_login
 def auth0_page():
-    return render_template("connectors/auth0.html")
+    return render_ui_template("connectors/auth0.html")
 
 @app.route("/connectors/auth0/connect")
 @require_login
@@ -7613,7 +7623,7 @@ def auth0_disconnect():
 @app.route("/connectors/cloudflare")
 @require_login
 def cloudflare_page():
-    return render_template("connectors/cloudflare.html")
+    return render_ui_template("connectors/cloudflare.html")
 
 @app.route("/connectors/cloudflare/connect")
 @require_login
@@ -7663,7 +7673,7 @@ def cloudflare_disconnect():
 @app.route("/connectors/sentry")
 @require_login
 def sentry_page():
-    return render_template("connectors/sentry.html")
+    return render_ui_template("connectors/sentry.html")
 
 @app.route("/connectors/sentry/connect")
 @require_login
@@ -7713,7 +7723,7 @@ def sentry_disconnect():
 @app.route("/connectors/quickbooks")
 @require_login
 def quickbooks_page():
-    return render_template("connectors/quickbooks.html")
+    return render_ui_template("connectors/quickbooks.html")
 
 @app.route("/connectors/quickbooks/connect")
 @require_login
@@ -7755,7 +7765,7 @@ def quickbooks_disconnect():
 @app.route("/connectors/xero")
 @require_login
 def xero_page():
-    return render_template("connectors/xero.html")
+    return render_ui_template("connectors/xero.html")
 
 @app.route("/connectors/xero/connect")
 @require_login
@@ -7797,7 +7807,7 @@ def xero_disconnect():
 @app.route("/connectors/amazon_seller")
 @require_login
 def amazon_seller_page():
-    return render_template("connectors/amazon_seller.html")
+    return render_ui_template("connectors/amazon_seller.html")
 
 @app.route("/connectors/amazon_seller/connect")
 @require_login
@@ -7839,7 +7849,7 @@ def amazon_seller_disconnect():
 @app.route("/connectors/newrelic")
 @require_login
 def newrelic_page():
-    return render_template("connectors/newrelic.html")
+    return render_ui_template("connectors/newrelic.html")
 
 @app.route("/connectors/newrelic/sync")
 @require_login
@@ -7869,7 +7879,7 @@ def newrelic_disconnect():
 @app.route("/connectors/openai")
 @require_login
 def openai_page():
-    return render_template("connectors/openai.html")
+    return render_ui_template("connectors/openai.html")
 
 @app.route("/connectors/openai/connect")
 @require_login
@@ -7921,7 +7931,7 @@ def openai_disconnect_proxy():
 @app.route("/connectors/huggingface")
 @require_login
 def huggingface_page():
-    return render_template("connectors/huggingface.html")
+    return render_ui_template("connectors/huggingface.html")
 
 @app.route("/connectors/huggingface/connect")
 @require_login
@@ -7973,7 +7983,7 @@ def huggingface_disconnect_proxy():
 @app.route("/connectors/airflow")
 @require_login
 def airflow_page():
-    return render_template("connectors/airflow.html")
+    return render_ui_template("connectors/airflow.html")
 
 @app.route("/connectors/airflow/connect")
 @require_login
@@ -8025,7 +8035,7 @@ def airflow_disconnect_proxy():
 @app.route("/connectors/kafka")
 @require_login
 def kafka_page():
-    return render_template("connectors/kafka.html")
+    return render_ui_template("connectors/kafka.html")
 
 @app.route("/connectors/kafka/connect")
 @require_login
@@ -8077,7 +8087,7 @@ def kafka_disconnect_proxy():
 @app.route("/connectors/dbt")
 @require_login
 def dbt_page():
-    return render_template("connectors/dbt.html")
+    return render_ui_template("connectors/dbt.html")
 
 
 @app.route("/connectors/dbt/connect")
@@ -8137,7 +8147,7 @@ def dbt_disconnect_proxy():
 @app.route("/connectors/typeform")
 @require_login
 def typeform_page():
-    return render_template("connectors/typeform.html")
+    return render_ui_template("connectors/typeform.html")
 
 
 @app.route("/connectors/typeform/connect")
@@ -8197,7 +8207,7 @@ def typeform_disconnect_proxy():
 @app.route("/connectors/surveymonkey")
 @require_login
 def surveymonkey_page():
-    return render_template("connectors/surveymonkey.html")
+    return render_ui_template("connectors/surveymonkey.html")
 
 
 @app.route("/connectors/surveymonkey/connect")
@@ -8257,7 +8267,7 @@ def surveymonkey_disconnect_proxy():
 @app.route("/connectors/pinecone")
 @require_login
 def pinecone_page():
-    return render_template("connectors/pinecone.html")
+    return render_ui_template("connectors/pinecone.html")
 
 
 @app.route("/connectors/pinecone/connect")
@@ -8316,7 +8326,7 @@ def pinecone_disconnect_proxy():
 @app.route("/connectors/netlify")
 @require_login
 def netlify_page():
-    return render_template("connectors/netlify.html")
+    return render_ui_template("connectors/netlify.html")
 
 
 @app.route("/connectors/netlify/connect")
@@ -8376,7 +8386,7 @@ def netlify_disconnect_proxy():
 @app.route("/connectors/linear")
 @require_login
 def linear_page():
-    return render_template("connectors/linear.html")
+    return render_ui_template("connectors/linear.html")
 
 
 @app.route("/connectors/linear/connect")
@@ -8435,7 +8445,7 @@ def linear_disconnect_proxy():
 @app.route("/connectors/bitbucket")
 @require_login
 def bitbucket_page():
-    return render_template("connectors/bitbucket.html")
+    return render_ui_template("connectors/bitbucket.html")
 
 
 @app.route("/connectors/bitbucket/connect")
@@ -8494,7 +8504,7 @@ def bitbucket_disconnect_proxy():
 @app.route("/connectors/vercel")
 @require_login
 def vercel_page():
-    return render_template("connectors/vercel.html")
+    return render_ui_template("connectors/vercel.html")
 
 
 @app.route("/connectors/vercel/connect")
