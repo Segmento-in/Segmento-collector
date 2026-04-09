@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import datetime
 import json
 import time
@@ -10,7 +10,7 @@ from backend.security.crypto import decrypt_value
 from backend.security.secure_fetch import fetchone_secure
 from backend.destinations.destination_router import push_to_destination
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "whatsapp"
 GRAPH_VERSION = "v25.0"
 GRAPH_BASE = f"https://graph.facebook.com/{GRAPH_VERSION}"

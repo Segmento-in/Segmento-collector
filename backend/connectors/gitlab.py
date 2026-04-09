@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 API = "https://gitlab.com/api/v4"
 

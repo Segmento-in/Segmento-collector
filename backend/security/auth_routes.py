@@ -1,4 +1,4 @@
-﻿from flask import Blueprint, request, jsonify, make_response, redirect
+from flask import Blueprint, request, jsonify, make_response, redirect
 import sqlite3
 import uuid
 import datetime
@@ -11,8 +11,8 @@ from werkzeug.security import check_password_hash
 
 auth = Blueprint("auth", __name__)
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
-UPLOAD_DIR = os.getenv("UPLOAD_DIR", "/tmp/uploads")
+DB = os.getenv("DB_PATH", "identity.db")
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 def get_base_url():

@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import datetime
 import json
@@ -7,7 +7,7 @@ import base64
 import os
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 BASE_URL = "https://oauth.reddit.com"
 TOKEN_URL = "https://www.reddit.com/api/v1/access_token"
 

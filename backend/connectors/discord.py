@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 
 API = "https://discord.com/api/v10"

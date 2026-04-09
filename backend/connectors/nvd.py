@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import os
 import json
@@ -6,7 +6,7 @@ import time
 from datetime import datetime, timedelta
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 BASE = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 
 # DB
@@ -168,7 +168,7 @@ def safe_get(headers, params):
             return r.json()
 
         if r.status_code == 429:
-            print("[NVD] Rate limited → sleeping", flush=True)
+            print("[NVD] Rate limited ? sleeping", flush=True)
             time.sleep(60)
 
     except Exception as e:

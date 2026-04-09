@@ -1,4 +1,4 @@
-﻿import feedparser
+import feedparser
 import sqlite3
 import os
 import datetime
@@ -7,7 +7,7 @@ import urllib.parse
 
 from backend.destinations.destination_router import push_to_destination
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "news"
 
 

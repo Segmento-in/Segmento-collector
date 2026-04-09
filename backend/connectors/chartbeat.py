@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import os
 import datetime
@@ -9,7 +9,7 @@ from backend.security.crypto import encrypt_value, decrypt_value
 from backend.security.secure_fetch import fetchone_secure
 from backend.destinations.destination_router import push_to_destination
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "chartbeat"
 BASE_URL = "https://api.chartbeat.com"
 
@@ -42,7 +42,7 @@ def get_credentials(uid):
 
     api_key  = decrypt_value(row["api_key"])
     host     = decrypt_value(row["scopes"])        # stored in scopes column
-    query_id = row["access_token"]                 # optional — stored in access_token column
+    query_id = row["access_token"]                 # optional � stored in access_token column
     if query_id:
         query_id = decrypt_value(query_id)
 
@@ -149,7 +149,7 @@ def _cb_get(api_key, path, params=None, retries=3):
 
             if r.status_code == 429:
                 wait = 2 ** attempt
-                print(f"[CHARTBEAT] Rate limited. Waiting {wait}s…", flush=True)
+                print(f"[CHARTBEAT] Rate limited. Waiting {wait}s�", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -160,7 +160,7 @@ def _cb_get(api_key, path, params=None, retries=3):
 
             if r.status_code >= 500:
                 wait = 2 ** attempt
-                print(f"[CHARTBEAT] Server error {r.status_code}. Retry in {wait}s…", flush=True)
+                print(f"[CHARTBEAT] Server error {r.status_code}. Retry in {wait}s�", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -192,7 +192,7 @@ def _cb_post(api_key, path, payload=None, retries=3):
 
             if r.status_code == 429:
                 wait = 2 ** attempt
-                print(f"[CHARTBEAT] Rate limited. Waiting {wait}s…", flush=True)
+                print(f"[CHARTBEAT] Rate limited. Waiting {wait}s�", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -203,7 +203,7 @@ def _cb_post(api_key, path, payload=None, retries=3):
 
             if r.status_code >= 500:
                 wait = 2 ** attempt
-                print(f"[CHARTBEAT] Server error {r.status_code}. Retry in {wait}s…", flush=True)
+                print(f"[CHARTBEAT] Server error {r.status_code}. Retry in {wait}s�", flush=True)
                 time.sleep(wait)
                 continue
 
@@ -495,13 +495,13 @@ def sync_chartbeat(uid, sync_type="historical"):
 
     all_rows = []
 
-    # ── 1. Real-time top pages ──────────────────────────────────
+    # -- 1. Real-time top pages ----------------------------------
     top_pages = _fetch_top_pages(api_key, host)
     _insert_top_pages(uid, top_pages)
     all_rows.extend(top_pages)
     print(f"[CHARTBEAT] Top pages fetched: {len(top_pages)}", flush=True)
 
-    # ── 2. Historical page engagement ──────────────────────────
+    # -- 2. Historical page engagement --------------------------
     engagement_rows = []
 
     if sync_type == "historical":
@@ -521,7 +521,7 @@ def sync_chartbeat(uid, sync_type="historical"):
         all_rows.extend(engagement_rows)
         print(f"[CHARTBEAT] Page engagement rows: {len(engagement_rows)}", flush=True)
 
-    # ── 3. Recurring historical queries ────────────────────────
+    # -- 3. Recurring historical queries ------------------------
     recurring_rows = []
     effective_query_id = query_id or state.get("last_query_id")
 
@@ -531,7 +531,7 @@ def sync_chartbeat(uid, sync_type="historical"):
         all_rows.extend(recurring_rows)
         print(f"[CHARTBEAT] Recurring rows: {len(recurring_rows)}", flush=True)
 
-    # ── 4. Video engagement (if video host format detected) ─────
+    # -- 4. Video engagement (if video host format detected) -----
     video_rows = []
     video_host = f"video@{host}"
 
@@ -541,7 +541,7 @@ def sync_chartbeat(uid, sync_type="historical"):
         all_rows.extend(video_rows)
         print(f"[CHARTBEAT] Video rows: {len(video_rows)}", flush=True)
 
-    # ── Push to destination ─────────────────────────────────────
+    # -- Push to destination -------------------------------------
     dest_cfg = get_active_destination(uid)
 
     rows_pushed = 0
@@ -550,7 +550,7 @@ def sync_chartbeat(uid, sync_type="historical"):
     elif not dest_cfg:
         print("[CHARTBEAT] No active destination configured.", flush=True)
 
-    # ── Update state ────────────────────────────────────────────
+    # -- Update state --------------------------------------------
     state["last_sync_date"] = today_str
     if effective_query_id:
         state["last_query_id"] = effective_query_id

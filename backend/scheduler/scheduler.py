@@ -1,4 +1,4 @@
-﻿import time
+import time
 import requests
 import sqlite3
 import datetime
@@ -7,7 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import os
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
+DB_PATH = os.getenv("DB_PATH", "identity.db")
 BASE_URL = os.getenv("BASE_URL", "http://localhost:7860") + "/_backend"
 
 # Prevent overlapping runs
@@ -126,7 +126,7 @@ def run_job(job):
         )
 
         if r.status_code == 200:
-            print(f"[SCHEDULER] {source} sync OK →", r.json(), flush=True)
+            print(f"[SCHEDULER] {source} sync OK ?", r.json(), flush=True)
             mark_job_run(uid, source)
         else:
             print(f"[SCHEDULER] {source} sync FAILED:", r.text, flush=True)

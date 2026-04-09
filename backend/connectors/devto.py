@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import os
 import datetime
@@ -6,7 +6,7 @@ import json
 import time
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 BASE = "https://dev.to/api"
 

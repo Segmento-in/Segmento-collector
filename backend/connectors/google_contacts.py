@@ -1,4 +1,4 @@
-﻿import json
+import json
 import time
 import sqlite3
 import os
@@ -14,7 +14,7 @@ from backend.security.token_manager import ensure_valid_google_token
 
 # ---------------- CONFIG ---------------- #
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "contacts"
 
 

@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import os
 import datetime
@@ -9,7 +9,7 @@ from backend.security.crypto import encrypt_value, decrypt_value
 from backend.security.secure_fetch import fetchone_secure
 from backend.destinations.destination_router import push_to_destination
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "socialinsider"
 BASE_URL = "https://api.socialinsider.io"
 

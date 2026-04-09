@@ -7,7 +7,7 @@ from backend.security.secure_fetch import fetchone_secure
 from backend.security.crypto import encrypt_value
 from backend.destinations.destination_router import push_to_destination
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "aws_rds"
 
 # MySQL-family engines

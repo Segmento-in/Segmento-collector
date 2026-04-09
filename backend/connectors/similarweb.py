@@ -12,7 +12,7 @@ from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "similarweb"
 API_BASE = "https://api.similarweb.com"
 DEFAULT_LIMIT = 100

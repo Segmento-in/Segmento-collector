@@ -1,4 +1,4 @@
-﻿import json
+import json
 import sqlite3
 import os
 import time
@@ -16,7 +16,7 @@ from google.api_core.exceptions import (
 from backend.security.secure_fetch import fetchone_secure
 from backend.destinations.destination_router import push_to_destination
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "bigquery"
 
 

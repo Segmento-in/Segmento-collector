@@ -10,7 +10,7 @@ from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "ebay"
 ORDERS_SOURCE = "ebay_orders"
 LISTINGS_SOURCE = "ebay_listings"

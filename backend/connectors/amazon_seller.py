@@ -9,7 +9,7 @@ from flask import redirect, request, jsonify
 # -------------------------------
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
+DB_PATH = os.getenv("DB_PATH", "identity.db")
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)

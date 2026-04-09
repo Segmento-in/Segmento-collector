@@ -18,7 +18,7 @@ import sqlite3
 import os
 import datetime
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 def resolve_destination_format(dest_cfg, source):
 

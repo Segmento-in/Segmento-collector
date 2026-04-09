@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import os
 import time
@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 BASE = "https://en.wikipedia.org/w/api.php"
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 
 HEADERS = {

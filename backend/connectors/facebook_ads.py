@@ -1,11 +1,11 @@
-﻿import requests
+import requests
 import datetime
 import json
 import time
 import sqlite3
 import os
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 GRAPH_VERSION = "v19.0"
 GRAPH_BASE = f"https://graph.facebook.com/{GRAPH_VERSION}"
 
@@ -242,7 +242,7 @@ def sync_facebook_ads(uid, sync_type="historical"):
         params = None
 
     # ------------------------------------------------
-    # 4️⃣ INSIGHTS (AD LEVEL)
+    # 4?? INSIGHTS (AD LEVEL)
     # ------------------------------------------------
 
     url = f"{GRAPH_BASE}/{ad_account_id}/insights"

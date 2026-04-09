@@ -4,7 +4,7 @@ import json
 import uuid
 import datetime
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 def init_sync_db():
     try:

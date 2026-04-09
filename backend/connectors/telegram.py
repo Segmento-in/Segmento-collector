@@ -1,10 +1,10 @@
-﻿import requests
+import requests
 import sqlite3
 import datetime
 import json
 import os
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 BASE = "https://api.telegram.org"
 
 

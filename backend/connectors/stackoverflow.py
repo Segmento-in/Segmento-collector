@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import datetime
 import json
@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 API = "https://api.stackexchange.com/2.3"
 

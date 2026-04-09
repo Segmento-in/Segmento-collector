@@ -13,7 +13,7 @@ from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "outbrain"
 LOGIN_URL = "https://api.outbrain.com/amplify/v0.1/login"
 API_BASE = "https://api.outbrain.com/amplify/v0.1"

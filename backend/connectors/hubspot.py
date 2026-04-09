@@ -11,7 +11,7 @@ from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "hubspot"
 CONTACTS_SOURCE = "hubspot_contacts"
 COMPANIES_SOURCE = "hubspot_companies"

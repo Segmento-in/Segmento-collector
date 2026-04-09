@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import datetime
 import json
@@ -8,7 +8,7 @@ from backend.destinations.destination_router import push_to_destination
 
 load_dotenv()
 SOURCE = "books"
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 API_KEY = os.getenv("GOOGLE_API_KEY")
 

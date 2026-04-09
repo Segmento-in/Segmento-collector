@@ -1,4 +1,4 @@
-﻿import sqlite3
+import sqlite3
 import os
 import json
 import datetime
@@ -11,7 +11,7 @@ from backend.destinations.destination_router import push_to_destination
 from backend.security.token_manager import ensure_valid_google_token
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "youtube"
 
 

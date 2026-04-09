@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import os
 import datetime
@@ -8,7 +8,7 @@ import time
 from backend.destinations.destination_router import push_to_destination
 
 SOURCE = "webfonts"
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 WEBFONTS_URL = "https://webfonts.googleapis.com/v1/webfonts"
 
 

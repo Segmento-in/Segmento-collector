@@ -1,4 +1,4 @@
-﻿from pytrends.request import TrendReq
+from pytrends.request import TrendReq
 from pytrends.exceptions import TooManyRequestsError
 
 import sqlite3
@@ -8,7 +8,7 @@ import json
 import random
 import time
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 def clean_pandas(obj):
 

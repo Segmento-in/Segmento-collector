@@ -7,7 +7,7 @@ from backend.security.crypto import decrypt_value
 
 load_dotenv()
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 AUTH_URL="https://www.pinterest.com/oauth/"
 TOKEN_URL="https://api.pinterest.com/v5/oauth/token"

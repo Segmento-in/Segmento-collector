@@ -1,11 +1,11 @@
-﻿import requests
+import requests
 import sqlite3
 import datetime
 import json
 import os
 import time
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 GRAPH_BASE = "https://graph.facebook.com/v19.0"
 
 

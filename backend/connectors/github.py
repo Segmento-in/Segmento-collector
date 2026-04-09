@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import datetime
 import json
@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from backend.destinations.destination_router import push_to_destination
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "github"
 
 API = "https://api.github.com"

@@ -3,6 +3,8 @@ import logging
 import importlib
 import inspect
 import re
+import base64
+import hashlib
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -38,18 +40,7 @@ from google_auth_oauthlib.flow import Flow
 from backend.scheduler.scheduler import start_scheduler
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-REAL_DB = os.getenv("DB_PATH", "/tmp/identity.db")
-
-_original_sqlite_connect = sqlite3.connect
-
-def fixed_connect(db_path, *args, **kwargs):
-
-    if isinstance(db_path, str) and db_path.endswith("identity.db"):
-        db_path = REAL_DB
-
-    return _original_sqlite_connect(db_path, *args, **kwargs)
-
-sqlite3.connect = fixed_connect
+DB_PATH = os.getenv("DB_PATH", "identity.db")
 
 # AI
 from backend.ai.intent_engine import detect_intent
@@ -75,6 +66,48 @@ def get_base_url():
     Prioritizes BASE_URL environment variable, falls back to request.host_url.
     """
     return os.getenv("BASE_URL", request.host_url.rstrip("/"))
+
+
+# Temporary PKCE verifier storage for Google OAuth callback exchange.
+# Keyed by user/session/source so the verifier survives the redirect.
+_GOOGLE_PKCE_STORE = {}
+_GOOGLE_PKCE_TTL_SECONDS = 900
+
+
+def _google_pkce_key(uid: str, source: str, session_id: str | None) -> str:
+    return f"{uid}:{source}:{session_id or 'no-session'}"
+
+
+def _google_generate_pkce_pair() -> tuple[str, str]:
+    verifier = secrets.token_urlsafe(64)
+    digest = hashlib.sha256(verifier.encode("ascii")).digest()
+    challenge = base64.urlsafe_b64encode(digest).decode("ascii").rstrip("=")
+    return verifier, challenge
+
+
+def _google_store_pkce(uid: str, source: str, session_id: str | None, verifier: str) -> None:
+    now = time.time()
+    # Lightweight cleanup of expired entries.
+    expired_keys = [
+        k for k, v in _GOOGLE_PKCE_STORE.items()
+        if (now - v.get("created_at", 0)) > _GOOGLE_PKCE_TTL_SECONDS
+    ]
+    for k in expired_keys:
+        _GOOGLE_PKCE_STORE.pop(k, None)
+
+    _GOOGLE_PKCE_STORE[_google_pkce_key(uid, source, session_id)] = {
+        "verifier": verifier,
+        "created_at": now,
+    }
+
+
+def _google_pop_pkce(uid: str, source: str, session_id: str | None) -> str | None:
+    rec = _GOOGLE_PKCE_STORE.pop(_google_pkce_key(uid, source, session_id), None)
+    if not rec:
+        return None
+    if (time.time() - rec.get("created_at", 0)) > _GOOGLE_PKCE_TTL_SECONDS:
+        return None
+    return rec.get("verifier")
 
 
 
@@ -514,7 +547,7 @@ def load_logged_user():
     if not session_id:
         return
 
-    con = sqlite3.connect(REAL_DB)
+    con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
 
     cur.execute("""
@@ -644,12 +677,12 @@ def me():
 
 app.register_blueprint(auth)
 
-UPLOAD_FOLDER = os.getenv("UPLOAD_DIR", "/tmp/uploads")
+UPLOAD_FOLDER = os.getenv("UPLOAD_DIR", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# ✓ CHANGED: Use absolute path to root database, not relative "identity.db"
-DB = REAL_DB
-
+# Database path from environment (local default: identity.db)
+DB = DB_PATH
+sqlite3.connect(DB).close()
 
 # ---------------- GOOGLE CONFIG ----------------
 
@@ -707,7 +740,7 @@ GOOGLE_CLIENT_CONFIG = {
 
 #-------------Helper Fucntion---------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
+DB_PATH = os.getenv("DB_PATH", "identity.db")
 def get_db():
 
     con = sqlite3.connect(
@@ -4574,10 +4607,16 @@ def google_connect():
         redirect_uri=get_base_url() + "/oauth/callback"
     )
 
+    session_id = request.cookies.get("segmento_session")
+    code_verifier, code_challenge = _google_generate_pkce_pair()
+    _google_store_pkce(uid, source, session_id, code_verifier)
+
     auth_url, state = flow.authorization_url(
         access_type="offline",
         prompt="consent",
         include_granted_scopes="true",
+        code_challenge=code_challenge,
+        code_challenge_method="S256",
         state=source
     )
 
@@ -4736,9 +4775,16 @@ def unified_oauth_callback():
         redirect_uri=get_base_url() + "/oauth/callback"
     )
 
+    session_id = request.cookies.get("segmento_session")
+    code_verifier = _google_pop_pkce(uid, source, session_id)
+    if not code_verifier:
+        con.close()
+        return "Missing PKCE code_verifier. Please reconnect Google and try again.", 400
+
     flow.fetch_token(
         code=code,
-        include_client_id=True
+        include_client_id=True,
+        code_verifier=code_verifier
     )
 
     creds = flow.credentials
@@ -12832,7 +12878,7 @@ def discourse_topics():
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
 
-    con = sqlite3.connect(REAL_DB)
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -12859,7 +12905,7 @@ def discourse_categories():
     if not uid:
         return jsonify({"error": "Unauthorized"}), 401
 
-    con = sqlite3.connect(REAL_DB)
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 

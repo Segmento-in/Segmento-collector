@@ -12,7 +12,7 @@ from backend.destinations.destination_router import push_to_destination
 from backend.security.crypto import encrypt_value
 from backend.security.secure_fetch import fetchone_secure
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 SOURCE = "dynamodb"
 TABLES_SOURCE = "dynamodb_tables"
 DATA_SOURCE = "dynamodb_data"

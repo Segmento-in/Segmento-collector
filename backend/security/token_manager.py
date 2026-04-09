@@ -1,4 +1,4 @@
-﻿import sqlite3
+import sqlite3
 import os
 from datetime import datetime, timezone
 
@@ -10,7 +10,7 @@ from backend.security.secure_db import decrypt_payload
 from backend.security.secure_db import encrypt_payload
 
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 SOURCE_ALIASES = {
     "search_console": "search-console"

@@ -1,4 +1,4 @@
-﻿import requests
+import requests
 import sqlite3
 import os
 import datetime
@@ -9,7 +9,7 @@ from backend.destinations.destination_router import push_to_destination
 
 
 SOURCE = "pagespeed"
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 BASE_URL = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
 
@@ -119,7 +119,7 @@ def fetch_pagespeed(url, strategy, categories, api_key):
 
             if r.status_code == 429:
                 wait = 5 * (attempt + 1)
-                print(f"[PageSpeed] Rate limited → retry {wait}s", flush=True)
+                print(f"[PageSpeed] Rate limited ? retry {wait}s", flush=True)
                 time.sleep(wait)
                 continue
 

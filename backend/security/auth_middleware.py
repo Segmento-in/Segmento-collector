@@ -1,8 +1,8 @@
-﻿from flask import request, g, redirect
+from flask import request, g, redirect
 import sqlite3
 import os
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 
 def get_db():

@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 INSTANCE=os.getenv("MASTODON_INSTANCE","https://mastodon.social")
 
 HEADERS={"User-Agent":"SegmentoCollector/1.0"}

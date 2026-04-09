@@ -1,4 +1,4 @@
-﻿import sqlite3
+import sqlite3
 import os
 import json
 import datetime
@@ -8,7 +8,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from backend.security.token_manager import ensure_valid_google_token
 
-DB = os.getenv("DB_PATH", "/tmp/identity.db")
+DB = os.getenv("DB_PATH", "identity.db")
 
 def get_state(uid, source):
 
@@ -370,7 +370,7 @@ def sync_gmail():
 
             except Exception as e:
 
-                # History expired / invalid → fallback
+                # History expired / invalid ? fallback
                 print("[GMAIL] History failed:", e, flush=True)
                 print("[GMAIL] Falling back to full sync", flush=True)
 

@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import os
 import datetime
 
@@ -34,7 +34,7 @@ app.config.update(
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.getenv("DB_PATH", "/tmp/identity.db")
+DB_PATH = os.getenv("DB_PATH", "identity.db")
 
 def copy_auth_cookies(source_response, target_response):
     raw_headers = getattr(getattr(source_response, "raw", None), "headers", None)
