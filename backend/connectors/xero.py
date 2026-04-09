@@ -80,7 +80,11 @@ def callback_xero(uid=None, redirect_uri=None):
     
     if "access_token" in data:
         # Get Tenant ID
-        tenant_res = requests.get("https://api.xero.com/connections", headers={"Authorization": f"Bearer {data['access_token']}"})
+        tenant_res = requests.get(
+            "https://api.xero.com/connections",
+            headers={"Authorization": f"Bearer {data['access_token']}"},
+            timeout=5,
+        )
         tenants = tenant_res.json()
         tenant_id = tenants[0]['tenantId'] if tenants else None
         tenant_name = tenants[0]['tenantName'] if tenants else "Unknown"

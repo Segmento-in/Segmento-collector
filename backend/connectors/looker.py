@@ -179,7 +179,12 @@ def connect_looker(uid: str) -> dict:
             raise Exception("Invalid credentials or Base URL")
         
         # Verify by fetching exactly 1 user
-        res = requests.get(f"{base_url}/users", headers={"Authorization": f"Bearer {token}"}, params={"limit": 1})
+        res = requests.get(
+            f"{base_url}/users",
+            headers={"Authorization": f"Bearer {token}"},
+            params={"limit": 1},
+            timeout=5,
+        )
         res.raise_for_status()
         
     except Exception as exc:

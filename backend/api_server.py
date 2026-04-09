@@ -15380,7 +15380,8 @@ def whatsapp_save_app():
 
     response = requests.get(
         url,
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers={"Authorization": f"Bearer {access_token}"},
+        timeout=5,
     )
 
     if response.status_code != 200:

@@ -7,8 +7,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 import requests
 import sqlite3
+import json
 from functools import wraps
 from werkzeug.middleware.proxy_fix import ProxyFix
+from urllib.parse import urlsplit, urlencode
 
 from flask import (
     Flask,
@@ -39,6 +41,108 @@ IMAGE_BASE_URL = os.getenv(
     "IMAGE_BASE_URL",
     "https://res.cloudinary.com/dqxzfuory/image/upload"
 )
+
+_BACKEND_APP = None
+
+
+def _get_backend_app():
+    global _BACKEND_APP
+    if _BACKEND_APP is None:
+        from backend.api_server import app as backend_app
+        _BACKEND_APP = backend_app
+    return _BACKEND_APP
+
+
+class _BackendLocalResponse:
+    def __init__(self, flask_response):
+        self.status_code = flask_response.status_code
+        self.headers = flask_response.headers
+        self.content = flask_response.get_data()
+        self.text = flask_response.get_data(as_text=True)
+        self.raw = type("RawResponse", (), {"headers": flask_response.headers})()
+
+    def json(self):
+        if not self.text:
+            return {}
+        return json.loads(self.text)
+
+
+class _BackendAwareRequests:
+    def __init__(self, real_requests):
+        self._real = real_requests
+
+    def _extract_internal_path(self, url):
+        if not isinstance(url, str):
+            return None
+
+        if url.startswith("/_backend"):
+            return url[len("/_backend"):] or "/"
+
+        parsed = urlsplit(url)
+        if not parsed.path:
+            return None
+
+        is_localhost = parsed.hostname in {"localhost", "127.0.0.1"}
+        is_backend_path = parsed.path.startswith("/_backend")
+
+        if not (is_localhost or is_backend_path):
+            return None
+
+        path = parsed.path
+        if path.startswith("/_backend"):
+            path = path[len("/_backend"):] or "/"
+
+        if parsed.query:
+            path = f"{path}?{parsed.query}"
+        return path
+
+    def request(self, method, url, **kwargs):
+        internal_path = self._extract_internal_path(url)
+        if internal_path is None:
+            if method.upper() == "GET" and "timeout" not in kwargs:
+                kwargs["timeout"] = 5
+            return self._real.request(method, url, **kwargs)
+
+        backend_app = _get_backend_app()
+        headers = dict(kwargs.pop("headers", {}) or {})
+        cookies = kwargs.pop("cookies", None)
+        params = kwargs.pop("params", None)
+        allow_redirects = kwargs.pop("allow_redirects", True)
+        kwargs.pop("timeout", None)
+
+        if cookies and "Cookie" not in headers:
+            headers["Cookie"] = "; ".join(f"{k}={v}" for k, v in dict(cookies).items())
+
+        if params:
+            query = urlencode(params, doseq=True)
+            internal_path = f"{internal_path}&{query}" if "?" in internal_path else f"{internal_path}?{query}"
+
+        with backend_app.test_client(use_cookies=False) as client:
+            response = client.open(
+                path=internal_path,
+                method=method,
+                headers=headers,
+                data=kwargs.pop("data", None),
+                json=kwargs.pop("json", None),
+                follow_redirects=allow_redirects,
+            )
+
+        return _BackendLocalResponse(response)
+
+    def get(self, url, **kwargs):
+        return self.request("GET", url, **kwargs)
+
+    def post(self, url, **kwargs):
+        return self.request("POST", url, **kwargs)
+
+    def put(self, url, **kwargs):
+        return self.request("PUT", url, **kwargs)
+
+    def delete(self, url, **kwargs):
+        return self.request("DELETE", url, **kwargs)
+
+
+requests = _BackendAwareRequests(requests)
 
 def copy_auth_cookies(source_response, target_response):
     raw_headers = getattr(getattr(source_response, "raw", None), "headers", None)
