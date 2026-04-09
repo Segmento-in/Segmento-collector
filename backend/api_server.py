@@ -17,7 +17,7 @@ os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
 
 import time
 from flask import send_from_directory
-from flask import Flask,request,redirect,make_response,jsonify,render_template_string
+from flask import Flask,request,redirect,make_response,jsonify,render_template_string,session
 import sqlite3,uuid,datetime,os,json
 import secrets
 from flask_cors import CORS
@@ -518,6 +518,7 @@ load_dotenv()
 IST = zoneinfo.ZoneInfo("Asia/Kolkata")
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY")
 app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_SAMESITE="None",
@@ -4618,6 +4619,8 @@ def google_connect():
     session_id = request.cookies.get("segmento_session")
     code_verifier, code_challenge = _google_generate_pkce_pair()
     _google_store_pkce(uid, source, session_id, code_verifier)
+    session["code_verifier"] = code_verifier
+    print("PKCE stored:", session.get("code_verifier"), flush=True)
 
     auth_url, state = flow.authorization_url(
         access_type="offline",
@@ -4789,10 +4792,13 @@ def unified_oauth_callback():
     )
 
     session_id = request.cookies.get("segmento_session")
-    code_verifier = _google_pop_pkce(uid, source, session_id)
+    code_verifier = session.get("code_verifier")
+    print("PKCE retrieved:", code_verifier, flush=True)
+    if not code_verifier:
+        code_verifier = _google_pop_pkce(uid, source, session_id)
     if not code_verifier:
         con.close()
-        return "Missing PKCE code_verifier. Please reconnect Google and try again.", 400
+        return "Missing PKCE code_verifier. Please reconnect Google.", 400
 
     try:
         flow.fetch_token(
@@ -4844,6 +4850,8 @@ def unified_oauth_callback():
 
     finally:
         con.close()
+
+    session.pop("code_verifier", None)
 
     return redirect(
         f"/connectors/{source}"
