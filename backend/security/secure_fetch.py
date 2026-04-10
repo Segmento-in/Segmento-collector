@@ -19,15 +19,19 @@ class SecureRow(dict):
 
 
 def auto_decrypt_row(row):
-
     for k, v in row.items():
-
         if isinstance(v, str) and v.startswith("gAAAAA"):
             try:
-                row[k] = decrypt_value(v)
-            except Exception:
-                import traceback; traceback.print_exc()
-                print('Exception caught', flush=True)
+                decrypted = decrypt_value(v)
+                if decrypted is not None:
+                    row[k] = decrypted
+                else:
+                    # Decryption failed but we handle it safely
+                    import logging
+                    logging.warning(f"Field {k} could not be decrypted - potential key mismatch.")
+            except Exception as e:
+                import logging
+                logging.error(f"Error decrypting field {k}: {str(e)}")
 
     return row
 

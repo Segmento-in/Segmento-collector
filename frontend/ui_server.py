@@ -37,6 +37,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.getenv("DB_PATH", "identity.db")
+SESSION_COOKIE_NAME = "segmento_session"
 IMAGE_BASE_URL = os.getenv(
     "IMAGE_BASE_URL",
     "https://res.cloudinary.com/dqxzfuory/image/upload"

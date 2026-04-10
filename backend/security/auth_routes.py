@@ -234,11 +234,26 @@ def login():
     # DECRYPT STORED PASSWORD
     try:
         stored_hash = decrypt_value(encrypted_hash)
-    except Exception:
+        if stored_hash is None:
+            # This happens if decrypt_value handles the exception and returns None
+            import logging
+            logging.error(f"Decryption failed for user {email} - possible key mismatch.")
+    except Exception as e:
+        import logging
+        logging.error(f"Unexpected error during decryption for user {email}: {str(e)}")
         stored_hash = None
 
     # VERIFY PASSWORD
-    if not stored_hash or not check_password_hash(stored_hash, password):
+    if not stored_hash:
+        con.close()
+        # Still return "invalid" to avoid leaking whether decryption failed vs wrong password
+        return redirect(build_login_redirect(
+            "invalid",
+            next_url=next_url,
+            auth_required=auth_required
+        ))
+
+    if not check_password_hash(stored_hash, password):
         con.close()
         return redirect(build_login_redirect(
             "invalid",
