@@ -518,7 +518,7 @@ load_dotenv()
 IST = zoneinfo.ZoneInfo("Asia/Kolkata")
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
+app.secret_key = os.getenv("SECRET_KEY") or os.getenv("FERNET_KEY") or "segmento_fallback_secret_key_123"
 app.config.update(
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_SAMESITE="None",
@@ -535,8 +535,16 @@ CORS(
 
 from flask import g
 
+_system_initialized = False
+
 @app.before_request
 def load_logged_user():
+    global _system_initialized
+    if not _system_initialized:
+        init_db()
+        seed_test_user()
+        start_scheduler()
+        _system_initialized = True
 
     g.user_id = None
 
@@ -21532,9 +21540,8 @@ def recover_connector_data(source):
         print("[RECOVER ERROR]", e, flush=True)
         return jsonify({"error": str(e)}), 500
 
-init_db()
-seed_test_user()
-start_scheduler()
+# Initialization moved to first request (load_logged_user) to prevent
+# Gunicorn master-process fork SSL-sharing corruption.
 
 if __name__=="__main__":
     app.run(port=4000,debug=True,host="0.0.0.0",use_reloader=False)
