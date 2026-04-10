@@ -170,26 +170,29 @@ def _update_status(uid: str, status: str):
 
 
 def _set_connection_enabled(uid: str, enabled: bool):
-    con = get_db()
-    cur = con.cursor()
-    cur.execute(
-        """
-        UPDATE google_connections
-        SET enabled=?
-        WHERE uid=? AND source=?
-        """,
-        (1 if enabled else 0, uid, SOURCE),
-    )
-    if cur.rowcount == 0:
+    try:
+        con = get_db()
+        cur = con.cursor()
         cur.execute(
             """
-            INSERT INTO google_connections (uid, source, enabled)
-            VALUES (?, ?, ?)
+            UPDATE google_connections
+            SET enabled=?
+            WHERE uid=? AND source=?
             """,
-            (uid, SOURCE, 1 if enabled else 0),
+            (1 if enabled else 0, uid, SOURCE),
         )
-    con.commit()
-    con.close()
+        if cur.rowcount == 0:
+            cur.execute(
+                """
+                INSERT INTO google_connections (uid, source, enabled)
+                VALUES (?, ?, ?)
+                """,
+                (uid, SOURCE, 1 if enabled else 0),
+            )
+        con.commit()
+        con.close()
+    except Exception as e:
+        pass
 
 
 def save_config(uid: str, access_token: str):
@@ -498,18 +501,23 @@ def sync_hubspot(uid: str, sync_type: str = "incremental") -> dict:
 
 
 def disconnect_hubspot(uid: str) -> dict:
-    _set_connection_enabled(uid, False)
-    _update_status(uid, "disconnected")
-    _log(f"Disconnected uid={uid}")
-    return {"status": "disconnected"}
 
+    try:
+        _set_connection_enabled(uid, False)
+        _update_status(uid, "disconnected")
+        _log(f"Disconnected uid={uid}")
+        return {"status": "success"}
+    
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return {"status": "error", "message": str(e)}
 
 def _get_active_destination(uid: str) -> dict | None:
     con = get_db()
     cur = con.cursor()
     cur.execute(
         """
-        SELECT dest_type, host, port, username, password, database_name
+        SELECT dest_type, host, port, username, password, database_name, format
         FROM destination_configs
         WHERE uid=? AND source=? AND is_active=1
         LIMIT 1
@@ -523,11 +531,12 @@ def _get_active_destination(uid: str) -> dict | None:
         return None
 
     return {
-        "type": row["dest_type"],
-        "host": row["host"],
-        "port": row["port"],
-        "username": row["username"],
-        "password": row["password"],
-        "database_name": row["database_name"],
+        "type": row.get("dest_type"),
+        "host": row.get("host"),
+        "port": row.get("port"),
+        "username": row.get("username"),
+        "password": row.get("password"),
+        "database_name": row.get("database_name"),
+        "format": row.get("format")
     }
 

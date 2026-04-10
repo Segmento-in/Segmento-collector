@@ -25,10 +25,13 @@ def auto_decrypt_row(row):
                 decrypted = decrypt_value(v)
                 if decrypted is not None:
                     row[k] = decrypted
+                    # We avoid logging plaintext, but we log the successful decryption operation.
+                    import logging
+                    logging.info(f"[CRYPTO] Successfully decrypted field: {k}")
                 else:
                     # Decryption failed but we handle it safely
                     import logging
-                    logging.warning(f"Field {k} could not be decrypted - potential key mismatch.")
+                    logging.warning(f"[CRYPTO FAIL] Field {k} could not be decrypted - potential key mismatch.")
             except Exception as e:
                 import logging
                 logging.error(f"Error decrypting field {k}: {str(e)}")

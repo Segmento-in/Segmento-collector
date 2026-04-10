@@ -11,7 +11,6 @@ from backend.destinations.mongodb_writer import push_mongodb
 from backend.destinations.elasticsearch_writer import push_elasticsearch
 from backend.destinations.duckdb_writer import push_duckdb
 from backend.destinations.gcs_writer import push_gcs
-from backend.security.secure_db import decrypt_payload
 from flask import g, has_request_context
 
 import sqlite3
@@ -33,10 +32,11 @@ def validate_destination(dest):
         if not dest.get("password"):
             raise Exception("BigQuery requires service account JSON")
 
-    if dest_type == "postgres":
         if not dest.get("host"):
+            print("[ROUTER VALIDATION] Postgres host missing", flush=True)
             raise Exception("Postgres host missing")
 
+    print(f"[ROUTER VALIDATION] OK - Destination type: {dest_type}", flush=True)
     return dest
 
 
@@ -80,10 +80,8 @@ def push_to_destination(dest_cfg, source, rows, skip_storage=False):
         return 0
 
     dest_cfg = validate_destination(dest_cfg)
-
-    # FORCE DECRYPT DESTINATION CONFIG
-    dest_cfg = decrypt_payload(dict(dest_cfg))
-    dest_cfg = validate_destination(dest_cfg)
+    
+    print(f"[ROUTER START] destination={source} | skip_storage={skip_storage}", flush=True)
 
     # CENTRAL FORMAT RESOLUTION
     dest_cfg = resolve_destination_format(dest_cfg, source)

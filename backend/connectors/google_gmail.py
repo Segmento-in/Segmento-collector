@@ -472,7 +472,7 @@ def sync_gmail():
 
 
         cur.execute("""
-            SELECT dest_type, host, port, username, password, database_name
+            SELECT dest_type, host, port, username, password, database_name, format
             FROM destination_configs
             WHERE uid=? AND source='gmail' AND is_active=1
             LIMIT 1

@@ -84,8 +84,11 @@ def _update_status(uid: str, status: str):
 
 
 def _set_connection_enabled(uid: str, enabled: bool):
-    con = get_db()
-    cur = con.cursor()
+    try:
+        con = get_db()
+        cur = con.cursor()
+    except Exception as e:
+        pass
 
     cur.execute(
         """
@@ -226,11 +229,17 @@ def connect_bigquery(uid: str):
 
 
 def disconnect_bigquery(uid: str):
-    """
-    Disable connector for this user.
-    """
-    _set_connection_enabled(uid, False)
-    _update_status(uid, "disconnected")
+
+    try:
+        """
+        Disable connector for this user.
+        """
+        _set_connection_enabled(uid, False)
+        _update_status(uid, "disconnected")
+        return {"status": "success"}
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return {"status": "error", "message": str(e)}
 
 def normalize_bigquery_row(row):
     """

@@ -77,16 +77,19 @@ def _update_status(uid: str, status: str):
 
 
 def _set_connection_enabled(uid: str, enabled: bool):
-    con = get_db()
-    cur = con.cursor()
-    cur.execute(
-        """
-        UPDATE google_connections
-        SET enabled=?
-        WHERE uid=? AND source=?
-        """,
-        (1 if enabled else 0, uid, SOURCE),
-    )
+    try:
+        con = get_db()
+        cur = con.cursor()
+        cur.execute(
+            """
+            UPDATE google_connections
+            SET enabled=?
+            WHERE uid=? AND source=?
+            """,
+            (1 if enabled else 0, uid, SOURCE),
+        )
+    except Exception as e:
+        pass
 
     if cur.rowcount == 0:
         cur.execute(
@@ -365,18 +368,23 @@ def sync_dynamodb(uid: str, sync_type: str = "incremental") -> dict:
 
 
 def disconnect_dynamodb(uid: str) -> dict:
-    _set_connection_enabled(uid, False)
-    _update_status(uid, "disconnected")
-    _log(f"Disconnected uid={uid}")
-    return {"status": "disconnected"}
 
+    try:
+        _set_connection_enabled(uid, False)
+        _update_status(uid, "disconnected")
+        _log(f"Disconnected uid={uid}")
+        return {"status": "success"}
+    
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return {"status": "error", "message": str(e)}
 
 def _get_active_destination(uid: str) -> dict | None:
     con = get_db()
     cur = con.cursor()
     cur.execute(
         """
-        SELECT dest_type, host, port, username, password, database_name
+        SELECT dest_type, host, port, username, password, database_name, format
         FROM destination_configs
         WHERE uid=? AND source=? AND is_active=1
         LIMIT 1

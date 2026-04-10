@@ -89,6 +89,9 @@ def _update_status(uid: str, status: str):
 
 
 def _set_connection_enabled(uid: str, enabled: bool):
+    try:
+    except Exception as e:
+        pass
 
     con = get_db()
     cur = con.cursor()
@@ -434,11 +437,16 @@ def sync_rds(uid: str, sync_type: str = "incremental") -> dict:
 
 
 def disconnect_rds(uid: str) -> dict:
-    """Disable the connector in google_connections and mark status disconnected."""
-    _set_connection_enabled(uid, False)
-    _update_status(uid, "disconnected")
-    _log(f"Disconnected uid={uid}")
-    return {"status": "disconnected"}
+
+    try:
+        """Disable the connector in google_connections and mark status disconnected."""
+        _set_connection_enabled(uid, False)
+        _update_status(uid, "disconnected")
+        _log(f"Disconnected uid={uid}")
+        return {"status": "success"}
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return {"status": "error", "message": str(e)}
 
 def _get_active_destination(uid: str) -> dict | None:
 
@@ -446,7 +454,7 @@ def _get_active_destination(uid: str) -> dict | None:
     cur = con.cursor()
 
     cur.execute("""
-        SELECT dest_type, host, port, username, password, database_name
+        SELECT dest_type, host, port, username, password, database_name, format
         FROM destination_configs
         WHERE uid=? AND source=? AND is_active=1
         LIMIT 1

@@ -112,7 +112,7 @@ def get_active_destination(uid):
     con = get_db()
     cur = con.cursor()
     cur.execute("""
-        SELECT dest_type, host, port, username, password, database_name
+        SELECT dest_type, host, port, username, password, database_name, format
         FROM destination_configs
         WHERE uid=? AND source=? AND is_active=1
         LIMIT 1
@@ -124,12 +124,13 @@ def get_active_destination(uid):
         return None
 
     return {
-        "type":          row["dest_type"],
-        "host":          row["host"],
-        "port":          row["port"],
-        "username":      row["username"],
-        "password":      row["password"],
-        "database_name": row["database_name"],
+        "type": row.get("dest_type"),
+        "host": row.get("host"),
+        "port": row.get("port"),
+        "username": row.get("username"),
+        "password": row.get("password"),
+        "database_name": row.get("database_name"),
+        "format": row.get("format")
     }
 
 
@@ -568,25 +569,31 @@ def sync_chartbeat(uid, sync_type="historical"):
 
 
 def disconnect_chartbeat(uid):
-    con = get_db()
-    cur = con.cursor()
 
-    cur.execute("""
-        UPDATE google_connections
-        SET enabled=0
-        WHERE uid=? AND source='chartbeat'
-    """, (uid,))
-
-    cur.execute("""
-        DELETE FROM chartbeat_connections
-        WHERE uid=?
-    """, (uid,))
-
-    cur.execute("""
-        UPDATE connector_configs
-        SET status='disconnected'
-        WHERE uid=? AND connector='chartbeat'
-    """, (uid,))
-
-    con.commit()
-    con.close()
+    try:
+        con = get_db()
+        cur = con.cursor()
+    
+        cur.execute("""
+            UPDATE google_connections
+            SET enabled=0
+            WHERE uid=? AND source='chartbeat'
+        """, (uid,))
+    
+        cur.execute("""
+            DELETE FROM chartbeat_connections
+            WHERE uid=?
+        """, (uid,))
+    
+        cur.execute("""
+            UPDATE connector_configs
+            SET status='disconnected'
+            WHERE uid=? AND connector='chartbeat'
+        """, (uid,))
+    
+        con.commit()
+        con.close()
+        return {"status": "success"}
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return {"status": "error", "message": str(e)}

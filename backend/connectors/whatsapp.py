@@ -317,7 +317,7 @@ def sync_whatsapp(uid=None, sync_type="historical"):
         cur = con.cursor()
 
         cur.execute("""
-        SELECT dest_type, host, port, username, password, database_name
+        SELECT dest_type, host, port, username, password, database_name, format
         FROM destination_configs
         WHERE uid=? AND source=? AND is_active=1
         LIMIT 1
@@ -330,13 +330,14 @@ def sync_whatsapp(uid=None, sync_type="historical"):
             return None
 
         return {
-            "type": row["dest_type"],
-            "host": row["host"],
-            "port": row["port"],
-            "username": row["username"],
-            "password": row["password"],
-            "database_name": row["database_name"]
-        }
+        "type": row.get("dest_type"),
+        "host": row.get("host"),
+        "port": row.get("port"),
+        "username": row.get("username"),
+        "password": row.get("password"),
+        "database_name": row.get("database_name"),
+        "format": row.get("format")
+    }
 
     dest_cfg = get_active_destination(uid)
 
@@ -348,16 +349,23 @@ def sync_whatsapp(uid=None, sync_type="historical"):
     return len(all_rows)
 
 def disconnect_whatsapp(uid):
-    con = get_db()
-    cur = con.cursor()
-    # Remove connection
-    cur.execute("DELETE FROM whatsapp_connections WHERE uid=?", (uid,))
-    # Remove job
-    cur.execute("DELETE FROM connector_jobs WHERE uid=? AND source='whatsapp'", (uid,))
-    # Disable connector initialization
-    cur.execute("UPDATE google_connections SET enabled=0 WHERE uid=? AND source='whatsapp'", (uid,))
-    # Remove state
-    cur.execute("DELETE FROM connector_state WHERE uid=? AND source='whatsapp'", (uid,))
+
+    try:
+        con = get_db()
+        cur = con.cursor()
+        # Remove connection
+        cur.execute("DELETE FROM whatsapp_connections WHERE uid=?", (uid,))
+        # Remove job
+        cur.execute("DELETE FROM connector_jobs WHERE uid=? AND source='whatsapp'", (uid,))
+        # Disable connector initialization
+        cur.execute("UPDATE google_connections SET enabled=0 WHERE uid=? AND source='whatsapp'", (uid,))
+        # Remove state
+        cur.execute("DELETE FROM connector_state WHERE uid=? AND source='whatsapp'", (uid,))
+        
+        con.commit()
+        con.close()
     
-    con.commit()
-    con.close()
+        return {"status": "success"}
+    except Exception as e:
+        import traceback; traceback.print_exc()
+        return {"status": "error", "message": str(e)}

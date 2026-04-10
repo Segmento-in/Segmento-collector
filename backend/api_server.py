@@ -15225,19 +15225,28 @@ def get_destination(uid, source):
 
 def get_active_destination(uid, source):
     con = get_db()
-    # con.row_factory = sqlite3.Row  # Remove this; auto_decrypt_row handles dict conversion
     cur = con.cursor()
     cur.execute("""
-        SELECT *
+        SELECT dest_type, host, port, username, password, database_name, format
         FROM destination_configs
         WHERE uid=? AND source=? AND is_active=1
         LIMIT 1
     """, (uid, source))
-    row = fetchone_secure(cur)  # Already dict
+    row = fetchone_secure(cur)
     con.close()
+    
     if not row:
         return None
-    return row  # No need for dict(row); it's already a dict
+        
+    return {
+        "type": row.get("dest_type"),
+        "host": row.get("host"),
+        "port": row.get("port"),
+        "username": row.get("username"),
+        "password": row.get("password"),
+        "database_name": row.get("database_name"),
+        "format": row.get("format")
+    }
 
 # ---------- GA4 STATUS (FINAL) ----------
 
@@ -21519,8 +21528,6 @@ def recover_connector_data(source):
         
         if not dest_cfg:
             return jsonify({"error": "No active destination configured"}), 400
-            
-        dest_cfg["type"] = dest_cfg.get("dest_type")
             
         total_pushed = 0
         batches = 0

@@ -88,7 +88,7 @@ def get_active_destination(uid):
     cur = con.cursor()
 
     cur.execute("""
-        SELECT dest_type, host, port, username, password, database_name
+        SELECT dest_type, host, port, username, password, database_name, format
         FROM destination_configs
         WHERE uid=? AND source=? AND is_active=1
         ORDER BY id DESC
