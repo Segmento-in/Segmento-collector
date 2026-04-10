@@ -951,6 +951,7 @@
     </style>
 
     <script>
+  /* UI-DISCONNECT-FIX-v1 */
       document.addEventListener("DOMContentLoaded", () => {
         checkQuickBooksStatus();
         loadDestinations();
@@ -1034,7 +1035,11 @@
         const form = document.getElementById("credentialsForm");
         const success = document.getElementById("successState");
 
-        if (step >= 1) {
+        // PATCH: ensure successState is hidden when not fully connected
+    if (success) { success.classList.add("hidden"); success.classList.remove("opacity-100"); }
+    if (form) { form.classList.remove("opacity-0", "hidden"); }
+
+    if (step >= 1) {
           s1.className = "w-8 h-8 rounded-full bg-[#2CA01C] text-slate-900 dark:text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
           s1.innerHTML = "✓";
           s2.className = "w-8 h-8 rounded-full bg-[#2CA01C] text-slate-900 dark:text-white flex items-center justify-center text-xs font-bold transition-all duration-300";

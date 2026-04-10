@@ -635,6 +635,7 @@
 </style>
 
 <script>
+  /* UI-DISCONNECT-FIX-v1 */
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("saveCredsBtn").onclick = saveCredentials;
 
@@ -756,6 +757,10 @@
       success.classList.remove("opacity-100");
     }
 
+    // PATCH: ensure successState is hidden when not fully connected
+    if (success) { success.classList.add("hidden"); success.classList.remove("opacity-100"); }
+    if (form) { form.classList.remove("opacity-0", "hidden"); }
+
     if (step >= 1) {
       s1.className = "w-8 h-8 rounded-full bg-emerald-500 text-slate-900 dark:text-white flex items-center justify-center text-xs font-bold transition-all duration-300";
       s1.innerHTML = "✓";
@@ -826,8 +831,15 @@
       const res =
         await fetch("/connectors/pinterest/disconnect");
       if (res.ok) {
-        alert("Connection revoked.");
-        location.reload();
+        // Re-fetch status so UI swaps without full reload
+        const statusFnName = Object.keys(window).find(k =>
+          k.startsWith("check") && k.toLowerCase().includes("status") && typeof window[k] === "function"
+        );
+        if (statusFnName) {
+          await window[statusFnName]();
+        } else {
+          location.reload();
+        }
       }
       else {
         alert("Failed to disconnect.");
