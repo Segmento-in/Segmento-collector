@@ -6122,7 +6122,7 @@ def airtable_save_app_proxy():
 @require_login
 def airtable_disconnect_proxy():
     r = connector_disconnect("airtable")
-    return jsonify(r)
+    return safe_backend_json_response(r, include_status=True)
 
 
 # ================= ZENDESK ========================

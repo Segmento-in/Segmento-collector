@@ -16978,6 +16978,14 @@ def _notion_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'notion'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
 
     con = get_db()
     cur = con.cursor()
@@ -17148,6 +17156,14 @@ def hubspot_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'hubspot'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
 
     con = get_db()
     cur = con.cursor()
@@ -17481,6 +17497,14 @@ def _shopify_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'shopify'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
 
     con = get_db()
     cur = con.cursor()
@@ -17784,6 +17808,14 @@ def airtable_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'airtable'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
 
     con = get_db()
     cur = con.cursor()
@@ -17960,6 +17992,14 @@ def pipedrive_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'pipedrive'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
  
     con = get_db()
     cur = con.cursor()
@@ -18132,6 +18172,14 @@ def freshdesk_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'freshdesk'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
  
     con = get_db()
     cur = con.cursor()
@@ -18306,6 +18354,14 @@ def klaviyo_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'klaviyo'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
  
     con = get_db()
     cur = con.cursor()
@@ -18478,6 +18534,14 @@ def amplitude_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'amplitude'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
  
     con = get_db()
     cur = con.cursor()
@@ -18640,6 +18704,14 @@ def salesforce_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'salesforce'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_salesforce(uid, sync_type))
 
@@ -18717,6 +18789,14 @@ def jira_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'jira'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_jira(uid, sync_type))
 
@@ -18794,6 +18874,14 @@ def zoho_crm_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'zoho_crm'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_zoho_crm(uid, sync_type))
 
@@ -18871,6 +18959,14 @@ def paypal_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'paypal'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_paypal(uid, sync_type))
 
@@ -18945,6 +19041,14 @@ def asana_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'asana'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_asana(uid, sync_type))
  
@@ -19020,6 +19124,14 @@ def sendgrid_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'sendgrid'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_sendgrid(uid, sync_type))
  
@@ -19098,6 +19210,14 @@ def tableau_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'tableau'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_tableau(uid, sync_type))
 
@@ -19181,6 +19301,14 @@ def power_bi_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'power_bi'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_power_bi(uid, sync_type))
 
@@ -19264,6 +19392,14 @@ def workday_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'workday'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_workday(uid, sync_type))
 
@@ -19347,6 +19483,14 @@ def ebay_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'ebay'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_ebay(uid, sync_type))
 
@@ -19427,6 +19571,14 @@ def mixpanel_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'mixpanel'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_mixpanel(uid, sync_type))
  
@@ -19501,6 +19653,14 @@ def monday_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'monday'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_monday(uid, sync_type))
  
@@ -19576,6 +19736,14 @@ def clickup_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'clickup'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_clickup(uid, sync_type))
  
@@ -19651,6 +19819,14 @@ def helpscout_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'helpscout'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_helpscout(uid, sync_type))
  
@@ -19715,6 +19891,14 @@ def looker_disconnect_api():
 def looker_sync_api():
     uid = get_uid()
     if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'looker'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_looker(uid, sync_type))
 
@@ -19744,6 +19928,14 @@ def superset_disconnect_api():
 def superset_sync_api():
     uid = get_uid()
     if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'superset'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_superset(uid, sync_type))
 
@@ -19773,6 +19965,14 @@ def azure_blob_disconnect_api():
 def azure_blob_sync_api():
     uid = get_uid()
     if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'azure_blob'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_azure_blob(uid, sync_type))
 
@@ -19802,6 +20002,14 @@ def datadog_disconnect_api():
 def datadog_sync_api():
     uid = get_uid()
     if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'datadog'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_datadog(uid, sync_type))
 
@@ -19831,6 +20039,14 @@ def okta_disconnect_api():
 def okta_sync_api():
     uid = get_uid()
     if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'okta'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_okta(uid, sync_type))
 
@@ -19874,6 +20090,14 @@ def auth0_disconnect_api():
 def auth0_sync_api():
     uid = get_uid()
     if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'auth0'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_auth0(uid, sync_type))
 
@@ -19917,6 +20141,14 @@ def cloudflare_disconnect_api():
 def cloudflare_sync_api():
     uid = get_uid()
     if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'cloudflare'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_cloudflare(uid, sync_type))
 
@@ -19960,6 +20192,14 @@ def sentry_disconnect_api():
 def sentry_sync_api():
     uid = get_uid()
     if not uid: return jsonify({"error":"unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'sentry'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_sentry(uid, sync_type))
 
@@ -20154,6 +20394,14 @@ def openai_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'openai'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_openai(uid, sync_type))
  
@@ -20229,6 +20477,14 @@ def huggingface_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'huggingface'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_huggingface(uid, sync_type))
  
@@ -20304,6 +20560,14 @@ def airflow_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'airflow'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_airflow(uid, sync_type))
  
@@ -20379,6 +20643,14 @@ def kafka_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'kafka'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     sync_type = request.args.get("type", "incremental")
     return jsonify(sync_kafka(uid, sync_type))
  
@@ -20465,6 +20737,14 @@ def _dbt_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'dbt'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     con = get_db()
     cur = con.cursor()
     cur.execute(
@@ -20580,6 +20860,14 @@ def _typeform_sync():
         return jsonify({"error": "unauthorized"}), 401
     con = get_db()
     cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'typeform'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
+    con = get_db()
+    cur = con.cursor()
     cur.execute(
         "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='typeform' LIMIT 1",
         (uid,),
@@ -20691,6 +20979,14 @@ def _surveymonkey_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'surveymonkey'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     con = get_db()
     cur = con.cursor()
     cur.execute(
@@ -20806,6 +21102,14 @@ def _pinecone_sync():
         return jsonify({"error": "unauthorized"}), 401
     con = get_db()
     cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'pinecone'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
+    con = get_db()
+    cur = con.cursor()
     cur.execute(
         "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='pinecone' LIMIT 1",
         (uid,),
@@ -20918,6 +21222,14 @@ def _bitbucket_sync():
         return jsonify({"error": "unauthorized"}), 401
     con = get_db()
     cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'bitbucket'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
+    con = get_db()
+    cur = con.cursor()
     cur.execute(
         "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='bitbucket' LIMIT 1",
         (uid,),
@@ -21028,6 +21340,14 @@ def _vercel_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'vercel'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     con = get_db()
     cur = con.cursor()
     cur.execute(
@@ -21146,6 +21466,14 @@ def _netlify_sync():
         return jsonify({"error": "unauthorized"}), 401
     con = get_db()
     cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'netlify'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
+    con = get_db()
+    cur = con.cursor()
     cur.execute(
         "SELECT sync_type FROM connector_jobs WHERE uid=? AND source='netlify' LIMIT 1",
         (uid,),
@@ -21260,6 +21588,14 @@ def _linear_sync():
     uid = get_uid()
     if not uid:
         return jsonify({"error": "unauthorized"}), 401
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT enabled FROM google_connections WHERE uid=? AND source=? LIMIT 1", (uid, 'linear'))
+    conn_row = fetchone_secure(cur)
+    if not conn_row or conn_row.get("enabled") != 1:
+        if con: con.close()
+        return jsonify({"error": "Connector is disabled. Please authorize first.", "status": "disconnected"}), 403
+    
     con = get_db()
     cur = con.cursor()
     cur.execute(
